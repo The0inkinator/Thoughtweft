@@ -1,7 +1,10 @@
 import { Title } from "@solidjs/meta";
+import HeaderDefault from "~/components/layout/headerDefault"
 
 export default function Home() {
-  return (
+  return (<>
 <div>hello</div>
+<HeaderDefault/>
+</>
   );
 }

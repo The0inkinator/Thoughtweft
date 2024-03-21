@@ -22,14 +22,16 @@ export function PlayersProvider(props: any) {
         makePlayersList(list: Player[]) {
           setPlayersList(list);
         },
+
         addPlayerToList(player: Player) {
-          if (player.id) {
+          if (player.name && player.id) {
             const tempPlayerList: Player[] = [...playersList(), player];
-            console.log(tempPlayerList);
+            setPlayersList(tempPlayerList);
           } else {
             console.log("not a player");
           }
         },
+
         editPlayerInList(edit: Player, pos: number) {
           console.log(edit, pos);
         },

@@ -21,14 +21,13 @@ export default function PodBox() {
 
   const addPlayer = () => {
     if (inputValue()) {
-      const newPlayerList: string[] = [...playersInPod(), inputValue()];
-      setPlayersInPod(newPlayerList);
-      console.log(playersInPod());
+      const PlayerName: string = inputValue();
+      const PlayerId: number = playersList().length + 1;
+      const NewPlayer = { name: PlayerName, id: PlayerId };
+      addPlayerToList(NewPlayer);
       setInputValue("");
     }
   };
-
-  addPlayerToList({ name: "hhhello", id: 2 });
 
   return (
     <div class="podBoxContainer">

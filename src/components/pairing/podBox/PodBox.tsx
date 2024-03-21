@@ -1,8 +1,15 @@
 import "./podBox.css";
 import PlayerCard from "../playerCard";
 import { createSignal, For } from "solid-js";
+import { usePlayersContext } from "../../../context/PlayersContext";
 
+//TYPING
+
+//MAIN FUNCTION
 export default function PodBox() {
+  //Context State
+  const [playersState]: any = usePlayersContext();
+  //State
   const [playersInPod, setPlayersInPod] = createSignal<string[]>([
     "Keldan",
     "Aiden",

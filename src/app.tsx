@@ -11,13 +11,13 @@ export default function App() {
       root={(props) => (
         <MetaProvider>
           <Title>Thoughtweft</Title>
-          <Suspense>{props.children}</Suspense>
+          <PlayersProvider playersState={null}>
+            <Suspense>{props.children}</Suspense>
+          </PlayersProvider>
         </MetaProvider>
       )}
     >
-      <PlayersProvider playersState={null}>
-        <FileRoutes />
-      </PlayersProvider>
+      <FileRoutes />
     </Router>
   );
 }

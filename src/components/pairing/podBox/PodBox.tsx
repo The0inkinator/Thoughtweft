@@ -7,6 +7,16 @@ export default function PodBox() {
     "Keldan",
     "Aiden",
   ]);
+  const [inputValue, setInputValue] = createSignal<string>("");
+
+  const addPlayer = () => {
+    if (inputValue()) {
+      const newPlayerList: string[] = [...playersInPod(), inputValue()];
+      setPlayersInPod(newPlayerList);
+      console.log(playersInPod());
+      setInputValue("");
+    }
+  };
 
   return (
     <div class="podBoxContainer">
@@ -22,12 +32,16 @@ export default function PodBox() {
           id="playerNameInput"
           type="text"
           placeholder="Player's Name"
+          value={inputValue()}
+          onInput={(event) => {
+            setInputValue(event.target.value);
+          }}
         ></input>
         <button
           id="playerNameSubmit"
           type="submit"
           onClick={() => {
-            console.log("Hello");
+            addPlayer();
           }}
         ></button>
       </div>

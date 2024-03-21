@@ -1,9 +1,9 @@
-import "./headerDefault.css"
+import "./headerDefault.css";
 
 export default function HeaderDefault() {
-    return (
-        <div class="headerDefaultContainer">
-            <div class="headerDefaultLogo"></div>
-        </div>
-    )
+  return (
+    <div class="headerDefaultContainer">
+      <div class="headerDefaultLogo"></div>
+    </div>
+  );
 }

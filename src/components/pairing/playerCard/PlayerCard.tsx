@@ -1,14 +1,14 @@
-import "./playerCard.css"
+import "./playerCard.css";
 
 interface PlayerCardInputs {
-    name: string
+  name: string;
 }
 
-export default function PlayerCard({name}: PlayerCardInputs) {
-    return (
-        <div class="playerCardContainer">
-            <div class="playerIcon"></div>
-            <div class="playerName">{name}</div>
-        </div>
-    )
+export default function PlayerCard({ name }: PlayerCardInputs) {
+  return (
+    <div class="playerCardContainer">
+      <div class="playerIcon"></div>
+      <div class="playerName">{name}</div>
+    </div>
+  );
 }

@@ -7,7 +7,7 @@ import "./app.css";
 export default function App() {
   return (
     <Router
-      root={props => (
+      root={(props) => (
         <MetaProvider>
           <Title>Thoughtweft</Title>
           <Suspense>{props.children}</Suspense>

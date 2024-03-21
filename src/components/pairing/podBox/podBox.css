@@ -1,10 +1,26 @@
 .podBoxContainer {
-    width: 25rem;
-    height: 30rem;
-    background-color: rgb(73, 73, 110);
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    place-items: center;
-    border-radius: 2rem;
+  background-color: rgb(73, 73, 110);
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  border-radius: 2rem;
+  padding: 3rem;
+}
+
+#playerNameInputContainer {
+  background-color: grey;
+  padding: 0.25rem;
+}
+
+#playerNameInput {
+  color: red;
+}
+
+#playerNameInput::placeholder {
+  color: red;
+}
+
+#playerNameSubmit {
+  width: 1rem;
+  height: 1rem;
 }

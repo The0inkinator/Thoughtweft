@@ -1,1 +1,1 @@
-export {default} from "./PodBox"
+export { default } from "./PodBox";

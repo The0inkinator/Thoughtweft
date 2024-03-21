@@ -1,7 +1,14 @@
 import "./playerCard.css"
 
-export default function PlayerCard() {
+interface PlayerCardInputs {
+    name: string
+}
+
+export default function PlayerCard({name}: PlayerCardInputs) {
     return (
-        <div class="playerCardContainer"></div>
+        <div class="playerCardContainer">
+            <div class="playerIcon"></div>
+            <div class="playerName">{name}</div>
+        </div>
     )
 }

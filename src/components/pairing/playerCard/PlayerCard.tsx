@@ -1,3 +1,4 @@
+import "./playerCard.css"
 
 export default function PlayerCard() {
     return (

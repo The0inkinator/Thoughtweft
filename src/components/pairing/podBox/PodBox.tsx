@@ -8,7 +8,10 @@ import { usePlayersContext } from "../../../context/PlayersContext";
 //MAIN FUNCTION
 export default function PodBox() {
   //Context State
-  const [playersState]: any = usePlayersContext();
+  const [
+    playersList,
+    { editPlayerInList, addPlayerToList, makePlayersList },
+  ]: any = usePlayersContext();
   //State
   const [playersInPod, setPlayersInPod] = createSignal<string[]>([
     "Keldan",
@@ -25,12 +28,14 @@ export default function PodBox() {
     }
   };
 
+  addPlayerToList({ name: "hhhello", id: 2 });
+
   return (
     <div class="podBoxContainer">
-      <For each={playersInPod()}>
-        {(playerName) => (
+      <For each={playersList()}>
+        {(playerObj) => (
           <>
-            <PlayerCard name={playerName} />
+            <PlayerCard name={playerObj.name} />
           </>
         )}
       </For>

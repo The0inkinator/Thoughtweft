@@ -6,6 +6,7 @@ type Record = [number, number, number];
 
 interface Player {
   name: string;
+  id: number;
   pod?: number | null;
   matchRecord?: Record | null;
   eventRecord?: Record | null;
@@ -13,13 +14,24 @@ interface Player {
 
 export function PlayersProvider(props: any) {
   const [playersList, setPlayersList] = createSignal<Player[]>([
-      { name: "Keldan", pod: 1 },
+      { name: "Keldan", id: 1 },
     ]),
     playersState = [
       playersList,
       {
         makePlayersList(list: Player[]) {
           setPlayersList(list);
+        },
+        addPlayerToList(player: Player) {
+          if (player.id) {
+            const tempPlayerList: Player[] = [...playersList(), player];
+            console.log(tempPlayerList);
+          } else {
+            console.log("not a player");
+          }
+        },
+        editPlayerInList(edit: Player, pos: number) {
+          console.log(edit, pos);
         },
       },
     ];

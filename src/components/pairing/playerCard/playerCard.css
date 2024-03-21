@@ -1,5 +1,5 @@
 .playerCardContainer {
-    width: 1rem;
-    height: 1rem;
+    width: 80%;
+    aspect-ratio: 2/1;
     background-color: black;
 }

@@ -1,9 +1,9 @@
 .podBoxContainer {
-    width: 15rem;
-    height: 20rem;
+    width: 20rem;
+    height: 30rem;
     background-color: grey;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(4, 1fr);
-place-items: center;
+    place-items: center;
 }

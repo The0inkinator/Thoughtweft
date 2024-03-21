@@ -1,7 +1,5 @@
 import { createSignal, createContext, useContext } from "solid-js";
 
-const PlayersContext = createContext();
-
 type Record = [number, number, number];
 
 interface Player {
@@ -11,6 +9,15 @@ interface Player {
   matchRecord?: Record | null;
   eventRecord?: Record | null;
 }
+
+// interface PlayerContextValue {
+//   playersList: Player[];
+//   editPlayerInList?: (playerEdits: Player, playerToEdit: Player) => void;
+//   addPlayerToList?: (player: Player) => void;
+//   makePlayerList?: () => void;
+// }
+
+const PlayersContext = createContext();
 
 export function PlayersProvider(props: any) {
   const [playersList, setPlayersList] = createSignal<Player[]>([

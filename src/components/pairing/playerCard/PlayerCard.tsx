@@ -15,8 +15,24 @@ export default function PlayerCard({ name }: PlayerCardInputs) {
   ]: any = usePlayersContext();
   const [cardMode, setCardMode] = createSignal<CardMode>("display");
 
+  const editPlayer = () => {
+    console.log("edit Player");
+  };
+
   return (
-    <div class="playerCardContainer">
+    <div
+      class="playerCardContainer"
+      onClick={() => {
+        setCardMode("edit");
+      }}
+      onFocusIn={() => {
+        setCardMode("edit");
+      }}
+      onFocusOut={() => {
+        editPlayer();
+        setCardMode("display");
+      }}
+    >
       <div class="playerIcon"></div>
 
       <Switch fallback={<div class="playerName">{name}</div>}>
@@ -24,7 +40,7 @@ export default function PlayerCard({ name }: PlayerCardInputs) {
           <div class="playerName">{name}</div>
         </Match>
         <Match when={cardMode() === "edit"}>
-          <input class="editPlayerName"></input>
+          <input class="editPlayerName" value={name}></input>
         </Match>
       </Switch>
     </div>

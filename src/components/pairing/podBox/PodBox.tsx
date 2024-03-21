@@ -36,6 +36,11 @@ export default function PodBox() {
           onInput={(event) => {
             setInputValue(event.target.value);
           }}
+          onKeyPress={(event) => {
+            if (event.key === "Enter") {
+              addPlayer();
+            }
+          }}
         ></input>
         <button
           id="playerNameSubmit"

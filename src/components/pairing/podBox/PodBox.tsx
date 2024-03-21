@@ -13,10 +13,6 @@ export default function PodBox() {
     { editPlayerInList, addPlayerToList, makePlayersList },
   ]: any = usePlayersContext();
   //State
-  const [playersInPod, setPlayersInPod] = createSignal<string[]>([
-    "Keldan",
-    "Aiden",
-  ]);
   const [inputValue, setInputValue] = createSignal<string>("");
 
   const addPlayer = () => {

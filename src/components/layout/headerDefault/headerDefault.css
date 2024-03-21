@@ -1,7 +1,18 @@
 .headerDefaultContainer {
-    
+    width: 100vw;
+    height: 5rem;
+    background-color: rgb(23, 21, 31);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .headerDefaultLogo {
-    
+background-image: url("/logos/twLogoDark.svg");
+background-size: contain;
+background-repeat: no-repeat;
+height: 60%;
+aspect-ratio: 6/1;
+align-self: center;
+
 }

@@ -1,0 +1,47 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+/*CUSTOM FONTS*/
+
+@font-face {
+  font-family: "Modern Sans";
+  src: url("../fonts/ModernSans-Light.otf");
+}
+/*SITEWIDE VALUES*/
+:root {
+  /*Colors*/
+
+  --BackgroundColor: rgb(53, 55, 75);
+
+  /* Fonts & Font Variables */
+  --BodyFont: Modern Sans, Arial, sans-serif;
+  /*Gaps*/
+  --LargeGap: 4rem;
+  --SmallGap: 2rem;
+
+  /*Global Styling*/
+  background-color: var(--BackgroundColor);
+}
+
+/*BREAKPOINT - Desktops - Plus*/
+@media screen and (min-width: 1025px) {
+}
+
+/*BREAKPOINT - Laptops & Tablets*/
+@media screen and (max-width: 1024px) and (min-width: 481px) {
+  :root {
+
+  }
+}
+
+/*BREAKPOINT - Mobile - Minus*/
+@media screen and (max-width: 480px) {
+  :root {
+
+  }
+}

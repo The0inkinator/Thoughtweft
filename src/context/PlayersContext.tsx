@@ -10,13 +10,6 @@ interface Player {
   eventRecord?: Record | null;
 }
 
-// interface PlayerContextValue {
-//   playersList: Player[];
-//   editPlayerInList?: (playerEdits: Player, playerToEdit: Player) => void;
-//   addPlayerToList?: (player: Player) => void;
-//   makePlayerList?: () => void;
-// }
-
 const PlayersContext = createContext();
 
 export function PlayersProvider(props: any) {

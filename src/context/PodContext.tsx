@@ -3,6 +3,7 @@ import { createSignal, createContext, useContext } from "solid-js";
 type Pod = {
   podNumber: number;
   podSize: number;
+  registeredPlayers: number;
   podName?: string;
   cubePlayed?: URL;
 };

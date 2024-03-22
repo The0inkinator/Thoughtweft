@@ -31,7 +31,7 @@ export function PlayersProvider(props: any) {
         },
 
         addPlayerToList(inputName: string, inputId: number) {
-          const NewPlayer = { name: inputName, id: inputId };
+          const NewPlayer = { name: inputName, id: inputId, pod: 1 };
           const tempPlayerList: Player[] = [...playersList(), NewPlayer];
           setPlayersList(tempPlayerList);
         },

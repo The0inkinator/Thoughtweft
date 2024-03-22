@@ -8,18 +8,20 @@ interface PlayerCardInputs {
 
 type CardMode = "display" | "edit";
 
-export default function PlayerCard({ name, id }: PlayerCardInputs) {
+export default function PlayerCard({ id }: PlayerCardInputs) {
   //Context State
   const [playersList, { editPlayerInList, addPlayerToList, makePlayersList }] =
     usePlayersContext();
   //State
   const [cardMode, setCardMode] = createSignal<CardMode>("display");
-  const [playerName, setPlayerName] = createSignal<string>(name);
+  const [playerName, setPlayerName] = createSignal<string>(
+    playersList()[id - 1].name
+  );
 
   const PlayerNameCard = () => {
     return (
       <div class="playerName">
-        {name} {id}
+        {playersList()[id - 1].name} {id}
       </div>
     );
   };

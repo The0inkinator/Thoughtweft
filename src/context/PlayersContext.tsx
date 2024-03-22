@@ -42,9 +42,7 @@ export function PlayersProvider(props: any) {
           const updatePlayer = () => {
             setPlayersList((prevList) => {
               const newList = [...prevList];
-
               newList[idToEdit - 1].name = newName;
-              console.log(newList[idToEdit - 1].name);
               return newList;
             });
           };

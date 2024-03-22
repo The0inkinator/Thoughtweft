@@ -8,10 +8,8 @@ import { usePlayersContext } from "../../../context/PlayersContext";
 //MAIN FUNCTION
 export default function PodBox() {
   //Context State
-  const [
-    playersList,
-    { editPlayerInList, addPlayerToList, makePlayersList },
-  ]: any = usePlayersContext();
+  const [playersList, { editPlayerInList, addPlayerToList, makePlayersList }] =
+    usePlayersContext();
   //State
   const [inputValue, setInputValue] = createSignal<string>("");
 
@@ -19,7 +17,7 @@ export default function PodBox() {
     if (inputValue()) {
       const PlayerName: string = inputValue();
       const PlayerId: number = playersList().length + 1;
-      const NewPlayer = { name: PlayerName, id: PlayerId };
+      const NewPlayer = { name: PlayerName, id: PlayerId, telephone: "Hello" };
       addPlayerToList(NewPlayer);
       setInputValue("");
     }

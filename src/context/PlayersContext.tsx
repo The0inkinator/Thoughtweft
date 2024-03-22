@@ -10,14 +10,23 @@ interface Player {
   eventRecord?: Record | null;
 }
 
-const PlayersContext = createContext();
+type PlayerState = [
+  () => Player[],
+  {
+    makePlayersList: (list: Player[]) => void;
+    addPlayerToList: (player: Player) => void;
+    editPlayerInList: (edit: Player, pos: number) => void;
+  }
+];
+
+const PlayersContext = createContext<PlayerState | undefined>();
 
 export function PlayersProvider(props: any) {
   const [playersList, setPlayersList] = createSignal<Player[]>([
       { name: "Keldan", id: 1 },
     ]),
-    playersState = [
-      playersList,
+    playersState: PlayerState = [
+      () => playersList(),
       {
         makePlayersList(list: Player[]) {
           setPlayersList(list);
@@ -46,5 +55,5 @@ export function PlayersProvider(props: any) {
 }
 
 export function usePlayersContext() {
-  return useContext(PlayersContext);
+  return useContext(PlayersContext)!;
 }

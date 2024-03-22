@@ -22,9 +22,7 @@ type PlayerState = [
 const PlayersContext = createContext<PlayerState | undefined>();
 
 export function PlayersProvider(props: any) {
-  const [playersList, setPlayersList] = createSignal<Player[]>([
-      { name: "Keldan", id: 1 },
-    ]),
+  const [playersList, setPlayersList] = createSignal<Player[]>([]),
     playersState: PlayerState = [
       () => playersList(),
       {

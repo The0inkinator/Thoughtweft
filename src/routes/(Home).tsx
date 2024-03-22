@@ -12,7 +12,6 @@ export default function Home() {
       <HeaderDefault />
       <div class="homePageContainer">
         <PodBox />
-        <TestElement />
       </div>
     </>
   );

@@ -33,5 +33,5 @@ export function TestProvider(props: any) {
 }
 
 export function useTestContext() {
-  return useContext(TestContext)!; // Adding '!' to assert non-null
+  return useContext(TestContext)!;
 }

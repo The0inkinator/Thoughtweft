@@ -13,22 +13,12 @@ export default function PodBox() {
   //State
   const [inputValue, setInputValue] = createSignal<string>("");
 
-  const addPlayer = () => {
-    if (inputValue()) {
-      const PlayerName: string = inputValue();
-      const PlayerId: number = playersList().length + 1;
-      const NewPlayer = { name: PlayerName, id: PlayerId, telephone: "Hello" };
-      addPlayerToList(NewPlayer);
-      setInputValue("");
-    }
-  };
-
   return (
     <div class="podBoxContainer">
       <For each={playersList()}>
         {(playerObj) => (
           <>
-            <PlayerCard name={playerObj.name} />
+            <PlayerCard name={playerObj.name} id={playerObj.id} />
           </>
         )}
       </For>
@@ -43,7 +33,8 @@ export default function PodBox() {
           }}
           onKeyPress={(event) => {
             if (event.key === "Enter") {
-              addPlayer();
+              addPlayerToList(inputValue(), playersList().length + 1);
+              setInputValue("");
             }
           }}
         ></input>
@@ -51,7 +42,8 @@ export default function PodBox() {
           id="playerNameSubmit"
           type="submit"
           onClick={() => {
-            addPlayer();
+            addPlayerToList(inputValue(), playersList().length + 1);
+            setInputValue("");
           }}
         ></button>
       </div>

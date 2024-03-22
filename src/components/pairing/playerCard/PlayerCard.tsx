@@ -3,20 +3,25 @@ import { usePlayersContext } from "../../../context/PlayersContext";
 import { createSignal, Switch, Match } from "solid-js";
 interface PlayerCardInputs {
   name: string;
+  id: number;
 }
 
 type CardMode = "display" | "edit";
 
-export default function PlayerCard({ name }: PlayerCardInputs) {
+export default function PlayerCard({ name, id }: PlayerCardInputs) {
   //Context State
-  const [
-    playersList,
-    { editPlayerInList, addPlayerToList, makePlayersList },
-  ]: any = usePlayersContext();
+  const [playersList, { editPlayerInList, addPlayerToList, makePlayersList }] =
+    usePlayersContext();
+  //State
   const [cardMode, setCardMode] = createSignal<CardMode>("display");
+  const [playerName, setPlayerName] = createSignal<string>(name);
 
-  const editPlayer = () => {
-    console.log("edit Player");
+  const PlayerNameCard = () => {
+    return (
+      <div class="playerName">
+        {name} {id}
+      </div>
+    );
   };
 
   return (
@@ -29,18 +34,37 @@ export default function PlayerCard({ name }: PlayerCardInputs) {
         setCardMode("edit");
       }}
       onFocusOut={() => {
-        editPlayer();
         setCardMode("display");
       }}
     >
       <div class="playerIcon"></div>
 
-      <Switch fallback={<div class="playerName">{name}</div>}>
+      <Switch fallback={<PlayerNameCard />}>
         <Match when={cardMode() === "display"}>
-          <div class="playerName">{name}</div>
+          <PlayerNameCard />
         </Match>
         <Match when={cardMode() === "edit"}>
-          <input class="editPlayerName" value={name}></input>
+          <input
+            class="editPlayerName"
+            value={playerName()}
+            onInput={(event) => {
+              setPlayerName(event.target.value);
+            }}
+            onKeyPress={(event) => {
+              if (event.key === "Enter") {
+                editPlayerInList(id, playerName());
+                setCardMode("display");
+              }
+            }}
+          ></input>
+          <button
+            class="submitNewPlayerName"
+            type="submit"
+            onclick={() => {
+              editPlayerInList(id, playerName());
+              setCardMode("display");
+            }}
+          ></button>
         </Match>
       </Switch>
     </div>

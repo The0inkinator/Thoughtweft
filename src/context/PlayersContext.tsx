@@ -14,8 +14,8 @@ type PlayerState = [
   () => Player[],
   {
     makePlayersList: (list: Player[]) => void;
-    addPlayerToList: (player: Player) => void;
-    editPlayerInList: (edit: Player, pos: number) => void;
+    addPlayerToList: (inputName: string, inputId: number) => void;
+    editPlayerInList: (idToEdit: number, newName: string) => void;
   }
 ];
 
@@ -32,17 +32,24 @@ export function PlayersProvider(props: any) {
           setPlayersList(list);
         },
 
-        addPlayerToList(player: Player) {
-          if (player.name && player.id) {
-            const tempPlayerList: Player[] = [...playersList(), player];
-            setPlayersList(tempPlayerList);
-          } else {
-            console.log("not a player");
-          }
+        addPlayerToList(inputName: string, inputId: number) {
+          const NewPlayer = { name: inputName, id: inputId };
+          const tempPlayerList: Player[] = [...playersList(), NewPlayer];
+          setPlayersList(tempPlayerList);
         },
 
-        editPlayerInList(edit: Player, pos: number) {
-          console.log(edit, pos);
+        editPlayerInList(idToEdit: number, newName: string) {
+          const updatePlayer = () => {
+            setPlayersList((prevList) => {
+              const newList = [...prevList];
+
+              newList[idToEdit - 1].name = newName;
+              console.log(newList[idToEdit - 1].name);
+              return newList;
+            });
+          };
+
+          updatePlayer();
         },
       },
     ];

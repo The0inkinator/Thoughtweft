@@ -1,4 +1,7 @@
+import { createEffect, onMount } from "solid-js";
 import "./playerSlot.css";
+import { useEventContext } from "~/context/EventContext";
+import { Slot } from "~/context/EventContext";
 
 interface PlayerSlotInput {
   podNumber: number;
@@ -11,5 +14,27 @@ export default function PlayerSlot({
   slotNumber,
   filled,
 }: PlayerSlotInput) {
-  return <div class="playerSlotContainer">{slotNumber}</div>;
+  const [eventState, { updateSlotPos }] = useEventContext();
+
+  const stateForThisSlot = () => {
+    let tempState: Slot[] = eventState().slots.filter(
+      (slot) => slot.numberInPod === slotNumber && slot.podNumber === podNumber
+    );
+
+    return tempState[0];
+  };
+
+  let thisSlot!: HTMLDivElement;
+
+  onMount(() => {
+    let thisX = thisSlot.getBoundingClientRect().x;
+    let thisY = thisSlot.getBoundingClientRect().y;
+    updateSlotPos(podNumber, slotNumber, thisX, thisY);
+  });
+
+  return (
+    <div class="playerSlotContainer" ref={thisSlot}>
+      {podNumber}.{slotNumber}
+    </div>
+  );
 }

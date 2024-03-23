@@ -26,16 +26,12 @@ export default function PodCard({ id }: PodCardInputs) {
   //Slot State
   const [slots, setSlots] = createSignal<boolean[]>(buildSlotArray());
 
-  onMount(() => {
-    console.log(`Pod # ${id}'s slots look like:`, slots());
-  });
-
   return (
     <div class="podCardContainer">
       <div class="podNumber">Pod # {id}</div>
       <For each={slots()}>
         {(slot, index) => (
-          <PlayerSlot podNumber={id} slotNumber={index()} filled={slot} />
+          <PlayerSlot podNumber={id} slotNumber={index() + 1} filled={slot} />
         )}
       </For>
     </div>

@@ -2,32 +2,39 @@ import { createSignal, createContext, useContext } from "solid-js";
 
 //Establish Typing
 
-type Record = [number, number, number];
+export type Record = [number, number, number];
 
-type Player = {
+export type Player = {
   id: number;
   name: string;
-  pod: number;
+  pod?: number;
+  slot?: number;
   matchRecord?: Record;
   eventRecord?: Record;
 };
 
-type Pod = {
+export type Slot = {
+  podNumber: number;
+  numberInPod: number;
+  filled: boolean;
+  xpos?: number;
+  ypos?: number;
+};
+
+export type Pod = {
   podNumber: number;
   podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-  registeredPlayers: number;
   podName?: string;
   podCube?: URL;
 };
 
-type Event = { pods: Pod[]; playerList: Player[] };
+export type Event = { pods: Pod[]; slots: Slot[]; playerList: Player[] };
 
 type EventState = [
   () => Event,
   {
     makeEvent: (newEvent: Event) => void;
-    addPlayer: (newPlayer: string) => void;
-    testSignal: () => void;
+    updateSlotPos: (pod: number, slotNum: number, x: number, y: number) => void;
   }
 ];
 
@@ -35,13 +42,11 @@ type EventState = [
 
 const SampleEvent: Event = {
   pods: [
-    {
-      podNumber: 1,
-      podSize: 8,
-      registeredPlayers: 0,
-    },
-    { podNumber: 2, podSize: 4, registeredPlayers: 0 },
+    { podNumber: 1, podSize: 8 },
+    { podNumber: 2, podSize: 12 },
+    { podNumber: 3, podSize: 4 },
   ],
+  slots: [],
   playerList: [{ id: 0, name: "Keldan", pod: 1 }],
 };
 
@@ -55,42 +60,24 @@ export function EventContextProvider(props: any) {
         makeEvent(newEvent) {
           setEvent(newEvent);
         },
-
-        addPlayer(newPlayer) {
-          const tempEvent = event();
-          let newId = tempEvent.playerList.length;
-          let newName = newPlayer;
-          let newPodNumber = openPods()[0].podNumber;
-          let playerToAdd: Player = {
-            id: newId,
-            name: newName,
-            pod: newPodNumber,
-          };
-
+        updateSlotPos(pod, slotNum, x, y) {
           setEvent((prevEvent) => {
-            const updatedPlayerList = [...prevEvent.playerList, playerToAdd];
+            let newSlots = prevEvent.slots;
+            let slotToUpdate = newSlots.findIndex(
+              (slot) => slot.numberInPod === slotNum && slot.podNumber === pod
+            );
 
-            return { ...prevEvent, playerList: updatedPlayerList };
+            if (slotToUpdate !== -1) {
+              newSlots[slotToUpdate].xpos = x;
+              newSlots[slotToUpdate].ypos = y;
+              return { ...prevEvent, slots: newSlots };
+            } else {
+              return prevEvent;
+            }
           });
-        },
-
-        testSignal() {
-          setEvent(SampleEvent);
         },
       },
     ];
-
-  const refreshEvent = () => {
-    const updatedEvent = event();
-    setEvent(updatedEvent);
-  };
-
-  const openPods = () => {
-    let potentialPods = event().pods.filter(
-      (pod) => pod.registeredPlayers < pod.podSize
-    );
-    return potentialPods;
-  };
 
   return (
     <EventContext.Provider value={eventState}>

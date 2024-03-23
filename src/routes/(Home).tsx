@@ -11,7 +11,8 @@ export default function Home() {
     <>
       <HeaderDefault />
       <div class="homePageContainer">
-        <EventDisplay />
+        {/* <EventDisplay /> */}
+        <TestElement />
       </div>
     </>
   );

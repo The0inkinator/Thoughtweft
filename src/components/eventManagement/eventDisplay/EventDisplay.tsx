@@ -5,7 +5,7 @@ import PodCard from "../podCard/PodCard";
 
 export default function EventDisplay() {
   //Context State
-  const [eventState] = useEventContext();
+  const [eventState, { addPlayer }] = useEventContext();
   //Local State
   const [inputValue, setInputValue] = createSignal<string>("");
 
@@ -22,8 +22,9 @@ export default function EventDisplay() {
           }}
           onKeyPress={(event) => {
             if (event.key === "Enter") {
-              // add player function
+              addPlayer(inputValue());
               setInputValue("");
+              console.log(eventState());
             }
           }}
         ></input>
@@ -36,7 +37,7 @@ export default function EventDisplay() {
           }}
         ></button>
       </div>
-      <For each={eventState()}>{(pod) => <PodCard />}</For>
+      <For each={eventState().pods}>{(pod) => <PodCard />}</For>
     </div>
   );
 }

@@ -15,14 +15,13 @@
 /*SITEWIDE VALUES*/
 :root {
   /*Colors*/
-
   --BackgroundColor: rgb(53, 55, 75);
 
   /* Fonts & Font Variables */
   --BodyFont: Modern Sans, Arial, sans-serif;
-  /*Gaps*/
-  --LargeGap: 4rem;
-  --SmallGap: 2rem;
+
+  /*Global Sizing*/
+  --PlayerCard: 4rem;
 
   /*Global Styling*/
   background-color: var(--BackgroundColor);

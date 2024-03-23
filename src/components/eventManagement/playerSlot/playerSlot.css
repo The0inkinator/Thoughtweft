@@ -1,0 +1,4 @@
+.playerSlotContainer {
+  background-color: black;
+  width: var(--PlayerCard);
+}

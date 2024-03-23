@@ -1,5 +1,15 @@
 import "./playerSlot.css";
 
-export default function PlayerSlot() {
-  return <div class="playerSlotContainer"></div>;
+interface PlayerSlotInput {
+  podNumber: number;
+  slotNumber: number;
+  filled: boolean;
+}
+
+export default function PlayerSlot({
+  podNumber,
+  slotNumber,
+  filled,
+}: PlayerSlotInput) {
+  return <div class="playerSlotContainer">{slotNumber}</div>;
 }

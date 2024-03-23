@@ -1,5 +1,6 @@
 .playerCardContainer {
-  width: 90%;
+  position: absolute;
+  width: var(--PlayerCard);
   aspect-ratio: 3/1;
   display: flex;
   align-items: center;

@@ -22,6 +22,7 @@
 
   /*Global Sizing*/
   --PlayerCard: 4rem;
+  --PodCard: 20rem;
 
   /*Global Styling*/
   background-color: var(--BackgroundColor);

@@ -1,4 +1,7 @@
 .playerSlotContainer {
   background-color: black;
+  color: white;
   width: var(--PlayerCard);
+  aspect-ratio: 1/1;
+  margin: 0.5rem;
 }

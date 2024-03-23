@@ -5,6 +5,7 @@ import { Suspense } from "solid-js";
 import { PlayersProvider } from "./context/PlayersContext";
 import { TestProvider } from "./context/TestContext";
 import { PodContextProvider } from "./context/PodContext";
+import { EventContextProvider } from "./context/EventContext";
 import "./app.css";
 
 export default function App() {
@@ -16,7 +17,9 @@ export default function App() {
           <TestProvider>
             <PlayersProvider>
               <PodContextProvider>
-                <Suspense>{props.children}</Suspense>
+                <EventContextProvider>
+                  <Suspense>{props.children}</Suspense>
+                </EventContextProvider>
               </PodContextProvider>
             </PlayersProvider>
           </TestProvider>

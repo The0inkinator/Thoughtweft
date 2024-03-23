@@ -19,7 +19,8 @@ const PodContext = createContext<PodState | undefined>();
 
 export function PodContextProvider(props: any) {
   const [podList, setPodList] = createSignal<Pod[]>([
-      { podNumber: 1, podSize: 8 },
+      { podNumber: 1, podSize: 8, registeredPlayers: 0 },
+      { podNumber: 2, podSize: 8, registeredPlayers: 0 },
     ]),
     podState: PodState = [
       () => podList(),

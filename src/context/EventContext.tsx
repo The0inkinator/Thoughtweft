@@ -15,7 +15,7 @@ type Player = {
 type Pod = {
   podNumber: number;
   podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-  registeredPlayers: Player[];
+  registeredPlayers: number;
   podName?: string;
   podCube?: URL;
 };
@@ -27,7 +27,7 @@ type EventState = [
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: (newPlayer: string) => void;
-    refreshEvent: () => void;
+    testSignal: () => void;
   }
 ];
 
@@ -38,9 +38,9 @@ const SampleEvent: Event = {
     {
       podNumber: 1,
       podSize: 8,
-      registeredPlayers: [{ id: 0, name: "Keldan", pod: 1 }],
+      registeredPlayers: 0,
     },
-    { podNumber: 2, podSize: 4, registeredPlayers: [] },
+    { podNumber: 2, podSize: 4, registeredPlayers: 0 },
   ],
   playerList: [{ id: 0, name: "Keldan", pod: 1 }],
 };
@@ -56,13 +56,9 @@ export function EventContextProvider(props: any) {
           setEvent(newEvent);
         },
 
-        refreshEvent() {
-          const updatedEvent = event();
-          setEvent(updatedEvent);
-        },
-
         addPlayer(newPlayer) {
-          let newId = event().playerList.length;
+          const tempEvent = event();
+          let newId = tempEvent.playerList.length;
           let newName = newPlayer;
           let newPodNumber = openPods()[0].podNumber;
           let playerToAdd: Player = {
@@ -71,18 +67,15 @@ export function EventContextProvider(props: any) {
             pod: newPodNumber,
           };
 
-          const receivingPod = event().pods.find(
-            (pod) => pod.podNumber === newPodNumber
-          );
+          setEvent((prevEvent) => {
+            const updatedPlayerList = [...prevEvent.playerList, playerToAdd];
 
-          if (receivingPod) {
-            receivingPod.registeredPlayers.push(playerToAdd);
-            event().playerList.push(playerToAdd);
+            return { ...prevEvent, playerList: updatedPlayerList };
+          });
+        },
 
-            refreshEvent();
-          } else {
-            console.log("Pod not found");
-          }
+        testSignal() {
+          setEvent(SampleEvent);
         },
       },
     ];
@@ -90,12 +83,11 @@ export function EventContextProvider(props: any) {
   const refreshEvent = () => {
     const updatedEvent = event();
     setEvent(updatedEvent);
-    console.log("refreshed event", event());
   };
 
   const openPods = () => {
     let potentialPods = event().pods.filter(
-      (pod) => pod.registeredPlayers.length < pod.podSize
+      (pod) => pod.registeredPlayers < pod.podSize
     );
     return potentialPods;
   };

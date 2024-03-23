@@ -39,7 +39,7 @@ const SampleEvent: Event = [
 const EventContext = createContext<EventState | undefined>();
 
 export function EventContextProvider(props: any) {
-  const [event, setEvent] = createSignal<Event>([]),
+  const [event, setEvent] = createSignal<Event>(SampleEvent),
     eventState: EventState = [
       () => event(),
       {

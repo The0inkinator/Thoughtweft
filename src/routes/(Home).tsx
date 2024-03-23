@@ -1,8 +1,7 @@
 import { Title } from "@solidjs/meta";
 import HeaderDefault from "~/components/layout/headerDefault";
-import PodBox from "~/components/pairing/podBox";
 import TestElement from "~/components/Test/TestElement";
-import EventDisplay from "~/components/pairing/eventDisplay/EventDisplay";
+import EventDisplay from "../components/eventManagement/eventDisplay";
 
 import "../routeStyling/home.css";
 

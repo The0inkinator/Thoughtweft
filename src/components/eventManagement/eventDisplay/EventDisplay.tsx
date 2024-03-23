@@ -59,7 +59,14 @@ export default function EventDisplay() {
           {(pod) => <PodCard id={pod.podNumber} />}
         </For>
         <For each={eventState().playerList}>
-          {(player) => <PlayerCard id={player.id} name={player.name} />}
+          {(player) => (
+            <PlayerCard
+              id={player.id}
+              name={player.name}
+              slotNumber={player.slot}
+              podNumber={player.pod}
+            />
+          )}
         </For>
       </div>
     </>

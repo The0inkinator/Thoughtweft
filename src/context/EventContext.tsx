@@ -47,7 +47,11 @@ const SampleEvent: Event = {
     { podNumber: 3, podSize: 4 },
   ],
   slots: [],
-  playerList: [{ id: 0, name: "Keldan", pod: 1 }],
+  playerList: [
+    { id: 0, name: "Keldan", pod: 1, slot: 1 },
+    { id: 1, name: "Aiden", pod: 2, slot: 3 },
+    { id: 2, name: "Colton", pod: 3, slot: 2 },
+  ],
 };
 
 const EventContext = createContext<EventState | undefined>();

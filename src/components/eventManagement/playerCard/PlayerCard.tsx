@@ -1,5 +1,5 @@
 import "./playerCard.css";
-import { usePlayersContext } from "../../../context/PlayersContext";
+import { useEventContext } from "~/context/EventContext";
 import { createSignal, Switch, Match } from "solid-js";
 interface PlayerCardInputs {
   name: string;
@@ -8,22 +8,17 @@ interface PlayerCardInputs {
 
 type CardMode = "display" | "edit";
 
-export default function PlayerCard({ id }: PlayerCardInputs) {
+export default function PlayerCard({ id, name }: PlayerCardInputs) {
   //Context State
-  const [playersList, { editPlayerInList, addPlayerToList, makePlayersList }] =
-    usePlayersContext();
+  const [eventState] = useEventContext();
   //State
   const [cardMode, setCardMode] = createSignal<CardMode>("display");
   const [playerName, setPlayerName] = createSignal<string>(
-    playersList()[id - 1].name
+    eventState().playerList[id].name
   );
 
   const PlayerNameCard = () => {
-    return (
-      <div class="playerName">
-        {playersList()[id - 1].name} {id}
-      </div>
-    );
+    return <div class="playerName">{eventState().playerList[id].name}</div>;
   };
 
   return (
@@ -54,7 +49,7 @@ export default function PlayerCard({ id }: PlayerCardInputs) {
             }}
             onKeyPress={(event) => {
               if (event.key === "Enter") {
-                editPlayerInList(id, playerName());
+                //edit player in list
                 setCardMode("display");
               }
             }}
@@ -63,7 +58,7 @@ export default function PlayerCard({ id }: PlayerCardInputs) {
             class="submitNewPlayerName"
             type="submit"
             onclick={() => {
-              editPlayerInList(id, playerName());
+              // edit player in list
               setCardMode("display");
             }}
           ></button>

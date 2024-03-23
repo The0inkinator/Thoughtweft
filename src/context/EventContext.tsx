@@ -14,19 +14,20 @@ type Player = {
 
 type Pod = {
   podNumber: number;
-  podSize: number;
+  podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
   registeredPlayers: Player[];
   podName?: string;
   podCube?: URL;
 };
 
-type Event = { pods: Pod[]; totalPlayers: number };
+type Event = { pods: Pod[]; playerList: Player[] };
 
 type EventState = [
   () => Event,
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: (newPlayer: string) => void;
+    refreshEvent: () => void;
   }
 ];
 
@@ -34,10 +35,14 @@ type EventState = [
 
 const SampleEvent: Event = {
   pods: [
-    { podNumber: 1, podSize: 8, registeredPlayers: [] },
+    {
+      podNumber: 1,
+      podSize: 8,
+      registeredPlayers: [{ id: 0, name: "Keldan", pod: 1 }],
+    },
     { podNumber: 2, podSize: 4, registeredPlayers: [] },
   ],
-  totalPlayers: 0,
+  playerList: [{ id: 0, name: "Keldan", pod: 1 }],
 };
 
 const EventContext = createContext<EventState | undefined>();
@@ -51,8 +56,13 @@ export function EventContextProvider(props: any) {
           setEvent(newEvent);
         },
 
+        refreshEvent() {
+          const updatedEvent = event();
+          setEvent(updatedEvent);
+        },
+
         addPlayer(newPlayer) {
-          let newId = event().totalPlayers + 1;
+          let newId = event().playerList.length;
           let newName = newPlayer;
           let newPodNumber = openPods()[0].podNumber;
           let playerToAdd: Player = {
@@ -67,14 +77,21 @@ export function EventContextProvider(props: any) {
 
           if (receivingPod) {
             receivingPod.registeredPlayers.push(playerToAdd);
-            let currentTotalPlayers = event().totalPlayers;
-            event().totalPlayers = currentTotalPlayers + 1;
+            event().playerList.push(playerToAdd);
+
+            refreshEvent();
           } else {
             console.log("Pod not found");
           }
         },
       },
     ];
+
+  const refreshEvent = () => {
+    const updatedEvent = event();
+    setEvent(updatedEvent);
+    console.log("refreshed event", event());
+  };
 
   const openPods = () => {
     let potentialPods = event().pods.filter(

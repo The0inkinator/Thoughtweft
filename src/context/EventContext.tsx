@@ -19,6 +19,7 @@ export type Slot = {
   filled: boolean;
   xpos?: number;
   ypos?: number;
+  slotRef?: HTMLDivElement;
 };
 
 export type Pod = {
@@ -34,7 +35,13 @@ type EventState = [
   () => Event,
   {
     makeEvent: (newEvent: Event) => void;
-    updateSlotPos: (pod: number, slotNum: number, x: number, y: number) => void;
+    updateSlot: (
+      pod: number,
+      slotNum: number,
+      x?: number,
+      y?: number,
+      inputSlotRef?: HTMLDivElement
+    ) => void;
   }
 ];
 
@@ -64,7 +71,7 @@ export function EventContextProvider(props: any) {
         makeEvent(newEvent) {
           setEvent(newEvent);
         },
-        updateSlotPos(pod, slotNum, x, y) {
+        updateSlot(pod, slotNum, x, y, inputSlotRef) {
           setEvent((prevEvent) => {
             let newSlots = prevEvent.slots;
             let slotToUpdate = newSlots.findIndex(
@@ -74,6 +81,7 @@ export function EventContextProvider(props: any) {
             if (slotToUpdate !== -1) {
               newSlots[slotToUpdate].xpos = x;
               newSlots[slotToUpdate].ypos = y;
+              newSlots[slotToUpdate].slotRef = inputSlotRef;
               return { ...prevEvent, slots: newSlots };
             } else {
               return prevEvent;

@@ -14,7 +14,7 @@ export default function PlayerSlot({
   slotNumber,
   filled,
 }: PlayerSlotInput) {
-  const [eventState, { updateSlotPos }] = useEventContext();
+  const [eventState, { updateSlot }] = useEventContext();
 
   const stateForThisSlot = () => {
     let tempState: Slot[] = eventState().slots.filter(
@@ -29,11 +29,21 @@ export default function PlayerSlot({
   onMount(() => {
     let thisX = thisSlot.getBoundingClientRect().x;
     let thisY = thisSlot.getBoundingClientRect().y;
-    updateSlotPos(podNumber, slotNumber, thisX, thisY);
+    updateSlot(podNumber, slotNumber, thisX, thisY, thisSlot);
   });
 
   return (
-    <div class="playerSlotContainer" ref={thisSlot}>
+    <div
+      class="playerSlotContainer"
+      ref={thisSlot}
+      onClick={() => {
+        const slotToLog = eventState().slots.filter(
+          (slot) =>
+            slot.numberInPod === slotNumber && slot.podNumber === podNumber
+        );
+        console.log(slotToLog[0].slotRef);
+      }}
+    >
       {podNumber}.{slotNumber}
     </div>
   );

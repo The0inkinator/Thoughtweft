@@ -9,7 +9,7 @@ export default function EventDisplay() {
   return (
     <>
       <div id="eventDisplayHeader"></div>
-      <div class="eventDisplayContainer"></div>
+      <div class="eventDisplayCont"></div>
     </>
   );
 }

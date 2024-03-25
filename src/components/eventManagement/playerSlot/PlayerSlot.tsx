@@ -33,17 +33,7 @@ export default function PlayerSlot({
   });
 
   return (
-    <div
-      class="playerSlotContainer"
-      ref={thisSlot}
-      onClick={() => {
-        const slotToLog = eventState().slots.filter(
-          (slot) =>
-            slot.numberInPod === slotNumber && slot.podNumber === podNumber
-        );
-        console.log(slotToLog[0].slotRef);
-      }}
-    >
+    <div class="playerSlotContainer" ref={thisSlot}>
       {podNumber}.{slotNumber}
     </div>
   );

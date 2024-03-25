@@ -31,27 +31,32 @@ export default function PlayerCard({
   };
 
   onMount(() => {
-    let parentSlotsX = eventState().slots.filter(
+    // let parentSlotsX = eventState().slots.filter(
+    //   (slot) => slot.numberInPod === slotNumber && slot.podNumber === podNumber
+    // )[0].xpos;
+    // let parentSlotsY = eventState().slots.filter(
+    //   (slot) => slot.numberInPod === slotNumber && slot.podNumber === podNumber
+    // )[0].ypos;
+
+    // let thisX = thisPlayerCard.getBoundingClientRect().x;
+    // let thisY = thisPlayerCard.getBoundingClientRect().x;
+
+    // let calcx = parentSlotsX! - thisX;
+    // let calcy = parentSlotsY! - thisY;
+
+    // thisPlayerCard.style.left = `${calcx}px`;
+    // thisPlayerCard.style.top = `${calcy}px`;
+
+    let parentSlot = eventState().slots.filter(
       (slot) => slot.numberInPod === slotNumber && slot.podNumber === podNumber
-    )[0].xpos;
-    let parentSlotsY = eventState().slots.filter(
-      (slot) => slot.numberInPod === slotNumber && slot.podNumber === podNumber
-    )[0].ypos;
+    )[0].slotRef;
 
-    let thisX = thisPlayerCard.getBoundingClientRect().x;
-    let thisY = thisPlayerCard.getBoundingClientRect().x;
-
-    let calcx = parentSlotsX! - thisX;
-    let calcy = parentSlotsY! - thisY;
-
-    thisPlayerCard.style.left = `${calcx}px`;
-    thisPlayerCard.style.top = `${calcy}px`;
+    parentSlot?.appendChild(thisPlayerCard);
   });
 
   return (
     <div class="playerCardContainer" ref={thisPlayerCard}>
       <div class="playerIcon"></div>
-
       <div class="playerName">{eventState().playerList[id].name}</div>
     </div>
   );

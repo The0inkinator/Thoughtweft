@@ -29,10 +29,15 @@ export type Pod = {
   podCube?: URL;
 };
 
+export type EventSettings = {
+  playerCap: number;
+};
+
 export type Event = {
   evtPods: Pod[];
   evtSlots: Slot[];
   evtPlayerList: Player[];
+  evtSettings: EventSettings;
 };
 
 type EventState = [
@@ -57,6 +62,7 @@ const SampleEvent: Event = {
     { id: 6, name: "Jesse" },
     { id: 7, name: "Jack" },
   ],
+  evtSettings: { playerCap: 0 },
 };
 
 const EventContext = createContext<EventState | undefined>();

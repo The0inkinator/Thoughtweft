@@ -2,10 +2,40 @@
   background-color: rgb(73, 73, 110);
   display: flex;
   flex-direction: column;
-  place-items: center;
-  border-radius: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--LargeBorderRadius);
   width: var(--PodCard);
-  aspect-ratio: 2/3;
-  margin: 2rem;
+  aspect-ratio: var(--PodCardAR);
   padding: 2rem;
+  margin: 2rem;
+}
+
+.addButton {
+  all: unset;
+  width: 25%;
+  aspect-ratio: 1/1;
+  background-color: rgb(25, 25, 39);
+  border-radius: var(--MedBorderRadius);
+  cursor: pointer;
+}
+
+.settingsCont {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.confirmSettingsButton {
+  all: unset;
+  width: 50%;
+  aspect-ratio: 3/1;
+  background-color: rgb(25, 25, 39);
+  border-radius: var(--MedBorderRadius);
+  cursor: pointer;
+  text-align: center;
+  color: aliceblue;
+  font-weight: bolder;
 }

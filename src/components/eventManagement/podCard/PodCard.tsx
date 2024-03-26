@@ -9,5 +9,5 @@ export default function PodCard() {
   //Context State
   const [eventState] = useEventContext();
 
-  return <div class="podCardCont"></div>;
+  return <div class="podCardCont"> Pod Card</div>;
 }

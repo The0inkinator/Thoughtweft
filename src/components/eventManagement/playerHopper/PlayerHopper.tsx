@@ -1,5 +1,5 @@
 import "./playerHopper.css";
 
 export default function PlayerHopper() {
-  return <div class="playerHopperCont"></div>;
+  return <div class="playerHopperCont">Player Hopper</div>;
 }

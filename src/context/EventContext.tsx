@@ -29,28 +29,34 @@ export type Pod = {
   podCube?: URL;
 };
 
-export type Event = { pods: Pod[]; slots: Slot[]; playerList: Player[] };
+export type Event = {
+  evtPods: Pod[];
+  evtSlots: Slot[];
+  evtPlayerList: Player[];
+};
 
 type EventState = [
   () => Event,
   {
     makeEvent: (newEvent: Event) => void;
-    updateSlot: (
-      pod: number,
-      slotNum: number,
-      x?: number,
-      y?: number,
-      inputSlotRef?: HTMLDivElement
-    ) => void;
   }
 ];
 
 //Create Sample Event
 
 const SampleEvent: Event = {
-  pods: [{ podNumber: 1, podSize: 8 }],
-  slots: [],
-  playerList: [{ id: 0, name: "Keldan" }],
+  evtPods: [{ podNumber: 1, podSize: 8 }],
+  evtSlots: [],
+  evtPlayerList: [
+    { id: 0, name: "Keldan" },
+    { id: 1, name: "Colton" },
+    { id: 2, name: "Aiden" },
+    { id: 3, name: "Harrison" },
+    { id: 4, name: "Josh" },
+    { id: 5, name: "Daniel" },
+    { id: 6, name: "Jesse" },
+    { id: 7, name: "Jack" },
+  ],
 };
 
 const EventContext = createContext<EventState | undefined>();
@@ -62,23 +68,6 @@ export function EventContextProvider(props: any) {
       {
         makeEvent(newEvent) {
           setEvent(newEvent);
-        },
-        updateSlot(pod, slotNum, x, y, inputSlotRef) {
-          setEvent((prevEvent) => {
-            let newSlots = prevEvent.slots;
-            let slotToUpdate = newSlots.findIndex(
-              (slot) => slot.numberInPod === slotNum && slot.podNumber === pod
-            );
-
-            if (slotToUpdate !== -1) {
-              newSlots[slotToUpdate].xpos = x;
-              newSlots[slotToUpdate].ypos = y;
-              newSlots[slotToUpdate].slotRef = inputSlotRef;
-              return { ...prevEvent, slots: newSlots };
-            } else {
-              return prevEvent;
-            }
-          });
         },
       },
     ];

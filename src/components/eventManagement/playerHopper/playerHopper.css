@@ -1,3 +1,12 @@
 .playerHopperCont {
-  all: unset;
+  background-color: rgb(73, 73, 110);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--LargeBorderRadius);
+  width: var(--PodCard);
+  aspect-ratio: var(--PodCardAR);
+  padding: 2rem;
+  margin: 2rem;
 }

@@ -19,40 +19,53 @@ export default function PodPlusButton() {
   const [eventState] = useEventContext();
   //Local State
   const [buttonMode, setButtonMode] = createSignal<ButtonMode>("add");
+  //refs
+  let podPlusButtonBGRef!: HTMLDivElement;
+
+  // createEffect(() => {
+  //   if (buttonMode() !== "settings") {
+  //     podPlusButtonBGRef.style.opacity = "0";
+  //   } else {
+  //     podPlusButtonBGRef.style.opacity = "1";
+  //   }
+  // });
 
   return (
-    <div class="podPlusButtonCont">
-      <Switch>
-        <Match when={buttonMode() === "add"}>
-          <button
-            class="addButton"
-            type="submit"
-            onclick={() => {
-              setButtonMode("settings");
-            }}
-          ></button>
-        </Match>
-        <Match when={buttonMode() === "settings"}>
-          <div class="settingsCont">
+    <div class="evtDisplayFrame">
+      <div class="evtDisplayContent">
+        <Switch>
+          <Match when={buttonMode() === "add"}>
             <button
-              class="confirmSettingsButton"
+              class="addButton"
               type="submit"
               onclick={() => {
-                if (eventState().evtSettings.playerCap > 0) {
-                  setButtonMode("podsFull");
-                } else {
-                  setButtonMode("add");
-                }
+                setButtonMode("settings");
               }}
-            >
-              Submit
-            </button>
-          </div>
-        </Match>
-        <Match when={buttonMode() === "podsFull"}>
-          <></>
-        </Match>
-      </Switch>
+            ></button>
+          </Match>
+          <Match when={buttonMode() === "settings"}>
+            <div class="settingsCont">
+              <button
+                class="confirmSettingsButton"
+                type="submit"
+                onclick={() => {
+                  if (eventState().evtSettings.playerCap > 0) {
+                    setButtonMode("podsFull");
+                  } else {
+                    setButtonMode("add");
+                  }
+                }}
+              >
+                Submit
+              </button>
+            </div>
+          </Match>
+          <Match when={buttonMode() === "podsFull"}>
+            <></>
+          </Match>
+        </Switch>
+        <div class="evtDisplayBG" ref={podPlusButtonBGRef}></div>
+      </div>
     </div>
   );
 }

@@ -14,7 +14,11 @@ export default function EventDisplay() {
       <div class="eventDisplayCont">
         <div class="podDisplayCont">
           <PlayerHopper />
-          <For each={eventState().evtPods}>{(pod) => <PodCard />}</For>
+          <For each={eventState().evtPods}>
+            {(pod) => (
+              <PodCard podSize={pod.podSize} podNumber={pod.podNumber} />
+            )}
+          </For>
           <PodPlusButton />
         </div>
       </div>

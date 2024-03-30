@@ -14,7 +14,7 @@ export type Player = {
 };
 
 export type Slot = {
-  podNumber: number;
+  podNumber: number | "podLess";
   numberInPod: number;
   filled: boolean;
   xpos?: number;
@@ -44,6 +44,10 @@ type EventState = [
   () => Event,
   {
     makeEvent: (newEvent: Event) => void;
+    addPlayer: ({ name }: Player) => void;
+    addPod: ({ podSize, podName, podCube }: Pod) => void;
+    editPodSize: ({ podNumber, podSize }: Pod) => void;
+    editSlotsInPod: ({ podNumber }: Slot) => void;
   }
 ];
 
@@ -51,7 +55,7 @@ type EventState = [
 
 const SampleEvent: Event = {
   evtPods: [{ podNumber: 1, podSize: 8 }],
-  evtSlots: [],
+  evtSlots: [{ podNumber: "podLess", numberInPod: 0, filled: false }],
   evtPlayerList: [
     { id: 0, name: "Keldan" },
     { id: 1, name: "Colton" },
@@ -75,6 +79,27 @@ export function EventContextProvider(props: any) {
         makeEvent(newEvent) {
           setEvent(newEvent);
         },
+        addPlayer({ name }) {},
+        addPod({ podSize }) {},
+        editPodSize({ podNumber, podSize }) {
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+            const podToChangeIndex = newEvt.evtPods.findIndex(
+              (pod) => pod.podNumber === podNumber
+            );
+            if (podToChangeIndex !== -1) {
+              newEvt.evtPods[podToChangeIndex] = {
+                ...newEvt.evtPods[podToChangeIndex],
+                podSize,
+              };
+              return newEvt;
+            } else {
+              console.log("no pod to change");
+              return prevEvt;
+            }
+          });
+        },
+        editSlotsInPod({ podNumber }) {},
       },
     ];
 

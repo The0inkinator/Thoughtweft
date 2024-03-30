@@ -1,5 +1,10 @@
 import "./playerHopper.css";
+import DisplayFrame from "../displayFrame";
 
 export default function PlayerHopper() {
-  return <div class="playerHopperCont">Player Hopper</div>;
+  return (
+    <DisplayFrame>
+      <div class="playerHopperCont">Player Hopper</div>
+    </DisplayFrame>
+  );
 }

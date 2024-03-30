@@ -8,6 +8,7 @@ import {
   Match,
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
+import DisplayFrame from "../displayFrame";
 
 interface PodPlusButtonInputs {}
 
@@ -22,17 +23,9 @@ export default function PodPlusButton() {
   //refs
   let podPlusButtonBGRef!: HTMLDivElement;
 
-  // createEffect(() => {
-  //   if (buttonMode() !== "settings") {
-  //     podPlusButtonBGRef.style.opacity = "0";
-  //   } else {
-  //     podPlusButtonBGRef.style.opacity = "1";
-  //   }
-  // });
-
   return (
-    <div class="evtDisplayFrame">
-      <div class="evtDisplayContent">
+    <DisplayFrame>
+      <div class="podPlusButtonCont">
         <Switch>
           <Match when={buttonMode() === "add"}>
             <button
@@ -41,7 +34,9 @@ export default function PodPlusButton() {
               onclick={() => {
                 setButtonMode("settings");
               }}
-            ></button>
+            >
+              New
+            </button>
           </Match>
           <Match when={buttonMode() === "settings"}>
             <div class="settingsCont">
@@ -64,8 +59,7 @@ export default function PodPlusButton() {
             <></>
           </Match>
         </Switch>
-        <div class="evtDisplayBG" ref={podPlusButtonBGRef}></div>
       </div>
-    </div>
+    </DisplayFrame>
   );
 }

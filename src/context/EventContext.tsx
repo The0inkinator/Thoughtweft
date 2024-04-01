@@ -17,8 +17,6 @@ export type Seat = {
   podNumber: number;
   seatNumber: number;
   filled: boolean;
-  xpos?: number;
-  ypos?: number;
   seatRef?: HTMLDivElement;
 };
 
@@ -65,7 +63,7 @@ const SampleEvent: Event = {
   evtPods: [{ podNumber: 1, podSize: 8 }],
   evtSeats: [{ podNumber: 0, seatNumber: 0, filled: false }],
   evtPlayerList: [
-    { id: 0, name: "Keldan", pod: 0, seat: 0 },
+    { id: 0, name: "Keldan", pod: 1, seat: 2 },
     { id: 1, name: "Colton", pod: 0, seat: 0 },
     { id: 2, name: "Aiden", pod: 0, seat: 0 },
     { id: 3, name: "Harrison", pod: 0, seat: 0 },

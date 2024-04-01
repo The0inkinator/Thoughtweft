@@ -1,0 +1,8 @@
+.playerSeatCont {
+  background-color: rgb(25, 25, 39);
+  width: 2rem;
+  height: 2rem;
+  margin-block: 1rem;
+  text-align: center;
+  color: aliceblue;
+}

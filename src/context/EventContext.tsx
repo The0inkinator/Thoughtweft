@@ -49,6 +49,11 @@ type EventState = [
     removePod: (podNumber: number) => void;
     editPodSize: ({ podNumber, podSize }: Pod) => void;
     updateSeatsInPod: (podNumber: number) => void;
+    updateSeatRef: (
+      podNumber: number,
+      seatNumber: number,
+      seatRef: HTMLDivElement
+    ) => void;
   }
 ];
 
@@ -152,6 +157,48 @@ export function EventContextProvider(props: any) {
               return prevEvt;
             }
           });
+        },
+        updateSeatRef(
+          podNumber: number,
+          seatNumber: number,
+          seatRef: HTMLDivElement
+        ) {
+          // // console.log("updating");
+          // setEvent((prevEvt) => {
+          //   const newEvt = { ...prevEvt };
+          //   const seatIndex = newEvt.evtSeats.findIndex(
+          //     (seat) =>
+          //       seat.podNumber === podNumber && seat.seatNumber === seatNumber
+          //   );
+          //   if (seatIndex !== -1) {
+          //     const updatedSeat = {
+          //       ...newEvt.evtSeats[seatIndex],
+          //       seatRef: seatRef,
+          //     };
+          //     newEvt.evtSeats[seatIndex] = updatedSeat;
+          //   }
+
+          //   return newEvt;
+          // });
+
+          // const seatIndex = () => {
+          //   return event().evtSeats.filter(
+          //     (seat) =>
+          //       seat.podNumber === podNumber && seat.seatNumber === seatNumber
+          //   );
+          // };
+          // console.log(event().evtSeats);
+          // console.log(seatIndex());
+          const seatIndex = () => {
+            return event().evtSeats.findIndex(
+              (seat) =>
+                seat.podNumber === podNumber && seat.seatNumber === seatNumber
+            );
+          };
+
+          if (seatIndex() !== -1) {
+            event().evtSeats[seatIndex()].seatRef = seatRef;
+          }
         },
       },
     ];

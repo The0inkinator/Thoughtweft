@@ -10,12 +10,26 @@ interface PlayerSlotInput {
 }
 
 export default function PlayerSeat({ podNumber, seatNumber }: PlayerSlotInput) {
-  const [eventState, {}] = useEventContext();
+  //Context State
+  const [eventState, { updateSeatRef }] = useEventContext();
+
+  const thisSeatState = () => {
+    return eventState().evtSeats.filter(
+      (seat) => seat.podNumber === podNumber && seat.seatNumber === seatNumber
+    )[0];
+  };
+
+  createEffect(() => {
+    if (thisSeatState().seatRef !== thisSeat) {
+      updateSeatRef(podNumber, seatNumber, thisSeat);
+    }
+  });
 
   let thisSeat!: HTMLDivElement;
 
   return (
     <div class="playerSeatCont" ref={thisSeat}>
+      Seat # {seatNumber}
       <PlayerCard></PlayerCard>
     </div>
   );

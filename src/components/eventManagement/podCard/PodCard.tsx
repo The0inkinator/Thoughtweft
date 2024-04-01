@@ -2,6 +2,7 @@ import "./podCard.css";
 import { createEffect, createSignal, For, onMount } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
+import PlayerSeat from "../playerSeat";
 
 interface PodCardInputs {
   podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -80,13 +81,25 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
         <div class="tableCont">
           <div class="podSeatsUp">
             <For each={secondHalfSeats()}>
-              {(seat) => <div class="sampleSeat">{seat.seatNumber}</div>}
+              {(seat) => (
+                <PlayerSeat
+                  seatNumber={seat.seatNumber}
+                  podNumber={podNumber}
+                  seatFacing="left"
+                ></PlayerSeat>
+              )}
             </For>
           </div>
           <div class="podTable"></div>
           <div class="podSeatsDown">
             <For each={firstHalfSeats()}>
-              {(seat) => <div class="sampleSeat">{seat.seatNumber}</div>}
+              {(seat) => (
+                <PlayerSeat
+                  seatNumber={seat.seatNumber}
+                  podNumber={podNumber}
+                  seatFacing="right"
+                ></PlayerSeat>
+              )}
             </For>
           </div>
         </div>

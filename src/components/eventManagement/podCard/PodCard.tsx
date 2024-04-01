@@ -46,8 +46,7 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
     <DisplayFrame>
       <div class="podCardCont">
         <div class="podTitle">
-          Pod {podNumber} Pod Size {podSize} Pod Seats{" "}
-          {`${thisPodSeats().length}`}
+          Pod {podNumber}
           <button
             type="submit"
             style={{ color: "red" }}

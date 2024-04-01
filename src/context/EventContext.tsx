@@ -100,7 +100,6 @@ export function EventContextProvider(props: any) {
               (pod) => pod.podNumber === podNumber
             );
             newEvt.evtPods.splice(podIndex, 1);
-            console.log(newEvt);
             return newEvt;
           });
         },

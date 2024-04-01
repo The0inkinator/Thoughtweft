@@ -7,8 +7,8 @@ export type Record = [number, number, number];
 export type Player = {
   id: number;
   name: string;
-  pod?: number;
-  seat?: number;
+  pod: number;
+  seat: number;
   matchRecord?: Record;
   eventRecord?: Record;
 };
@@ -21,6 +21,8 @@ export type Seat = {
   ypos?: number;
   seatRef?: HTMLDivElement;
 };
+
+type SeatUpdateParam = HTMLDivElement | boolean;
 
 export type Pod = {
   podNumber: number;
@@ -49,10 +51,10 @@ type EventState = [
     removePod: (podNumber: number) => void;
     editPodSize: ({ podNumber, podSize }: Pod) => void;
     updateSeatsInPod: (podNumber: number) => void;
-    updateSeatRef: (
+    updateSeat: (
       podNumber: number,
       seatNumber: number,
-      seatRef: HTMLDivElement
+      updateParam: SeatUpdateParam
     ) => void;
   }
 ];
@@ -61,16 +63,16 @@ type EventState = [
 
 const SampleEvent: Event = {
   evtPods: [{ podNumber: 1, podSize: 8 }],
-  evtSeats: [],
+  evtSeats: [{ podNumber: 0, seatNumber: 0, filled: false }],
   evtPlayerList: [
-    { id: 0, name: "Keldan" },
-    { id: 1, name: "Colton" },
-    { id: 2, name: "Aiden" },
-    { id: 3, name: "Harrison" },
-    { id: 4, name: "Josh" },
-    { id: 5, name: "Daniel" },
-    { id: 6, name: "Jesse" },
-    { id: 7, name: "Jack" },
+    { id: 0, name: "Keldan", pod: 0, seat: 0 },
+    { id: 1, name: "Colton", pod: 0, seat: 0 },
+    { id: 2, name: "Aiden", pod: 0, seat: 0 },
+    { id: 3, name: "Harrison", pod: 0, seat: 0 },
+    { id: 4, name: "Josh", pod: 0, seat: 0 },
+    { id: 5, name: "Daniel", pod: 0, seat: 0 },
+    { id: 6, name: "Jesse", pod: 0, seat: 0 },
+    { id: 7, name: "Jack", pod: 0, seat: 0 },
   ],
   evtSettings: { playerCap: 0 },
 };
@@ -148,7 +150,7 @@ export function EventContextProvider(props: any) {
                 const newSeat: Seat = {
                   podNumber: podNumber,
                   seatNumber: seatsInPod().length + 1,
-                  filled: false,
+                  filled: true,
                 };
                 newEvt.evtSeats = [...newEvt.evtSeats, newSeat];
               }
@@ -158,46 +160,33 @@ export function EventContextProvider(props: any) {
             }
           });
         },
-        updateSeatRef(
+        updateSeat(
           podNumber: number,
           seatNumber: number,
-          seatRef: HTMLDivElement
+          updateParam: SeatUpdateParam
         ) {
-          // // console.log("updating");
-          // setEvent((prevEvt) => {
-          //   const newEvt = { ...prevEvt };
-          //   const seatIndex = newEvt.evtSeats.findIndex(
-          //     (seat) =>
-          //       seat.podNumber === podNumber && seat.seatNumber === seatNumber
-          //   );
-          //   if (seatIndex !== -1) {
-          //     const updatedSeat = {
-          //       ...newEvt.evtSeats[seatIndex],
-          //       seatRef: seatRef,
-          //     };
-          //     newEvt.evtSeats[seatIndex] = updatedSeat;
-          //   }
+          if (updateParam instanceof HTMLDivElement) {
+            const seatIndex = () => {
+              return event().evtSeats.findIndex(
+                (seat) =>
+                  seat.podNumber === podNumber && seat.seatNumber === seatNumber
+              );
+            };
 
-          //   return newEvt;
-          // });
+            if (seatIndex() !== -1) {
+              event().evtSeats[seatIndex()].seatRef = updateParam;
+            }
+          } else if (typeof updateParam === "boolean") {
+            const seatIndex = () => {
+              return event().evtSeats.findIndex(
+                (seat) =>
+                  seat.podNumber === podNumber && seat.seatNumber === seatNumber
+              );
+            };
 
-          // const seatIndex = () => {
-          //   return event().evtSeats.filter(
-          //     (seat) =>
-          //       seat.podNumber === podNumber && seat.seatNumber === seatNumber
-          //   );
-          // };
-          // console.log(event().evtSeats);
-          // console.log(seatIndex());
-          const seatIndex = () => {
-            return event().evtSeats.findIndex(
-              (seat) =>
-                seat.podNumber === podNumber && seat.seatNumber === seatNumber
-            );
-          };
-
-          if (seatIndex() !== -1) {
-            event().evtSeats[seatIndex()].seatRef = seatRef;
+            if (seatIndex() !== -1) {
+              event().evtSeats[seatIndex()].filled = updateParam;
+            }
           }
         },
       },

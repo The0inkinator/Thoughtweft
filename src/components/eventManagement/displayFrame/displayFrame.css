@@ -1,7 +1,8 @@
 .evtDisplayFrame {
-  width: var(--PodCard);
-  aspect-ratio: var(--PodCardAR);
+  min-width: var(--PodCard);
+  min-height: var(--PodCard);
   position: relative;
+  margin: 2rem;
 }
 
 .evtDisplayFrameContent {
@@ -21,8 +22,8 @@
   position: absolute;
   background-color: rgb(73, 73, 110);
   border-radius: var(--LargeBorderRadius);
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);

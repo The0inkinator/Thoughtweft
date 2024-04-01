@@ -1,1 +1,50 @@
+.podCardCont {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
+.podTitle {
+  height: 10%;
+  /* outline: solid blue; */
+  align-content: end;
+  font-weight: bold;
+  color: aliceblue;
+  text-align: center;
+}
+
+.tableCont {
+  width: 100%;
+  height: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* outline: solid red; */
+}
+
+.podTable {
+  background-color: rgb(25, 25, 39);
+  width: 20%;
+  height: 70%;
+  margin-inline: 10%;
+}
+
+.podSeatsUp {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.podSeatsDown {
+  display: flex;
+  flex-direction: column;
+}
+
+.sampleSeat {
+  background-color: rgb(25, 25, 39);
+  width: 2rem;
+  height: 2rem;
+  margin-block: 1rem;
+  text-align: center;
+  color: aliceblue;
+}

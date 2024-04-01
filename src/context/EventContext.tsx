@@ -45,8 +45,8 @@ type EventState = [
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: ({ name }: Player) => void;
-    addPod: ({ podSize, podName, podCube }: Pod) => void;
-    removePod: ({ podNumber }: Pod) => void;
+    addPod: (podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12) => void;
+    removePod: (podNumber: number) => void;
     editPodSize: ({ podNumber, podSize }: Pod) => void;
     updateSeatsInPod: (podNumber: number) => void;
   }
@@ -81,8 +81,29 @@ export function EventContextProvider(props: any) {
           setEvent(newEvent);
         },
         addPlayer({ name }) {},
-        addPod({ podSize }) {},
-        removePod({ podNumber }) {},
+        addPod(podSize) {
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+
+            const newPod: Pod = {
+              podNumber: newEvt.evtPods.length + 1,
+              podSize: podSize,
+            };
+            newEvt.evtPods = [...newEvt.evtPods, newPod];
+            return newEvt;
+          });
+        },
+        removePod(podNumber) {
+          setEvent((preEvt) => {
+            const newEvt = { ...preEvt };
+            const podIndex = newEvt.evtPods.findIndex(
+              (pod) => pod.podNumber === podNumber
+            );
+            newEvt.evtPods.splice(podIndex, 1);
+            console.log(newEvt);
+            return newEvt;
+          });
+        },
         editPodSize({ podNumber, podSize }) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
@@ -109,26 +130,24 @@ export function EventContextProvider(props: any) {
             )!.podSize;
             const seatsInPod = () => {
               return newEvt.evtSeats.filter(
-                (seat) => (seat.podNumber = podNumber)
-              )!.length;
+                (seat) => seat.podNumber === podNumber
+              );
             };
 
-            if (seatsInPod() > newPodSize) {
-              const seatsToRemove = seatsInPod() - newPodSize;
+            if (seatsInPod().length > newPodSize) {
+              const seatsToRemove = seatsInPod().length - newPodSize;
               newEvt.evtSeats = [...newEvt.evtSeats.slice(0, -seatsToRemove)];
               return newEvt;
-            } else if (seatsInPod() < newPodSize) {
-              const seatsToAdd = newPodSize - seatsInPod();
-
+            } else if (seatsInPod().length < newPodSize) {
+              const seatsToAdd = newPodSize - seatsInPod().length;
               for (let i = 0; i < seatsToAdd; i++) {
                 const newSeat: Seat = {
                   podNumber: podNumber,
-                  seatNumber: seatsInPod() + 1,
+                  seatNumber: seatsInPod().length + 1,
                   filled: false,
                 };
                 newEvt.evtSeats = [...newEvt.evtSeats, newSeat];
               }
-
               return newEvt;
             } else {
               return prevEvt;

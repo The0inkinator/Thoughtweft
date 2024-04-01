@@ -11,7 +11,8 @@ interface PodCardInputs {
 //MAIN FUNCTION
 export default function PodCard({ podSize, podNumber }: PodCardInputs) {
   //Context State
-  const [eventState, { editPodSize, updateSeatsInPod }] = useEventContext();
+  const [eventState, { editPodSize, updateSeatsInPod, removePod }] =
+    useEventContext();
   const thisPodState = () => {
     return eventState().evtPods.filter((pod) => pod.podNumber === podNumber)[0];
   };
@@ -45,12 +46,14 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
     <DisplayFrame>
       <div class="podCardCont">
         <div class="podTitle">
-          Pod {podNumber}{" "}
+          Pod {podNumber} Pod Size {podSize} Pod Seats{" "}
+          {`${thisPodSeats().length}`}
           <button
             type="submit"
             style={{ color: "red" }}
             onClick={() => {
               editPodSize({ podNumber, podSize: 10 });
+              updateSeatsInPod(podNumber);
             }}
           >
             Make pod 10
@@ -59,19 +62,20 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
             type="submit"
             style={{ color: "red" }}
             onClick={() => {
-              editPodSize({ podNumber, podSize: 8 });
+              editPodSize({ podNumber, podSize: 7 });
+              updateSeatsInPod(podNumber);
             }}
           >
-            Make pod 8
+            Make pod 7
           </button>
           <button
             type="submit"
             style={{ color: "red" }}
             onClick={() => {
-              editPodSize({ podNumber, podSize: 7 });
+              removePod(podNumber);
             }}
           >
-            Make pod 7
+            Remove Pod
           </button>
         </div>
         <div class="tableCont">

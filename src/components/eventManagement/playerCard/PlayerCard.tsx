@@ -16,8 +16,20 @@ export default function PlayerCard() {
 
   return (
     <div class="playerCardCont" ref={thisPlayerCard}>
-      <div class="playerIcon"></div>
-      <div class="playerName">Keldan Campbell</div>
+      <Switch fallback={<></>}>
+        <Match when={playerCardMode() === "noSeat"}>
+          <></>
+        </Match>
+        <Match when={playerCardMode() === "dragging"}>
+          <></>
+        </Match>
+        <Match when={playerCardMode() === "hoveringSeat"}>
+          <></>
+        </Match>
+        <Match when={playerCardMode() === "seated"}>
+          <></>
+        </Match>
+      </Switch>
     </div>
   );
 }

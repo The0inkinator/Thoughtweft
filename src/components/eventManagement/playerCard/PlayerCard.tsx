@@ -45,13 +45,7 @@ export default function PlayerCard({
   });
 
   return (
-    <div
-      class="playerCardCont"
-      ref={thisPlayerCard}
-      onclick={() => {
-        console.log(targetSeat()?.seatRef);
-      }}
-    >
+    <div class="playerCardCont" ref={thisPlayerCard} onclick={() => {}}>
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
           <div class="playerName" onclick={() => {}}>

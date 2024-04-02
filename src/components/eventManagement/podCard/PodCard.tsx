@@ -3,6 +3,7 @@ import { createEffect, createSignal, For, onMount } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import PlayerSeat from "../playerSeat";
+import TestElement from "~/components/Test/TestElement";
 
 interface PodCardInputs {
   podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -36,6 +37,8 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
 
     return allEvtSeats.filter((seat, index) => index >= allEvtSeats.length / 2);
   };
+
+  //updates pod seats when off
 
   createEffect(() => {
     if (thisPodState().podSize !== thisPodSeats().length) {
@@ -83,6 +86,7 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
             <For each={secondHalfSeats()}>
               {(seat) => (
                 <PlayerSeat
+                  key={`seat-${seat.seatNumber}`}
                   seatNumber={seat.seatNumber}
                   podNumber={podNumber}
                   seatFacing="left"
@@ -94,11 +98,15 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
           <div class="podSeatsDown">
             <For each={firstHalfSeats()}>
               {(seat) => (
-                <PlayerSeat
-                  seatNumber={seat.seatNumber}
-                  podNumber={podNumber}
-                  seatFacing="right"
-                ></PlayerSeat>
+                // <PlayerSeat
+                //   key={`seat-${seat.seatNumber}`}
+                //   seatNumber={seat.seatNumber}
+                //   podNumber={podNumber}
+                //   seatFacing="right"
+                // ></PlayerSeat>
+                <div>
+                  <TestElement input={seat.seatNumber} />
+                </div>
               )}
             </For>
           </div>

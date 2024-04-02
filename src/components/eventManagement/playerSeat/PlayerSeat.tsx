@@ -4,6 +4,7 @@ import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
 
 interface PlayerSlotInput {
+  key: string;
   podNumber: number;
   seatNumber: number;
   seatFacing: "left" | "right";
@@ -34,13 +35,7 @@ export default function PlayerSeat({ podNumber, seatNumber }: PlayerSlotInput) {
   let thisSeat!: HTMLDivElement;
 
   return (
-    <div
-      class="playerSeatCont"
-      ref={thisSeat}
-      onclick={() => {
-        console.log(thisSeatState());
-      }}
-    >
+    <div class="playerSeatCont" ref={thisSeat} onclick={() => {}}>
       {/* <PlayerCard></PlayerCard> */}
     </div>
   );

@@ -38,6 +38,7 @@ export type Event = {
   evtSeats: Seat[];
   evtPlayerList: Player[];
   evtSettings: EventSettings;
+  visuals: "default" | "animating";
 };
 
 type EventState = [
@@ -73,6 +74,7 @@ const SampleEvent: Event = {
     { id: 7, name: "Jack", pod: 0, seat: 0 },
   ],
   evtSettings: { playerCap: 0 },
+  visuals: "default",
 };
 
 const EventContext = createContext<EventState | undefined>();

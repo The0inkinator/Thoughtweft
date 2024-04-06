@@ -1,7 +1,16 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
+import { useEventContext } from "~/context/EventContext";
 
-export default function TestBox() {
+interface TestBoxInputs {
+  seatNumber: number;
+
+  podNumber: number;
+}
+
+export default function TestBox({ seatNumber, podNumber }: TestBoxInputs) {
   const [mode, setMode] = createSignal<boolean>(false);
+  const [eventState, { updateSeat }] = useEventContext();
+
   return (
     <div
       style={{
@@ -16,6 +25,8 @@ export default function TestBox() {
           setMode(true);
         }
       }}
-    ></div>
+    >
+      {podNumber}
+    </div>
   );
 }

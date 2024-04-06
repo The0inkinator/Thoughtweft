@@ -16,7 +16,11 @@ export default function EventDisplay() {
           <PlayerHopper />
           <For each={eventState().evtPods}>
             {(pod) => (
-              <PodCard podSize={pod.podSize} podNumber={pod.podNumber} />
+              <PodCard
+                podSize={pod.podSize}
+                podNumber={pod.podNumber}
+                podId={pod.podId}
+              />
             )}
           </For>
           <PodPlusButton />

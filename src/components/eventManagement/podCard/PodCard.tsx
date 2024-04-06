@@ -1,5 +1,5 @@
 import "./podCard.css";
-import { createEffect, createSignal, For, onMount } from "solid-js";
+import { createEffect, createSignal, For, onMount, Index } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import PlayerSeat from "../playerSeat";
@@ -9,10 +9,11 @@ import TestBox from "~/components/Test/TestBox";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
+  podId: number;
 }
 
 //MAIN FUNCTION
-export default function PodCard({ podSize, podNumber }: PodCardInputs) {
+export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   //Context State
   const [eventState, { editPodSize, updatePodSize, removePod }] =
     useEventContext();
@@ -114,14 +115,14 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
                 </div>
               )}
             </For> */}
-            <For
-              each={
-                eventState().evtPods.find((pod) => podNumber === pod.podNumber)!
-                  .podSeats
-              }
-            >
-              {(pod) => <TestBox></TestBox>}
-            </For>
+            <Index each={eventState().evtPods[podId].podSeats}>
+              {(pod) => (
+                <TestBox
+                  seatNumber={pod().seatNumber}
+                  podNumber={pod().podNumber}
+                ></TestBox>
+              )}
+            </Index>
           </div>
         </div>
       </div>

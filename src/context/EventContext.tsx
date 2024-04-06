@@ -25,6 +25,7 @@ export type Seat = {
 };
 
 export type Pod = {
+  podId: number;
   podNumber: number;
   podSize: PodSizes;
   podSeats: Seat[];
@@ -66,6 +67,7 @@ type EventState = [
 const SampleEvent: Event = {
   evtPods: [
     {
+      podId: 0,
       podNumber: 1,
       podSize: 8,
       podSeats: [
@@ -125,6 +127,7 @@ export function EventContextProvider(props: any) {
             })();
 
             const newPod: Pod = {
+              podId: newEvt.evtPods.length + 1,
               podNumber: newEvt.evtPods.length + 1,
               podSize: inputPodSize,
               podSeats: newPodSeats,
@@ -152,15 +155,24 @@ export function EventContextProvider(props: any) {
             );
             newEvt.evtPods.splice(podIndex, 1);
 
-            newEvt.evtPods
-              .filter((pod) => pod.podNumber > inputPodNumber)
-              .map((pod) => {
-                const newPodNumber = pod.podNumber - 1;
-                pod.podNumber = newPodNumber;
-                pod.podSeats.map((seat) => {
-                  seat.podNumber = newPodNumber;
-                });
-              });
+            newEvt.evtPods.map((pod, podIndex) => {
+              const newPodNumber = podIndex + 1;
+              if (pod.podNumber !== newPodNumber) {
+                newEvt.evtPods[podIndex] = {
+                  ...newEvt.evtPods[podIndex],
+                  podNumber: newPodNumber,
+                };
+
+                newEvt.evtPods[podIndex].podSeats.map(
+                  (mappedSeat, seatIndex) => {
+                    newEvt.evtPods[podIndex].podSeats[seatIndex] = {
+                      ...newEvt.evtPods[podIndex].podSeats[seatIndex],
+                      podNumber: newPodNumber,
+                    };
+                  }
+                );
+              }
+            });
 
             return newEvt;
           });

@@ -49,13 +49,13 @@ type EventState = [
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: ({ name }: Player) => void;
-    addPod: (podSize: PodSizes) => void;
-    removePod: (podNumber: number) => void;
-    editPodSize: (podNumber: number, podSize: PodSizes) => void;
-    updatePodSize: (podNumber: number, newPodSize: number) => void;
+    addPod: (inputPodSize: PodSizes) => void;
+    removePod: (inputPodNumber: number) => void;
+    editPodSize: (inputPodNumber: number, inputPodSize: PodSizes) => void;
+    updatePodSize: (inputPodNumber: number, newPodSize: number) => void;
     updateSeat: (
-      podNumber: number,
-      seatNumber: number,
+      inputPodNumber: number,
+      inputSeatNumber: number,
       updateParam: SeatUpdateParam
     ) => void;
   }
@@ -97,46 +97,89 @@ export function EventContextProvider(props: any) {
     eventState: EventState = [
       () => event(),
       {
+        //MAKE EVENT
         makeEvent(newEvent) {
           setEvent(newEvent);
         },
+
+        //ADD PLAYER
         addPlayer({ name }) {},
-        addPod(podSize) {
+
+        //ADD POD
+        addPod(inputPodSize) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
 
+            const newPodSeats: Seat[] = (() => {
+              const tempArray = [];
+              for (let i = 1; i <= inputPodSize; i++) {
+                const newSeat: Seat = {
+                  podNumber: newEvt.evtPods.length + 1,
+                  seatNumber: i,
+                  filled: false,
+                };
+                tempArray.push(newSeat);
+              }
+
+              return tempArray;
+            })();
+
             const newPod: Pod = {
               podNumber: newEvt.evtPods.length + 1,
-              podSize: podSize,
-              podSeats: [],
+              podSize: inputPodSize,
+              podSeats: newPodSeats,
             };
             newEvt.evtPods = [...newEvt.evtPods, newPod];
             return newEvt;
           });
         },
-        removePod(podNumber) {
+
+        //REMOVE POD
+        removePod(inputPodNumber) {
+          // event()
+          //   .evtPods.filter((pod) => pod.podNumber > podNumber)
+          //   .map((pod) => {
+          //     const newPodNumber = pod.podNumber - 1;
+          //     pod.podNumber = newPodNumber;
+          //     pod.podSeats.map((seat) => {
+          //       seat.podNumber = newPodNumber;
+          //     });
+          //   });
           setEvent((preEvt) => {
             const newEvt = { ...preEvt };
             const podIndex = newEvt.evtPods.findIndex(
-              (pod) => pod.podNumber === podNumber
+              (pod) => pod.podNumber === inputPodNumber
             );
             newEvt.evtPods.splice(podIndex, 1);
+
+            newEvt.evtPods
+              .filter((pod) => pod.podNumber > inputPodNumber)
+              .map((pod) => {
+                const newPodNumber = pod.podNumber - 1;
+                pod.podNumber = newPodNumber;
+                pod.podSeats.map((seat) => {
+                  seat.podNumber = newPodNumber;
+                });
+              });
+
             return newEvt;
           });
         },
+
+        //EDIT POD SIZE
         editPodSize(
-          podNumber: number,
-          podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+          inputPodNumber: number,
+          inputPodSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
         ) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
             const podToChangeIndex = newEvt.evtPods.findIndex(
-              (pod) => pod.podNumber === podNumber
+              (pod) => pod.podNumber === inputPodNumber
             );
             if (podToChangeIndex !== -1) {
               newEvt.evtPods[podToChangeIndex] = {
                 ...newEvt.evtPods[podToChangeIndex],
-                podSize,
+                podSize: inputPodSize,
               };
               return newEvt;
             } else {
@@ -145,13 +188,15 @@ export function EventContextProvider(props: any) {
             }
           });
         },
-        updatePodSize(podNumber, newPodSize) {
+
+        //UPDATE POD SIZE
+        updatePodSize(inputPodNumber, newPodSize) {
           const podToEdit = event().evtPods.find(
-            (pod) => pod.podNumber === podNumber
+            (pod) => pod.podNumber === inputPodNumber
           );
 
           const podToEditIndex = event().evtPods.findIndex(
-            (pod) => pod.podNumber === podNumber
+            (pod) => pod.podNumber === inputPodNumber
           );
 
           if (podToEdit && podToEditIndex >= 0) {
@@ -165,7 +210,7 @@ export function EventContextProvider(props: any) {
                 const seatsStartingLength = podToEdit.podSeats.length;
                 for (let i = 1; i <= podDifference; i++) {
                   const newSeat: Seat = {
-                    podNumber: podNumber,
+                    podNumber: inputPodNumber,
                     seatNumber: seatsStartingLength + i,
                     filled: false,
                   };
@@ -191,50 +236,23 @@ export function EventContextProvider(props: any) {
                 return newEvt;
               });
             } else {
-              console.log(`No updates to pod ${podNumber}`);
+              console.log(`No updates to pod ${inputPodNumber}`);
             }
           }
-
-          // setEvent((prevEvt) => {
-          //   const newEvt = { ...prevEvt };
-          //   const newPodSize = newEvt.evtPods.find(
-          //     (pod) => pod.podNumber === podNumber
-          //   )!.podSize;
-          //   const seatsInPod = () => {
-          //     return newEvt.evtSeats.filter(
-          //       (seat) => seat.podNumber === podNumber
-          //     );
-          //   };
-          //   if (seatsInPod().length > newPodSize) {
-          //     const seatsToRemove = seatsInPod().length - newPodSize;
-          //     newEvt.evtSeats = [...newEvt.evtSeats.slice(0, -seatsToRemove)];
-          //     return newEvt;
-          //   } else if (seatsInPod().length < newPodSize) {
-          //     const seatsToAdd = newPodSize - seatsInPod().length;
-          //     for (let i = 0; i < seatsToAdd; i++) {
-          //       const newSeat: Seat = {
-          //         podNumber: podNumber,
-          //         seatNumber: seatsInPod().length + 1,
-          //         filled: true,
-          //       };
-          //       newEvt.evtSeats = [...newEvt.evtSeats, newSeat];
-          //     }
-          //     return newEvt;
-          //   } else {
-          //     return prevEvt;
-          //   }
-          // });
         },
+
+        //UPDATE SEAT
         updateSeat(
-          podNumber: number,
-          seatNumber: number,
+          inputPodNumber: number,
+          inputSeatNumber: number,
           updateParam: SeatUpdateParam
         ) {
           if (updateParam instanceof HTMLDivElement) {
             const seatIndex = () => {
               return event().evtSeats.findIndex(
                 (seat) =>
-                  seat.podNumber === podNumber && seat.seatNumber === seatNumber
+                  seat.podNumber === inputPodNumber &&
+                  seat.seatNumber === inputSeatNumber
               );
             };
 
@@ -245,7 +263,8 @@ export function EventContextProvider(props: any) {
             const seatIndex = () => {
               return event().evtSeats.findIndex(
                 (seat) =>
-                  seat.podNumber === podNumber && seat.seatNumber === seatNumber
+                  seat.podNumber === inputPodNumber &&
+                  seat.seatNumber === inputSeatNumber
               );
             };
 

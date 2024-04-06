@@ -13,8 +13,9 @@ interface PodCardInputs {
 //MAIN FUNCTION
 export default function PodCard({ podSize, podNumber }: PodCardInputs) {
   //Context State
-  const [eventState, { editPodSize, updateSeatsInPod, removePod }] =
+  const [eventState, { editPodSize, updatePodSize, removePod }] =
     useEventContext();
+  //Local State
   const thisPodState = () => {
     return eventState().evtPods.filter((pod) => pod.podNumber === podNumber)[0];
   };
@@ -22,54 +23,69 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
     return eventState().evtSeats.filter((seat) => seat.podNumber === podNumber);
   };
 
-  const firstHalfSeats = () => {
-    const allEvtSeats = eventState().evtSeats.filter(
-      (seat) => seat.podNumber === podNumber
-    );
+  type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
-    return allEvtSeats.filter((seat, index) => index < allEvtSeats.length / 2);
-  };
+  const [podSizeBtn, setPodSizeBtn] = createSignal<PodSizes>(podSize);
 
-  const secondHalfSeats = () => {
-    const allEvtSeats = eventState().evtSeats.filter(
-      (seat) => seat.podNumber === podNumber
-    );
+  const podOptions: PodSizes[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-    return allEvtSeats.filter((seat, index) => index >= allEvtSeats.length / 2);
-  };
+  const [podSizeDrop, setPodSizeDrop] = createSignal<"open" | "close">("close");
 
-  //updates pod seats when off
+  // const firstHalfSeats = () => {
+  //   const allEvtSeats = eventState().evtSeats.filter(
+  //     (seat) => seat.podNumber === podNumber
+  //   );
 
-  createEffect(() => {
-    if (thisPodState().podSize !== thisPodSeats().length) {
-      updateSeatsInPod(podNumber);
-    }
-  });
+  //   return allEvtSeats.filter((seat, index) => index < allEvtSeats.length / 2);
+  // };
+
+  // const secondHalfSeats = () => {
+  //   const allEvtSeats = eventState().evtSeats.filter(
+  //     (seat) => seat.podNumber === podNumber
+  //   );
+
+  //   return allEvtSeats.filter((seat, index) => index >= allEvtSeats.length / 2);
+  // };
 
   return (
     <DisplayFrame>
       <div class="podCardCont">
         <div class="podTitle">
           Pod {podNumber}
+          <p></p>
           <button
-            type="submit"
-            style={{ color: "red" }}
-            onClick={() => {
-              editPodSize({ podNumber, podSize: 10 });
-              updateSeatsInPod(podNumber);
+            class="podSizeDrop"
+            type="button"
+            onMouseUp={() => {
+              if (podSizeDrop() === "close") {
+                setPodSizeDrop("open");
+              }
             }}
           >
-            Make pod 10
-          </button>
-          <button
-            type="submit"
-            style={{ color: "red" }}
-            onClick={() => {
-              editPodSize({ podNumber, podSize: 7 });
-              updateSeatsInPod(podNumber);
-            }}
-          >
-            Make pod 7
+            {podSizeBtn()}
+            <div
+              class="podSizeMenu"
+              style={{
+                display: podSizeDrop() === "open" ? "block" : "none",
+              }}
+            >
+              <For each={podOptions}>
+                {(option) => (
+                  <div
+                    class="podSizeOption"
+                    style={{
+                      display: podSizeDrop() === "open" ? "block" : "none",
+                    }}
+                    onClick={() => {
+                      setPodSizeBtn(option);
+                      setPodSizeDrop("close");
+                    }}
+                  >
+                    {option}
+                  </div>
+                )}
+              </For>
+            </div>
           </button>
           <button
             type="submit"
@@ -82,21 +98,10 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
           </button>
         </div>
         <div class="tableCont">
-          <div class="podSeatsUp">
-            <For each={secondHalfSeats()}>
-              {(seat) => (
-                <PlayerSeat
-                  key={`seat-${seat.seatNumber}`}
-                  seatNumber={seat.seatNumber}
-                  podNumber={podNumber}
-                  seatFacing="left"
-                ></PlayerSeat>
-              )}
-            </For>
-          </div>
+          <div class="podSeatsUp"></div>
           <div class="podTable"></div>
           <div class="podSeatsDown">
-            <For each={firstHalfSeats()}>
+            {/* <For each={firstHalfSeats()}>
               {(seat) => (
                 // <PlayerSeat
                 //   key={`seat-${seat.seatNumber}`}
@@ -108,7 +113,7 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
                   <TestElement input={seat.seatNumber} />
                 </div>
               )}
-            </For>
+            </For> */}
           </div>
         </div>
       </div>

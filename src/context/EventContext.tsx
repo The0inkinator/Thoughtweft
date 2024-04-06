@@ -25,6 +25,7 @@ type SeatUpdateParam = HTMLDivElement | boolean;
 export type Pod = {
   podNumber: number;
   podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  podSeats: Seat[];
   podName?: string;
   podCube?: URL;
 };
@@ -48,8 +49,11 @@ type EventState = [
     addPlayer: ({ name }: Player) => void;
     addPod: (podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12) => void;
     removePod: (podNumber: number) => void;
-    editPodSize: ({ podNumber, podSize }: Pod) => void;
-    updateSeatsInPod: (podNumber: number) => void;
+    editPodSize: (
+      podNumber: number,
+      podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+    ) => void;
+    updatePodSize: (podNumber: number, newPodSize: number) => void;
     updateSeat: (
       podNumber: number,
       seatNumber: number,
@@ -61,7 +65,7 @@ type EventState = [
 //Create Sample Event
 
 const SampleEvent: Event = {
-  evtPods: [{ podNumber: 1, podSize: 8 }],
+  evtPods: [{ podNumber: 1, podSize: 8, podSeats: [] }],
   evtSeats: [{ podNumber: 0, seatNumber: 0, filled: false }],
   evtPlayerList: [
     { id: 0, name: "Keldan", pod: 1, seat: 2 },
@@ -95,6 +99,7 @@ export function EventContextProvider(props: any) {
             const newPod: Pod = {
               podNumber: newEvt.evtPods.length + 1,
               podSize: podSize,
+              podSeats: [],
             };
             newEvt.evtPods = [...newEvt.evtPods, newPod];
             return newEvt;
@@ -110,7 +115,10 @@ export function EventContextProvider(props: any) {
             return newEvt;
           });
         },
-        editPodSize({ podNumber, podSize }) {
+        editPodSize(
+          podNumber: number,
+          podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+        ) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
             const podToChangeIndex = newEvt.evtPods.findIndex(
@@ -128,37 +136,45 @@ export function EventContextProvider(props: any) {
             }
           });
         },
-        updateSeatsInPod(podNumber) {
-          setEvent((prevEvt) => {
-            const newEvt = { ...prevEvt };
-            const newPodSize = newEvt.evtPods.find(
-              (pod) => pod.podNumber === podNumber
-            )!.podSize;
-            const seatsInPod = () => {
-              return newEvt.evtSeats.filter(
-                (seat) => seat.podNumber === podNumber
-              );
-            };
+        updatePodSize(podNumber, newPodSize) {
+          const podToEdit = () => {
+            return event().evtPods.find((pod) => pod.podNumber === podNumber)!;
+          };
 
-            if (seatsInPod().length > newPodSize) {
-              const seatsToRemove = seatsInPod().length - newPodSize;
-              newEvt.evtSeats = [...newEvt.evtSeats.slice(0, -seatsToRemove)];
-              return newEvt;
-            } else if (seatsInPod().length < newPodSize) {
-              const seatsToAdd = newPodSize - seatsInPod().length;
-              for (let i = 0; i < seatsToAdd; i++) {
-                const newSeat: Seat = {
-                  podNumber: podNumber,
-                  seatNumber: seatsInPod().length + 1,
-                  filled: true,
-                };
-                newEvt.evtSeats = [...newEvt.evtSeats, newSeat];
-              }
-              return newEvt;
-            } else {
-              return prevEvt;
-            }
-          });
+          const podDifference =
+            podToEdit().podSize - podToEdit().podSeats.length;
+
+          console.log(podDifference);
+
+          // setEvent((prevEvt) => {
+          //   const newEvt = { ...prevEvt };
+          //   const newPodSize = newEvt.evtPods.find(
+          //     (pod) => pod.podNumber === podNumber
+          //   )!.podSize;
+          //   const seatsInPod = () => {
+          //     return newEvt.evtSeats.filter(
+          //       (seat) => seat.podNumber === podNumber
+          //     );
+          //   };
+          //   if (seatsInPod().length > newPodSize) {
+          //     const seatsToRemove = seatsInPod().length - newPodSize;
+          //     newEvt.evtSeats = [...newEvt.evtSeats.slice(0, -seatsToRemove)];
+          //     return newEvt;
+          //   } else if (seatsInPod().length < newPodSize) {
+          //     const seatsToAdd = newPodSize - seatsInPod().length;
+          //     for (let i = 0; i < seatsToAdd; i++) {
+          //       const newSeat: Seat = {
+          //         podNumber: podNumber,
+          //         seatNumber: seatsInPod().length + 1,
+          //         filled: true,
+          //       };
+          //       newEvt.evtSeats = [...newEvt.evtSeats, newSeat];
+          //     }
+          //     return newEvt;
+          //   } else {
+          //     return prevEvt;
+          //   }
+          // });
         },
         updateSeat(
           podNumber: number,

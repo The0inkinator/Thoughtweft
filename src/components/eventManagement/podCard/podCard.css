@@ -40,6 +40,32 @@
   flex-direction: column;
 }
 
+.podSizeDrop {
+  all: unset;
+  background-color: white;
+  color: black;
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.podSizeMenu {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.podSizeOption {
+  background-color: white;
+  height: 100%;
+  width: 100%;
+}
+
+.podSizeOption:hover {
+  background-color: grey;
+  cursor: pointer;
+}
+
 .sampleSeat {
   background-color: rgb(25, 25, 39);
   width: 2rem;

@@ -4,6 +4,10 @@ import { createSignal, createContext, useContext } from "solid-js";
 
 export type Record = [number, number, number];
 
+export type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+type SeatUpdateParam = HTMLDivElement | boolean;
+
 export type Player = {
   id: number;
   name: string;
@@ -20,11 +24,9 @@ export type Seat = {
   seatRef?: HTMLDivElement;
 };
 
-type SeatUpdateParam = HTMLDivElement | boolean;
-
 export type Pod = {
   podNumber: number;
-  podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  podSize: PodSizes;
   podSeats: Seat[];
   podName?: string;
   podCube?: URL;
@@ -47,12 +49,9 @@ type EventState = [
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: ({ name }: Player) => void;
-    addPod: (podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12) => void;
+    addPod: (podSize: PodSizes) => void;
     removePod: (podNumber: number) => void;
-    editPodSize: (
-      podNumber: number,
-      podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-    ) => void;
+    editPodSize: (podNumber: number, podSize: PodSizes) => void;
     updatePodSize: (podNumber: number, newPodSize: number) => void;
     updateSeat: (
       podNumber: number,
@@ -65,7 +64,17 @@ type EventState = [
 //Create Sample Event
 
 const SampleEvent: Event = {
-  evtPods: [{ podNumber: 1, podSize: 8, podSeats: [] }],
+  evtPods: [
+    {
+      podNumber: 1,
+      podSize: 8,
+      podSeats: [
+        { podNumber: 1, seatNumber: 1, filled: false },
+        { podNumber: 1, seatNumber: 2, filled: false },
+        { podNumber: 1, seatNumber: 3, filled: false },
+      ],
+    },
+  ],
   evtSeats: [{ podNumber: 0, seatNumber: 0, filled: false }],
   evtPlayerList: [
     { id: 0, name: "Keldan", pod: 1, seat: 2 },
@@ -137,14 +146,54 @@ export function EventContextProvider(props: any) {
           });
         },
         updatePodSize(podNumber, newPodSize) {
-          const podToEdit = () => {
-            return event().evtPods.find((pod) => pod.podNumber === podNumber)!;
-          };
+          const podToEdit = event().evtPods.find(
+            (pod) => pod.podNumber === podNumber
+          );
 
-          const podDifference =
-            podToEdit().podSize - podToEdit().podSeats.length;
+          const podToEditIndex = event().evtPods.findIndex(
+            (pod) => pod.podNumber === podNumber
+          );
 
-          console.log(podDifference);
+          if (podToEdit && podToEditIndex >= 0) {
+            podToEdit.podSize = newPodSize as PodSizes;
+
+            const podDifference = podToEdit.podSize - podToEdit.podSeats.length;
+
+            if (podDifference > 0) {
+              setEvent((prevEvt) => {
+                const newEvt = { ...prevEvt };
+                const seatsStartingLength = podToEdit.podSeats.length;
+                for (let i = 1; i <= podDifference; i++) {
+                  const newSeat: Seat = {
+                    podNumber: podNumber,
+                    seatNumber: seatsStartingLength + i,
+                    filled: false,
+                  };
+                  newEvt.evtPods[podToEditIndex].podSeats = [
+                    ...newEvt.evtPods[podToEditIndex].podSeats,
+                    newSeat,
+                  ];
+                }
+                return newEvt;
+              });
+            } else if (podDifference < 0) {
+              const seatNumToCut = Math.abs(podDifference);
+              const seatsStartingLength = podToEdit.podSeats.length;
+              setEvent((preEvt) => {
+                const newEvt = { ...preEvt };
+
+                newEvt.evtPods[podToEditIndex].podSeats = [
+                  ...newEvt.evtPods[podToEditIndex].podSeats.slice(
+                    0,
+                    seatsStartingLength - seatNumToCut
+                  ),
+                ];
+                return newEvt;
+              });
+            } else {
+              console.log(`No updates to pod ${podNumber}`);
+            }
+          }
 
           // setEvent((prevEvt) => {
           //   const newEvt = { ...prevEvt };

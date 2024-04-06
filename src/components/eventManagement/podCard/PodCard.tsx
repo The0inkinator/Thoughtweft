@@ -4,9 +4,10 @@ import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import PlayerSeat from "../playerSeat";
 import TestElement from "~/components/Test/TestElement";
-
+import { PodSizes } from "~/context/EventContext";
+import TestBox from "~/components/Test/TestBox";
 interface PodCardInputs {
-  podSize: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  podSize: PodSizes;
   podNumber: number;
 }
 
@@ -22,8 +23,6 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
   const thisPodSeats = () => {
     return eventState().evtSeats.filter((seat) => seat.podNumber === podNumber);
   };
-
-  type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
   const [podSizeBtn, setPodSizeBtn] = createSignal<PodSizes>(podSize);
 
@@ -70,7 +69,7 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
               }}
             >
               <For each={podOptions}>
-                {(option) => (
+                {(option: PodSizes) => (
                   <div
                     class="podSizeOption"
                     style={{
@@ -79,6 +78,7 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
                     onClick={() => {
                       setPodSizeBtn(option);
                       setPodSizeDrop("close");
+                      updatePodSize(podNumber, option);
                     }}
                   >
                     {option}
@@ -114,6 +114,14 @@ export default function PodCard({ podSize, podNumber }: PodCardInputs) {
                 </div>
               )}
             </For> */}
+            <For
+              each={
+                eventState().evtPods.find((pod) => podNumber === pod.podNumber)!
+                  .podSeats
+              }
+            >
+              {(pod) => <TestBox></TestBox>}
+            </For>
           </div>
         </div>
       </div>

@@ -43,6 +43,7 @@ export type Event = {
   evtPlayerList: Player[];
   evtSettings: EventSettings;
   visuals: "default" | "animating";
+  nextPodId: number;
 };
 
 type EventState = [
@@ -51,7 +52,7 @@ type EventState = [
     makeEvent: (newEvent: Event) => void;
     addPlayer: ({ name }: Player) => void;
     addPod: (inputPodSize: PodSizes) => void;
-    removePod: (inputPodNumber: number) => void;
+    removePod: (inputPodId: number) => void;
     editPodSize: (inputPodNumber: number, inputPodSize: PodSizes) => void;
     updatePodSize: (inputPodNumber: number, newPodSize: number) => void;
     updateSeat: (
@@ -90,6 +91,7 @@ const SampleEvent: Event = {
   ],
   evtSettings: { playerCap: 0 },
   visuals: "default",
+  nextPodId: 1,
 };
 
 const EventContext = createContext<EventState | undefined>();
@@ -127,18 +129,20 @@ export function EventContextProvider(props: any) {
             })();
 
             const newPod: Pod = {
-              podId: newEvt.evtPods.length + 1,
+              podId: event().nextPodId,
               podNumber: newEvt.evtPods.length + 1,
               podSize: inputPodSize,
               podSeats: newPodSeats,
             };
             newEvt.evtPods = [...newEvt.evtPods, newPod];
+            const newId = event().nextPodId + 1;
+            newEvt.nextPodId = newId;
             return newEvt;
           });
         },
 
         //REMOVE POD
-        removePod(inputPodNumber) {
+        removePod(inputPodId) {
           // event()
           //   .evtPods.filter((pod) => pod.podNumber > podNumber)
           //   .map((pod) => {
@@ -151,26 +155,31 @@ export function EventContextProvider(props: any) {
           setEvent((preEvt) => {
             const newEvt = { ...preEvt };
             const podIndex = newEvt.evtPods.findIndex(
-              (pod) => pod.podNumber === inputPodNumber
+              (pod) => pod.podId === inputPodId
             );
             newEvt.evtPods.splice(podIndex, 1);
 
             newEvt.evtPods.map((pod, podIndex) => {
               const newPodNumber = podIndex + 1;
               if (pod.podNumber !== newPodNumber) {
-                newEvt.evtPods[podIndex] = {
-                  ...newEvt.evtPods[podIndex],
-                  podNumber: newPodNumber,
-                };
+                // newEvt.evtPods[podIndex] = {
+                //   ...newEvt.evtPods[podIndex],
+                //   podNumber: newPodNumber,
+                // };
+                // newEvt.evtPods[podIndex].podNumber = newPodNumber;
+                // newEvt.evtPods[podIndex].podSeats.map(
+                //   (mappedSeat, seatIndex) => {
+                //     newEvt.evtPods[podIndex].podSeats[seatIndex] = {
+                //       ...newEvt.evtPods[podIndex].podSeats[seatIndex],
+                //       podNumber: newPodNumber,
+                //     };
+                //   }
+                // );
 
-                newEvt.evtPods[podIndex].podSeats.map(
-                  (mappedSeat, seatIndex) => {
-                    newEvt.evtPods[podIndex].podSeats[seatIndex] = {
-                      ...newEvt.evtPods[podIndex].podSeats[seatIndex],
-                      podNumber: newPodNumber,
-                    };
-                  }
-                );
+                newEvt.evtPods[podIndex].podSeats[0] = {
+                  ...newEvt.evtPods[podIndex].podSeats[0],
+                  podNumber: 100,
+                };
               }
             });
 

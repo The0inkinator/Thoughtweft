@@ -9,11 +9,15 @@ import TestBox from "~/components/Test/TestBox";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
-  podId: number;
+  thisPodId: number;
 }
 
 //MAIN FUNCTION
-export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
+export default function PodCard({
+  podSize,
+  podNumber,
+  thisPodId,
+}: PodCardInputs) {
   //Context State
   const [eventState, { editPodSize, updatePodSize, removePod }] =
     useEventContext();
@@ -92,7 +96,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             type="submit"
             style={{ color: "red" }}
             onClick={() => {
-              removePod(podNumber);
+              removePod(thisPodId);
             }}
           >
             Remove Pod
@@ -115,7 +119,13 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 </div>
               )}
             </For> */}
-            <Index each={eventState().evtPods[podId].podSeats}>
+
+            <Index
+              each={
+                eventState().evtPods.find((pod) => pod.podId === thisPodId)!
+                  .podSeats
+              }
+            >
               {(pod) => (
                 <TestBox
                   seatNumber={pod().seatNumber}

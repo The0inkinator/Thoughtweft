@@ -19,7 +19,7 @@ export default function EventDisplay() {
               <PodCard
                 podSize={pod.podSize}
                 podNumber={pod.podNumber}
-                podId={pod.podId}
+                thisPodId={pod.podId}
               />
             )}
           </For>

@@ -1,55 +1,40 @@
 import "./podCard.css";
-import { createEffect, createSignal, For, onMount, Index } from "solid-js";
+import {
+  createEffect,
+  createSignal,
+  For,
+  onMount,
+  Index,
+  createMemo,
+} from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import PlayerSeat from "../playerSeat";
 import TestElement from "~/components/Test/TestElement";
-import { PodSizes } from "~/context/EventContext";
+import { PodSizes } from "~/typing/eventTypes";
 import TestBox from "~/components/Test/TestBox";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
-  thisPodId: number;
+  podId: number;
 }
 
 //MAIN FUNCTION
-export default function PodCard({
-  podSize,
-  podNumber,
-  thisPodId,
-}: PodCardInputs) {
+export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   //Context State
-  const [eventState, { editPodSize, updatePodSize, removePod }] =
+  const [eventState, { updatePodSize, removePod, changePodNumber }] =
     useEventContext();
   //Local State
-  const thisPodState = () => {
-    return eventState().evtPods.filter((pod) => pod.podNumber === podNumber)[0];
-  };
-  const thisPodSeats = () => {
-    return eventState().evtSeats.filter((seat) => seat.podNumber === podNumber);
-  };
+
+  const thisPodSeats = createMemo(() =>
+    eventState().evtSeats.filter((seat) => seat.parentPodId === podId)
+  );
 
   const [podSizeBtn, setPodSizeBtn] = createSignal<PodSizes>(podSize);
 
   const podOptions: PodSizes[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   const [podSizeDrop, setPodSizeDrop] = createSignal<"open" | "close">("close");
-
-  // const firstHalfSeats = () => {
-  //   const allEvtSeats = eventState().evtSeats.filter(
-  //     (seat) => seat.podNumber === podNumber
-  //   );
-
-  //   return allEvtSeats.filter((seat, index) => index < allEvtSeats.length / 2);
-  // };
-
-  // const secondHalfSeats = () => {
-  //   const allEvtSeats = eventState().evtSeats.filter(
-  //     (seat) => seat.podNumber === podNumber
-  //   );
-
-  //   return allEvtSeats.filter((seat, index) => index >= allEvtSeats.length / 2);
-  // };
 
   return (
     <DisplayFrame>
@@ -96,7 +81,7 @@ export default function PodCard({
             type="submit"
             style={{ color: "red" }}
             onClick={() => {
-              removePod(thisPodId);
+              removePod(podId);
             }}
           >
             Remove Pod
@@ -106,33 +91,11 @@ export default function PodCard({
           <div class="podSeatsUp"></div>
           <div class="podTable"></div>
           <div class="podSeatsDown">
-            {/* <For each={firstHalfSeats()}>
+            <For each={thisPodSeats()}>
               {(seat) => (
-                // <PlayerSeat
-                //   key={`seat-${seat.seatNumber}`}
-                //   seatNumber={seat.seatNumber}
-                //   podNumber={podNumber}
-                //   seatFacing="right"
-                // ></PlayerSeat>
-                <div>
-                  <TestElement input={seat.seatNumber} />
-                </div>
+                <TestBox seatNumber={seat.seatNumber} podId={podId}></TestBox>
               )}
-            </For> */}
-
-            <Index
-              each={
-                eventState().evtPods.find((pod) => pod.podId === thisPodId)!
-                  .podSeats
-              }
-            >
-              {(pod) => (
-                <TestBox
-                  seatNumber={pod().seatNumber}
-                  podNumber={pod().podNumber}
-                ></TestBox>
-              )}
-            </Index>
+            </For>
           </div>
         </div>
       </div>

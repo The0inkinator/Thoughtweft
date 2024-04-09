@@ -1,0 +1,48 @@
+export type Record = [number, number, number];
+
+export type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+export type SeatUpdateParam = HTMLDivElement | boolean;
+
+export type Player = {
+  id: number;
+  name: string;
+  pod: number;
+  seat: number;
+  matchRecord?: Record;
+  eventRecord?: Record;
+};
+
+export type FullSeat = {
+  podId: number;
+  seatNumber: number;
+  filled: boolean;
+  seatRef?: HTMLDivElement;
+};
+
+export type ProxySeat = {
+  parentPodId: number;
+  seatNumber: number;
+};
+
+export type Pod = {
+  podId: number;
+  podNumber: number;
+  podSize: PodSizes;
+  podSeats: FullSeat[];
+  podName?: string;
+  podCube?: URL;
+};
+
+export type EventSettings = {
+  playerCap: number;
+};
+
+export type Event = {
+  evtPods: Pod[];
+  evtSeats: ProxySeat[];
+  evtPlayerList: Player[];
+  evtSettings: EventSettings;
+  visuals: "default" | "animating";
+  nextPodId: number;
+};

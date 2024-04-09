@@ -1,6 +1,7 @@
 import { createEffect, createSignal, onMount } from "solid-js";
 import "./TestElement.css";
 import { useTestContext } from "~/context/TestContext";
+import { useEventContext } from "~/context/EventContext";
 
 type ElementStates = "inSlot" | "dragging";
 
@@ -10,6 +11,10 @@ interface TestIntf {
 
 export default function TestElement({ input }: TestIntf) {
   const [testState, setTestState] = createSignal<ElementStates>("dragging");
+  const [eventState] = useEventContext();
+  const signalInput = () => {
+    return input;
+  };
 
   return (
     <div
@@ -19,7 +24,7 @@ export default function TestElement({ input }: TestIntf) {
         setTestState("inSlot");
       }}
     >
-      {input}
+      {signalInput()}
     </div>
   );
 }

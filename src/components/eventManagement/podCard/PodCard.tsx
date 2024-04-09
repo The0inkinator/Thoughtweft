@@ -27,7 +27,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   //Local State
 
   const thisPodSeats = createMemo(() =>
-    eventState().evtSeats.filter((seat) => seat.parentPodId === podId)
+    eventState().evtSeats.filter((seat) => seat.podId === podId)
   );
 
   const [podSizeBtn, setPodSizeBtn] = createSignal<PodSizes>(podSize);

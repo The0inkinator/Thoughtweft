@@ -15,13 +15,13 @@ export default function TestBox({ seatNumber, podId }: TestBoxInputs) {
       .podSeats.find((seat) => (seat.seatNumber = seatNumber))!;
   };
 
-  onMount(() => {
-    console.log(`seat ${seatNumber} added`);
-  });
+  // onMount(() => {
+  //   console.log(`seat ${seatNumber} added`);
+  // });
 
-  onCleanup(() => {
-    console.log(`seat ${seatNumber} cleaned up`);
-  });
+  // onCleanup(() => {
+  //   console.log(`seat ${seatNumber} cleaned up`);
+  // });
 
   return (
     <div

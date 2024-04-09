@@ -21,7 +21,7 @@ export type FullSeat = {
 };
 
 export type ProxySeat = {
-  parentPodId: number;
+  podId: number;
   seatNumber: number;
 };
 

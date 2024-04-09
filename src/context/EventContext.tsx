@@ -92,7 +92,7 @@ export function EventContextProvider(props: any) {
               const tempArray = [];
               for (let i = 1; i <= inputPodSize; i++) {
                 const newFullSeat: ProxySeat = {
-                  parentPodId: event().nextPodId,
+                  podId: event().nextPodId,
                   seatNumber: i,
                 };
                 tempArray.push(newFullSeat);
@@ -118,7 +118,35 @@ export function EventContextProvider(props: any) {
         },
 
         //REMOVE POD
-        removePod(inputPodId) {},
+        removePod(inputPodId) {
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+
+            const podIndexToRemove = newEvt.evtPods.findIndex(
+              (pod) => pod.podId === inputPodId
+            );
+            //remove all proxy seats
+            newEvt.evtSeats = newEvt.evtSeats.filter(
+              (seat) => seat.podId !== inputPodId
+            );
+            //remove the pod
+            if (podIndexToRemove !== -1) {
+              newEvt.evtPods.splice(podIndexToRemove, 1);
+            }
+
+            //update pod #s
+            newEvt.evtPods.map((pod, index) => {
+              if (pod.podNumber !== index + 1) {
+                newEvt.evtPods[index] = {
+                  ...newEvt.evtPods[index],
+                  podNumber: index + 1,
+                };
+              }
+            });
+
+            return newEvt;
+          });
+        },
 
         //CHANGE POD NUMBER
         changePodNumber(inputPodNumber, newPodNumber) {},

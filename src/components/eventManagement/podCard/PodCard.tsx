@@ -22,12 +22,16 @@ interface PodCardInputs {
 //MAIN FUNCTION
 export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   //Context State
-  const [eventState, { updatePodSize, removePod, changePodNumber }] =
-    useEventContext();
+  const [eventState, { updatePodSize, removePod }] = useEventContext();
   //Local State
+  const [localPodNumber, setLocalPodNumber] = createSignal(podNumber);
 
-  const thisPodSeats = createMemo(() =>
-    eventState().evtSeats.filter((seat) => seat.podId === podId)
+  const thisPodState = () => {
+    return eventState().evtPods.find((pod) => pod.podId === podId);
+  };
+
+  const thisPodSeats = eventState().evtSeats.filter(
+    (seat) => seat.podId === podId
   );
 
   const [podSizeBtn, setPodSizeBtn] = createSignal<PodSizes>(podSize);
@@ -36,11 +40,30 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   const [podSizeDrop, setPodSizeDrop] = createSignal<"open" | "close">("close");
 
+  onMount(() => {
+    // console.log(podNumber);
+  });
+
+  // createEffect(() => {
+  //   const thisPodIndex = () => {
+  //     return eventState().evtPods.findIndex((pod) => pod.podId === podId);
+  //   };
+  //   if (thisPodIndex() + 1 !== podNumber) {
+  //     console.log(thisPodIndex() + 1, "&", podNumber);
+  //     eventState().evtPods.find((pod) => pod.podId === podId)!.podNumber =
+  //       eventState().evtPods.length + 1;
+
+  //     // setLocalPodNumber(thisPodIndex() + 1);
+  //     updatePodNumber(podId);
+  //     console.log(thisPodState());
+  //   }
+  // });
+
   return (
     <DisplayFrame>
       <div class="podCardCont">
         <div class="podTitle">
-          Pod {podNumber}
+          Pod {thisPodState()?.podNumber}
           <p></p>
           <button
             class="podSizeDrop"
@@ -91,7 +114,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           <div class="podSeatsUp"></div>
           <div class="podTable"></div>
           <div class="podSeatsDown">
-            <For each={thisPodSeats()}>
+            <For each={thisPodSeats}>
               {(seat) => (
                 <TestBox seatNumber={seat.seatNumber} podId={podId}></TestBox>
               )}

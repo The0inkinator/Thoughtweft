@@ -18,7 +18,6 @@ type EventState = [
     addPlayer: ({ name }: Player) => void;
     addPod: (inputPodSize: PodSizes) => void;
     removePod: (inputPodId: number) => void;
-    changePodNumber: (inputPodNumber: number, newPodNumber: number) => void;
     updatePodSize: (inputPodId: number, newPodSize: number) => void;
     updateSeat: (
       inputPodNumber: number,
@@ -137,19 +136,13 @@ export function EventContextProvider(props: any) {
             //update pod #s
             newEvt.evtPods.map((pod, index) => {
               if (pod.podNumber !== index + 1) {
-                newEvt.evtPods[index] = {
-                  ...newEvt.evtPods[index],
-                  podNumber: index + 1,
-                };
+                newEvt.evtPods[index].podNumber = index + 1;
               }
             });
 
             return newEvt;
           });
         },
-
-        //CHANGE POD NUMBER
-        changePodNumber(inputPodNumber, newPodNumber) {},
 
         //UPDATE POD SIZE
         updatePodSize(inputPodId, newPodSize) {

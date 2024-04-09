@@ -38,7 +38,7 @@ export default function TestBox({ seatNumber, podId }: TestBoxInputs) {
         }
       }}
     >
-      {/* PdID: {thisSeatState().podId} St#: {thisSeatState().seatNumber} */}
+      {/* PdID: {podId} St#: {seatNumber} */}
     </div>
   );
 }

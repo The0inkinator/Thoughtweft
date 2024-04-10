@@ -30,9 +30,9 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     return eventState().evtPods.find((pod) => pod.podId === podId);
   };
 
-  const thisPodSeats = eventState().evtSeats.filter(
-    (seat) => seat.podId === podId
-  );
+  const thisPodSeats = () => {
+    return eventState().evtSeats.filter((seat) => seat.podId === podId);
+  };
 
   const [podSizeBtn, setPodSizeBtn] = createSignal<PodSizes>(podSize);
 
@@ -41,23 +41,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const [podSizeDrop, setPodSizeDrop] = createSignal<"open" | "close">("close");
 
   onMount(() => {
-    // console.log(podNumber);
+    updatePodSize(podId, thisPodState()!.podSize);
   });
-
-  // createEffect(() => {
-  //   const thisPodIndex = () => {
-  //     return eventState().evtPods.findIndex((pod) => pod.podId === podId);
-  //   };
-  //   if (thisPodIndex() + 1 !== podNumber) {
-  //     console.log(thisPodIndex() + 1, "&", podNumber);
-  //     eventState().evtPods.find((pod) => pod.podId === podId)!.podNumber =
-  //       eventState().evtPods.length + 1;
-
-  //     // setLocalPodNumber(thisPodIndex() + 1);
-  //     updatePodNumber(podId);
-  //     console.log(thisPodState());
-  //   }
-  // });
 
   return (
     <DisplayFrame>
@@ -91,7 +76,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                     onClick={() => {
                       setPodSizeBtn(option);
                       setPodSizeDrop("close");
-                      updatePodSize(podNumber, option);
+                      updatePodSize(podId, option);
                     }}
                   >
                     {option}
@@ -114,7 +99,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           <div class="podSeatsUp"></div>
           <div class="podTable"></div>
           <div class="podSeatsDown">
-            <For each={thisPodSeats}>
+            <For each={thisPodSeats()}>
               {(seat) => (
                 <TestBox seatNumber={seat.seatNumber} podId={podId}></TestBox>
               )}

@@ -146,49 +146,73 @@ export function EventContextProvider(props: any) {
 
         //UPDATE POD SIZE
         updatePodSize(inputPodId, newPodSize) {
-          // const podToEdit = event().evtPods.find(
-          //   (pod) => pod.podId === inputPodId
-          // );
-          // const podToEditIndex = event().evtPods.findIndex(
-          //   (pod) => pod.podId === inputPodId
-          // );
-          // if (podToEdit && podToEditIndex >= 0) {
-          //   podToEdit.podSize = newPodSize as PodSizes;
-          //   const podDifference = podToEdit.podSize - podToEdit.podSeats.length;
-          //   if (podDifference > 0) {
-          //     setEvent((prevEvt) => {
-          //       const newEvt = { ...prevEvt };
-          //       const seatsStartingLength = podToEdit.podSeats.length;
-          //       for (let i = 1; i <= podDifference; i++) {
-          //         const newSeat: FullSeat = {
-          //           podId: inputPodId,
-          //           seatNumber: seatsStartingLength + i,
-          //           filled: false,
-          //         };
-          //         newEvt.evtPods[podToEditIndex].podSeats = [
-          //           ...newEvt.evtPods[podToEditIndex].podSeats,
-          //           newSeat,
-          //         ];
-          //       }
-          //       return newEvt;
-          //     });
-          //   } else if (podDifference < 0) {
-          //     const seatNumToCut = Math.abs(podDifference);
-          //     const seatsStartingLength = podToEdit.podSeats.length;
-          //     setEvent((preEvt) => {
-          //       const newEvt = { ...preEvt };
-          //       newEvt.evtPods[podToEditIndex].podSeats = [
-          //         ...newEvt.evtPods[podToEditIndex].podSeats.slice(
-          //           0,
-          //           seatsStartingLength - seatNumToCut
-          //         ),
-          //       ];
-          //       return newEvt;
-          //     });
-          //   } else {
-          //     console.log(`No updates to pod ID: ${inputPodId}`);
-          //   }
-          // }
+          const podToEdit = event().evtPods.find(
+            (pod) => pod.podId === inputPodId
+          );
+          const podToEditIndex = event().evtPods.findIndex(
+            (pod) => pod.podId === inputPodId
+          );
+
+          if (podToEdit && podToEditIndex >= 0) {
+            podToEdit.podSize = newPodSize as PodSizes;
+            const podDifference = podToEdit.podSize - podToEdit.podSeats.length;
+            if (podDifference > 0) {
+              setEvent((prevEvt) => {
+                const newEvt = { ...prevEvt };
+                const seatsStartingLength = podToEdit.podSeats.length;
+
+                //add new fullSeats
+                for (let i = 1; i <= podDifference; i++) {
+                  const newSeat: FullSeat = {
+                    podId: inputPodId,
+                    seatNumber: seatsStartingLength + i,
+                    filled: false,
+                  };
+                  newEvt.evtPods[podToEditIndex].podSeats = [
+                    ...newEvt.evtPods[podToEditIndex].podSeats,
+                    newSeat,
+                  ];
+                }
+
+                //add new proxySeats
+                for (let i = 1; i <= podDifference; i++) {
+                  const newSeat: ProxySeat = {
+                    podId: inputPodId,
+                    seatNumber: seatsStartingLength + i,
+                  };
+                  newEvt.evtSeats = [...newEvt.evtSeats, newSeat];
+                }
+                return newEvt;
+              });
+            } else if (podDifference < 0) {
+              const seatNumToCut = Math.abs(podDifference);
+              const seatsStartingLength = podToEdit.podSeats.length;
+              setEvent((preEvt) => {
+                const newEvt = { ...preEvt };
+
+                //remove fullSeats
+                newEvt.evtPods[podToEditIndex].podSeats = [
+                  ...newEvt.evtPods[podToEditIndex].podSeats.slice(
+                    0,
+                    seatsStartingLength - seatNumToCut
+                  ),
+                ];
+
+                //remove proxySeats
+
+                newEvt.evtSeats = newEvt.evtSeats.filter(
+                  (seat) =>
+                    seat.podId !== inputPodId ||
+                    (seat.podId === inputPodId &&
+                      seat.seatNumber <= seatsStartingLength - seatNumToCut)
+                );
+
+                return newEvt;
+              });
+            } else {
+              console.log(`No updates to pod ID: ${inputPodId}`);
+            }
+          }
         },
 
         //UPDATE SEAT

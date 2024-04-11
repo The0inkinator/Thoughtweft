@@ -2,21 +2,21 @@ import "./playerHopper.css";
 import DisplayFrame from "../displayFrame";
 import { useEventContext } from "~/context/EventContext";
 import { For, createSignal, onMount } from "solid-js";
-import { Player } from "~/context/EventContext";
+import { Player } from "~/typing/eventTypes";
 import PlayerCard from "../playerCard";
 
 export default function PlayerHopper() {
   //Context State
-  const [eventState, { updateSeat }] = useEventContext();
+  const [eventState, { updateSeat, setPlayerHopperEl }] = useEventContext();
   //Local State
   const [startingPlayerCards, setStartingPlayerCards] = createSignal<Player[]>(
     []
   );
 
-  let podlessSeat!: HTMLDivElement;
+  let playerHopper!: HTMLDivElement;
 
   onMount(() => {
-    updateSeat(0, 0, podlessSeat);
+    setPlayerHopperEl(playerHopper);
     setStartingPlayerCards(eventState().evtPlayerList);
   });
 
@@ -35,7 +35,7 @@ export default function PlayerHopper() {
           <input type="checkbox" id="addToPod"></input>
           <label for="addToPod">Add to Pod?</label>
         </div>
-        <div class="podlessSeat" ref={podlessSeat}>
+        <div class="podlessSeat" ref={playerHopper}>
           <For each={startingPlayerCards()}>
             {(player) => (
               <PlayerCard

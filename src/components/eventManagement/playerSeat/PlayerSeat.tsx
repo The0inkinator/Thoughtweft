@@ -4,38 +4,43 @@ import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
 
 interface PlayerSlotInput {
-  key: string;
-  podNumber: number;
+  podId: number;
   seatNumber: number;
-  seatFacing: "left" | "right";
+  // seatFacing: "left" | "right";
 }
 
-export default function PlayerSeat({ podNumber, seatNumber }: PlayerSlotInput) {
+export default function PlayerSeat({ podId, seatNumber }: PlayerSlotInput) {
   //Context State
   const [eventState, { updateSeat }] = useEventContext();
 
   const thisSeatState = () => {
-    return eventState().evtSeats.filter(
-      (seat) => seat.podNumber === podNumber && seat.seatNumber === seatNumber
-    )[0];
+    return eventState()
+      .evtPods.find((pod) => pod.podId === podId)!
+      .podSeats.find((seat) => seat.seatNumber === seatNumber)!;
   };
 
   createEffect(() => {
     if (thisSeatState().seatRef !== thisSeat) {
-      updateSeat(podNumber, seatNumber, thisSeat);
+      updateSeat(podId, seatNumber, thisSeat);
     }
   });
 
   createEffect(() => {
     if (thisSeatState().filled === true && thisSeat.children.length < 1) {
-      updateSeat(podNumber, seatNumber, false);
+      updateSeat(podId, seatNumber, false);
     }
   });
 
   let thisSeat!: HTMLDivElement;
 
   return (
-    <div class="playerSeatCont" ref={thisSeat} onclick={() => {}}>
+    <div
+      class="playerSeatCont"
+      ref={thisSeat}
+      onclick={() => {
+        console.log(thisSeatState());
+      }}
+    >
       {/* <PlayerCard></PlayerCard> */}
     </div>
   );

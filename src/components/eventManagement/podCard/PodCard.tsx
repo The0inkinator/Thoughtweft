@@ -6,6 +6,7 @@ import {
   onMount,
   Index,
   createMemo,
+  ErrorBoundary,
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
@@ -46,67 +47,73 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   return (
     <DisplayFrame>
-      <div class="podCardCont">
-        <div class="podTitle">
-          Pod {thisPodState()?.podNumber}
-          <p></p>
-          <button
-            class="podSizeDrop"
-            type="button"
-            onMouseUp={() => {
-              if (podSizeDrop() === "close") {
-                setPodSizeDrop("open");
-              }
-            }}
-          >
-            {podSizeBtn()}
-            <div
-              class="podSizeMenu"
-              style={{
-                display: podSizeDrop() === "open" ? "block" : "none",
+      <ErrorBoundary fallback={<>oops!</>}>
+        <div class="podCardCont">
+          <div class="podTitle">
+            Pod {thisPodState()?.podNumber}
+            <p></p>
+            <button
+              class="podSizeDrop"
+              type="button"
+              onMouseUp={() => {
+                if (podSizeDrop() === "close") {
+                  setPodSizeDrop("open");
+                }
               }}
             >
-              <For each={podOptions}>
-                {(option: PodSizes) => (
-                  <div
-                    class="podSizeOption"
-                    style={{
-                      display: podSizeDrop() === "open" ? "block" : "none",
-                    }}
-                    onClick={() => {
-                      setPodSizeBtn(option);
-                      setPodSizeDrop("close");
-                      updatePodSize(podId, option);
-                    }}
-                  >
-                    {option}
-                  </div>
+              {podSizeBtn()}
+              <div
+                class="podSizeMenu"
+                style={{
+                  display: podSizeDrop() === "open" ? "block" : "none",
+                }}
+              >
+                <For each={podOptions}>
+                  {(option: PodSizes) => (
+                    <div
+                      class="podSizeOption"
+                      style={{
+                        display: podSizeDrop() === "open" ? "block" : "none",
+                      }}
+                      onClick={() => {
+                        setPodSizeBtn(option);
+                        setPodSizeDrop("close");
+                        updatePodSize(podId, option);
+                      }}
+                    >
+                      {option}
+                    </div>
+                  )}
+                </For>
+              </div>
+            </button>
+            <button
+              type="submit"
+              style={{ color: "red" }}
+              onClick={() => {
+                removePod(podId);
+              }}
+            >
+              Remove Pod
+            </button>
+          </div>
+          <div class="tableCont">
+            <div class="podSeatsUp"></div>
+            <div class="podTable"></div>
+            <div class="podSeatsDown">
+              <For each={thisPodSeats()}>
+                {(seat) => (
+                  <PlayerSeat
+                    seatNumber={seat.seatNumber}
+                    podId={podId}
+                  ></PlayerSeat>
+                  // <TestBox seatNumber={seat.seatNumber} podId={podId}></TestBox>
                 )}
               </For>
             </div>
-          </button>
-          <button
-            type="submit"
-            style={{ color: "red" }}
-            onClick={() => {
-              removePod(podId);
-            }}
-          >
-            Remove Pod
-          </button>
-        </div>
-        <div class="tableCont">
-          <div class="podSeatsUp"></div>
-          <div class="podTable"></div>
-          <div class="podSeatsDown">
-            <For each={thisPodSeats()}>
-              {(seat) => (
-                <TestBox seatNumber={seat.seatNumber} podId={podId}></TestBox>
-              )}
-            </For>
           </div>
         </div>
-      </div>
+      </ErrorBoundary>
     </DisplayFrame>
   );
 }

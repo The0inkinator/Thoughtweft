@@ -45,4 +45,5 @@ export type Event = {
   evtSettings: EventSettings;
   visuals: "default" | "animating";
   nextPodId: number;
+  playerHopper?: HTMLElement;
 };

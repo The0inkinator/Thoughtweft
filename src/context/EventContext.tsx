@@ -1,4 +1,5 @@
 import { createSignal, createContext, useContext } from "solid-js";
+import playerHopper from "~/components/eventManagement/playerHopper";
 import {
   Pod,
   Player,
@@ -20,10 +21,11 @@ type EventState = [
     removePod: (inputPodId: number) => void;
     updatePodSize: (inputPodId: number, newPodSize: number) => void;
     updateSeat: (
-      inputPodNumber: number,
+      inputPodId: number,
       inputSeatNumber: number,
       updateParam: SeatUpdateParam
     ) => void;
+    setPlayerHopperEl: (inputElement: HTMLElement) => void;
   }
 ];
 
@@ -32,7 +34,7 @@ type EventState = [
 const SampleEvent: Event = {
   evtPods: [
     {
-      podId: 0,
+      podId: 1,
       podNumber: 1,
       podSize: 8,
       podSeats: [],
@@ -51,7 +53,7 @@ const SampleEvent: Event = {
   ],
   evtSettings: { playerCap: 0 },
   visuals: "default",
-  nextPodId: 1,
+  nextPodId: 2,
 };
 
 const EventContext = createContext<EventState | undefined>();
@@ -217,33 +219,33 @@ export function EventContextProvider(props: any) {
 
         //UPDATE SEAT
         updateSeat(
-          inputPodNumber: number,
+          inputPodId: number,
           inputSeatNumber: number,
           updateParam: SeatUpdateParam
         ) {
-          // if (updateParam instanceof HTMLDivElement) {
-          //   const seatIndex = () => {
-          //     return event().evtSeats.findIndex(
-          //       (seat) =>
-          //         seat.podNumber === inputPodNumber &&
-          //         seat.seatNumber === inputSeatNumber
-          //     );
-          //   };
-          //   if (seatIndex() !== -1) {
-          //     event().evtSeats[seatIndex()].seatRef = updateParam;
-          //   }
-          // } else if (typeof updateParam === "boolean") {
-          //   const seatIndex = () => {
-          //     return event().evtSeats.findIndex(
-          //       (seat) =>
-          //         seat.podNumber === inputPodNumber &&
-          //         seat.seatNumber === inputSeatNumber
-          //     );
-          //   };
-          //   if (seatIndex() !== -1) {
-          //     event().evtSeats[seatIndex()].filled = updateParam;
-          //   }
-          // }
+          const podIndex = event().evtPods.findIndex(
+            (pod) => pod.podId === inputPodId
+          );
+          const seatIndex = event().evtPods[podIndex].podSeats.findIndex(
+            (seat) => seat.seatNumber === inputSeatNumber
+          );
+          if (updateParam instanceof HTMLDivElement) {
+            if (seatIndex !== -1) {
+              event().evtPods[podIndex].podSeats[seatIndex].seatRef =
+                updateParam;
+            }
+          } else if (typeof updateParam === "boolean") {
+            if (seatIndex !== -1) {
+              event().evtPods[podIndex].podSeats[seatIndex].filled =
+                updateParam;
+            }
+          }
+        },
+        setPlayerHopperEl(inputElement) {
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt, playerHopper: inputElement };
+            return newEvt;
+          });
         },
       },
     ];

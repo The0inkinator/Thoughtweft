@@ -28,16 +28,35 @@ export default function PlayerCard({
   const thisPlayerState = () => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
   };
-  const targetSeat = () => {
-    return eventState().evtSeats.find(
-      (seat) =>
-        seat.seatNumber === thisPlayerState().seat &&
-        seat.podNumber === thisPlayerState().pod
+  const playerPodId = () => {
+    const podToCheck = eventState().evtPods.find(
+      (pod) => pod.podNumber === thisPlayerState().pod
     );
+
+    if (podToCheck?.podId) {
+      return podToCheck.podId;
+    } else {
+      return 0;
+    }
+  };
+
+  onMount(() => {
+    console.log(playerPodId());
+  });
+
+  const targetSeat = () => {
+    if (playerPodId() > 0) {
+      return eventState()
+        .evtPods.find((pod) => pod.podId === playerPodId())!
+        .podSeats.find((seat) => seat.seatNumber === thisPlayerState().seat)!
+        .seatRef;
+    } else {
+      return eventState().playerHopper!;
+    }
   };
 
   const updateChild = () => {
-    targetSeat()?.seatRef?.appendChild(thisPlayerCard);
+    targetSeat()?.appendChild(thisPlayerCard);
   };
 
   onMount(() => {

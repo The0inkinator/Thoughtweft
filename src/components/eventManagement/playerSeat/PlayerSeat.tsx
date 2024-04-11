@@ -1,4 +1,4 @@
-import { createEffect, onMount } from "solid-js";
+import { createEffect, onCleanup, onMount } from "solid-js";
 import "./playerSeat.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";

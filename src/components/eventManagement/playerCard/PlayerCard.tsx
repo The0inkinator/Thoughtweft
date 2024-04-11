@@ -24,25 +24,29 @@ export default function PlayerCard({
   const [playerCardParent, setPlayerCardParent] =
     createSignal<HTMLDivElement>();
   //refs
+
   let thisPlayerCard!: HTMLDivElement;
+
   const thisPlayerState = () => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
   };
+
   const playerPodId = () => {
     const podToCheck = eventState().evtPods.find(
       (pod) => pod.podNumber === thisPlayerState().pod
     );
 
-    if (podToCheck?.podId) {
+    if (
+      podToCheck?.podId &&
+      podToCheck.podSeats.length >= thisPlayerState().seat
+    ) {
       return podToCheck.podId;
     } else {
       return 0;
     }
   };
 
-  onMount(() => {
-    console.log(playerPodId());
-  });
+  onMount(() => {});
 
   const targetSeat = () => {
     if (playerPodId() > 0) {
@@ -59,8 +63,15 @@ export default function PlayerCard({
     targetSeat()?.appendChild(thisPlayerCard);
   };
 
-  onMount(() => {
-    setTimeout(updateChild, 1);
+  // onMount(() => {
+  //   setTimeout(updateChild, 1);
+  // });
+
+  createEffect(() => {
+    if (thisPlayerCard.parentNode !== targetSeat()) {
+      console.log("triggered", thisPlayerState(), "tgt ID", playerPodId());
+      setTimeout(updateChild, 1);
+    }
   });
 
   return (

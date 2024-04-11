@@ -50,7 +50,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
       <ErrorBoundary fallback={<>oops!</>}>
         <div class="podCardCont">
           <div class="podTitle">
-            Pod {thisPodState()?.podNumber}
+            Pod {thisPodState()?.podNumber} Id {thisPodState()?.podId}
             <p></p>
             <button
               class="podSizeDrop"

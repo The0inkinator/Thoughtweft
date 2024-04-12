@@ -43,7 +43,8 @@ export type Event = {
   evtSeats: ProxySeat[];
   evtPlayerList: Player[];
   evtSettings: EventSettings;
-  visuals: "default" | "animating";
   nextPodId: number;
+  evtStage: "seating" | "staging" | number;
+  evtLoading: boolean;
   playerHopper?: HTMLElement;
 };

@@ -6,10 +6,14 @@ import PlayerCard from "../playerCard";
 interface PlayerSlotInput {
   podId: number;
   seatNumber: number;
-  // seatFacing: "left" | "right";
+  tableSide: "L" | "R";
 }
 
-export default function PlayerSeat({ podId, seatNumber }: PlayerSlotInput) {
+export default function PlayerSeat({
+  podId,
+  seatNumber,
+  tableSide,
+}: PlayerSlotInput) {
   //Context State
   const [eventState, { updateSeat }] = useEventContext();
 
@@ -33,6 +37,34 @@ export default function PlayerSeat({ podId, seatNumber }: PlayerSlotInput) {
 
   let thisSeat!: HTMLDivElement;
 
+  const assignToGrid = () => {
+    if (tableSide === "R") {
+      const vertGridPos = seatNumber;
+      thisSeat.style.gridColumn = "2";
+      thisSeat.style.gridRow = `${vertGridPos}`;
+    } else if (tableSide === "L") {
+      const podSize = eventState().evtSeats.filter(
+        (seat) => seat.podId === podId
+      )!.length;
+      const evenVertGridPos = podSize - seatNumber + 1;
+      const oddVertGridPos = podSize - seatNumber + 2;
+      thisSeat.style.gridColumn = "1";
+      thisSeat.style.gridRow = `${evenVertGridPos}`;
+
+      if (podSize % 2 === 0) {
+        thisSeat.style.gridColumn = "1";
+        thisSeat.style.gridRow = `${evenVertGridPos}`;
+      } else {
+        thisSeat.style.gridColumn = "1";
+        thisSeat.style.gridRow = `${oddVertGridPos}`;
+      }
+    }
+  };
+
+  createEffect(() => {
+    assignToGrid();
+  });
+
   return (
     <div
       class="playerSeatCont"
@@ -41,6 +73,7 @@ export default function PlayerSeat({ podId, seatNumber }: PlayerSlotInput) {
         console.log(thisSeatState());
       }}
     >
+      {seatNumber}
       {/* <PlayerCard></PlayerCard> */}
     </div>
   );

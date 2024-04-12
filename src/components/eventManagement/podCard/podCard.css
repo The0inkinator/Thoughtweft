@@ -24,20 +24,17 @@
 }
 
 .podTable {
-  background-color: rgb(25, 25, 39);
+  /* background-color: rgb(25, 25, 39); */
+  background-color: red;
   width: 20%;
   height: 70%;
   margin-inline: 10%;
 }
 
-.podSeatsUp {
-  display: flex;
-  flex-direction: column-reverse;
-}
-
-.podSeatsDown {
-  display: flex;
-  flex-direction: column;
+.podSeats {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  grid-template-rows: repeat(6, auto);
 }
 
 .podSizeDrop {

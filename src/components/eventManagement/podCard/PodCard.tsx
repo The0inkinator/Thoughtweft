@@ -36,10 +36,19 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   };
 
   const [podSizeBtn, setPodSizeBtn] = createSignal<PodSizes>(podSize);
-
   const podOptions: PodSizes[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
   const [podSizeDrop, setPodSizeDrop] = createSignal<"open" | "close">("close");
+
+  const leftSeats = () => {
+    return thisPodSeats().filter(
+      (seat, index) => index >= thisPodSeats().length / 2
+    );
+  };
+  const rightSeats = () => {
+    return thisPodSeats().filter(
+      (seat, index) => index < thisPodSeats().length / 2
+    );
+  };
 
   onMount(() => {
     updatePodSize(podId, thisPodState()!.podSize);
@@ -98,18 +107,26 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             </button>
           </div>
           <div class="tableCont">
-            <div class="podSeatsUp"></div>
-            <div class="podTable"></div>
-            <div class="podSeatsDown">
-              <For each={thisPodSeats()}>
+            <div class="podSeats">
+              <For each={rightSeats()}>
                 {(seat) => (
                   <PlayerSeat
                     seatNumber={seat.seatNumber}
                     podId={podId}
+                    tableSide="R"
                   ></PlayerSeat>
-                  // <TestBox seatNumber={seat.seatNumber} podId={podId}></TestBox>
                 )}
               </For>
+              <For each={leftSeats()}>
+                {(seat) => (
+                  <PlayerSeat
+                    seatNumber={seat.seatNumber}
+                    podId={podId}
+                    tableSide="L"
+                  ></PlayerSeat>
+                )}
+              </For>
+              <div class="podTable"></div>
             </div>
           </div>
         </div>

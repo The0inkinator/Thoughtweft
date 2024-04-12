@@ -40,7 +40,7 @@ export default function PlayerSeat({
   const assignToGrid = () => {
     if (tableSide === "R") {
       const vertGridPos = seatNumber;
-      thisSeat.style.gridColumn = "2";
+      thisSeat.style.gridColumn = "3";
       thisSeat.style.gridRow = `${vertGridPos}`;
     } else if (tableSide === "L") {
       const podSize = eventState().evtSeats.filter(

@@ -42,7 +42,7 @@ const SampleEvent: Event = {
   ],
   evtSeats: [],
   evtPlayerList: [
-    { id: 0, name: "Keldan", pod: 1, seat: 5 },
+    { id: 0, name: "Keldan", pod: 0, seat: 0 },
     { id: 1, name: "Colton", pod: 0, seat: 0 },
     { id: 2, name: "Aiden", pod: 0, seat: 0 },
     { id: 3, name: "Harrison", pod: 0, seat: 0 },

@@ -117,6 +117,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                   ></PlayerSeat>
                 )}
               </For>
+              <div class="podTable"></div>
               <For each={leftSeats()}>
                 {(seat) => (
                   <PlayerSeat
@@ -126,7 +127,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                   ></PlayerSeat>
                 )}
               </For>
-              <div class="podTable"></div>
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ import {
   SeatUpdateParam,
   FullSeat,
   ProxySeat,
+  PlayerUpdateOptions,
 } from "~/typing/eventTypes";
 
 //Typing
@@ -24,6 +25,11 @@ type EventState = [
       inputPodId: number,
       inputSeatNumber: number,
       updateParam: SeatUpdateParam
+    ) => void;
+    updatePlayer: (
+      inputPlayerId: number,
+      option: PlayerUpdateOptions,
+      input: any
     ) => void;
     setPlayerHopperEl: (inputElement: HTMLElement) => void;
     setPlayerDrag: (playerId: number, inputBoolean: boolean) => void;
@@ -85,6 +91,7 @@ export function EventContextProvider(props: any) {
                   podId: event().nextPodId,
                   seatNumber: i,
                   filled: false,
+                  hovered: false,
                 };
                 tempArray.push(newFullSeat);
               }
@@ -171,6 +178,7 @@ export function EventContextProvider(props: any) {
                     podId: inputPodId,
                     seatNumber: seatsStartingLength + i,
                     filled: false,
+                    hovered: false,
                   };
                   newEvt.evtPods[podToEditIndex].podSeats = [
                     ...newEvt.evtPods[podToEditIndex].podSeats,
@@ -243,6 +251,24 @@ export function EventContextProvider(props: any) {
             }
           }
         },
+
+        //UPDATE PLAYER
+        updatePlayer(inputPlayerId, option, input) {
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+            const playerIndexToEdit = newEvt.evtPlayerList.findIndex(
+              (player) => player.id === inputPlayerId
+            );
+
+            if (playerIndexToEdit !== -1) {
+              if (option === "seatHovered") {
+              }
+            }
+            return newEvt;
+          });
+        },
+
+        //SET ELEMENT FOR PLAYER HOPPER
         setPlayerHopperEl(inputElement) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt, playerHopper: inputElement };

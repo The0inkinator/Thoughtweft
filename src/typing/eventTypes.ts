@@ -4,6 +4,13 @@ export type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export type SeatUpdateParam = HTMLDivElement | boolean;
 
+export type PlayerUpdateOptions =
+  | "id"
+  | "name"
+  | "pod"
+  | "seat"
+  | "seatHovered";
+
 export type Player = {
   id: number;
   name: string;
@@ -18,6 +25,7 @@ export type FullSeat = {
   podId: number;
   seatNumber: number;
   filled: boolean;
+  hovered: boolean;
   seatRef?: HTMLDivElement;
 };
 

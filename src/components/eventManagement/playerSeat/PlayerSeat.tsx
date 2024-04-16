@@ -15,7 +15,7 @@ export default function PlayerSeat({
   tableSide,
 }: PlayerSlotInput) {
   //Context State
-  const [eventState, { updateSeat }] = useEventContext();
+  const [eventState, { updateSeat, updatePlayer }] = useEventContext();
 
   const thisSeatState = () => {
     return eventState()
@@ -73,9 +73,8 @@ export default function PlayerSeat({
     <div
       class="playerSeatCont"
       ref={thisSeat}
-      onMouseOver={() => {
+      onMouseEnter={() => {
         if (draggedPlayer()) {
-          console.log("dragged Player");
         }
       }}
     >

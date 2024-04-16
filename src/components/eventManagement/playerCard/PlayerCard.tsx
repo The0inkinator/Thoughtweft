@@ -8,6 +8,7 @@ import {
   createEffect,
   onCleanup,
 } from "solid-js";
+import { Portal } from "solid-js/web";
 
 interface PlayerCardInputs {
   playerID: number;
@@ -31,6 +32,7 @@ export default function PlayerCard({
   //refs
 
   let thisPlayerCard!: HTMLDivElement;
+  let playerNameDiv!: HTMLDivElement;
   let xOffset: number, yOffset: number;
 
   const thisPlayerState = () => {
@@ -76,11 +78,12 @@ export default function PlayerCard({
   const dragInit = (event: MouseEvent) => {
     if (playerCardMode() !== "dragging") {
       setPlayerCardMode("dragging");
-      console.log("drag init");
+
       event.preventDefault;
       xOffset = event.clientX - thisPlayerCard.offsetLeft;
       yOffset = event.clientY - thisPlayerCard.offsetTop;
       thisPlayerCard.style.position = "absolute";
+      playerNameDiv.style.position = "absolute";
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
     }
@@ -92,12 +95,16 @@ export default function PlayerCard({
       const y = event.clientY - yOffset;
       thisPlayerCard.style.left = `${x}px`;
       thisPlayerCard.style.top = `${y}px`;
+      thisPlayerCard.style.zIndex = "4";
+      // playerNameDiv.style.left = `${x}px`;
+      // playerNameDiv.style.top = `${y}px`;
     }
   };
   const dragEnd = () => {
     setPlayerCardMode("noSeat");
-    console.log("drag end");
+
     thisPlayerCard.style.position = "static";
+    playerNameDiv.style.position = "static";
     thisPlayerCard.style.top = "0px";
     thisPlayerCard.style.left = "0px";
     document.removeEventListener("mousemove", dragging);
@@ -122,7 +129,7 @@ export default function PlayerCard({
           </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
-          <div class="playerName" onclick={() => {}}>
+          <div class="playerName" ref={playerNameDiv} onclick={() => {}}>
             {playerName}
           </div>
         </Match>

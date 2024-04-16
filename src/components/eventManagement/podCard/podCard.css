@@ -12,6 +12,7 @@
   font-weight: bold;
   color: aliceblue;
   text-align: center;
+  z-index: 1;
 }
 
 .tableCont {

@@ -26,6 +26,7 @@ type EventState = [
       updateParam: SeatUpdateParam
     ) => void;
     setPlayerHopperEl: (inputElement: HTMLElement) => void;
+    setPlayerDrag: (playerId: number, inputBoolean: boolean) => void;
   }
 ];
 
@@ -42,14 +43,14 @@ const SampleEvent: Event = {
   ],
   evtSeats: [],
   evtPlayerList: [
-    { id: 0, name: "Keldan", pod: 0, seat: 0 },
-    { id: 1, name: "Colton", pod: 0, seat: 0 },
-    { id: 2, name: "Aiden", pod: 0, seat: 0 },
-    { id: 3, name: "Harrison", pod: 0, seat: 0 },
-    { id: 4, name: "Josh", pod: 0, seat: 0 },
-    { id: 5, name: "Daniel", pod: 0, seat: 0 },
-    { id: 6, name: "Jesse", pod: 0, seat: 0 },
-    { id: 7, name: "Jack", pod: 0, seat: 0 },
+    { id: 0, name: "Keldan", pod: 0, seat: 0, dragging: false },
+    { id: 1, name: "Colton", pod: 0, seat: 0, dragging: false },
+    { id: 2, name: "Aiden", pod: 0, seat: 0, dragging: false },
+    { id: 3, name: "Harrison", pod: 0, seat: 0, dragging: false },
+    { id: 4, name: "Josh", pod: 0, seat: 0, dragging: false },
+    { id: 5, name: "Daniel", pod: 0, seat: 0, dragging: false },
+    { id: 6, name: "Jesse", pod: 0, seat: 0, dragging: false },
+    { id: 7, name: "Jack", pod: 0, seat: 0, dragging: false },
   ],
   evtSettings: { playerCap: 0 },
   evtStage: "seating",
@@ -245,6 +246,21 @@ export function EventContextProvider(props: any) {
         setPlayerHopperEl(inputElement) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt, playerHopper: inputElement };
+            return newEvt;
+          });
+        },
+
+        //SET PLAYER DRAG BOOLEAN
+        setPlayerDrag(playerId, inputBoolean) {
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+            const playerIndexToEdit = newEvt.evtPlayerList.findIndex(
+              (player) => player.id === playerId
+            );
+            newEvt.evtPlayerList[playerIndexToEdit] = {
+              ...newEvt.evtPlayerList[playerIndexToEdit],
+              dragging: inputBoolean,
+            };
             return newEvt;
           });
         },

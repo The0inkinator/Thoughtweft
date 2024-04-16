@@ -9,6 +9,7 @@ export type Player = {
   name: string;
   pod: number;
   seat: number;
+  dragging: boolean;
   matchRecord?: Record;
   eventRecord?: Record;
 };

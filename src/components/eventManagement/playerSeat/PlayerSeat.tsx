@@ -23,6 +23,10 @@ export default function PlayerSeat({
       .podSeats.find((seat) => seat.seatNumber === seatNumber)!;
   };
 
+  const draggedPlayer = () => {
+    return eventState().evtPlayerList.find((player) => player.dragging);
+  };
+
   createEffect(() => {
     if (thisSeatState().seatRef !== thisSeat) {
       updateSeat(podId, seatNumber, thisSeat);
@@ -69,8 +73,10 @@ export default function PlayerSeat({
     <div
       class="playerSeatCont"
       ref={thisSeat}
-      onclick={() => {
-        console.log(thisSeatState());
+      onMouseOver={() => {
+        if (draggedPlayer()) {
+          console.log("dragged Player");
+        }
       }}
     >
       {seatNumber}

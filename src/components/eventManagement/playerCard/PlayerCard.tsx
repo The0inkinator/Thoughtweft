@@ -7,6 +7,7 @@ import {
   onMount,
   createEffect,
   onCleanup,
+  createMemo,
 } from "solid-js";
 import { Portal } from "solid-js/web";
 
@@ -26,7 +27,7 @@ export default function PlayerCard({
   seatNumber,
 }: PlayerCardInputs) {
   //Context State
-  const [eventState] = useEventContext();
+  const [eventState, { setPlayerDrag }] = useEventContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
   //refs
@@ -34,9 +35,9 @@ export default function PlayerCard({
   let thisPlayerCard!: HTMLDivElement;
   let xOffset: number, yOffset: number;
 
-  const thisPlayerState = () => {
+  const thisPlayerState = createMemo(() => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
-  };
+  });
 
   const playerPodId = () => {
     const podToCheck = eventState().evtPods.find(
@@ -77,7 +78,7 @@ export default function PlayerCard({
   const dragInit = (event: MouseEvent) => {
     if (playerCardMode() !== "dragging") {
       setPlayerCardMode("dragging");
-
+      setPlayerDrag(playerID, true);
       event.preventDefault;
       xOffset = event.clientX - thisPlayerCard.offsetLeft;
       yOffset = event.clientY - thisPlayerCard.offsetTop;
@@ -98,7 +99,7 @@ export default function PlayerCard({
   };
   const dragEnd = () => {
     setPlayerCardMode("noSeat");
-
+    setPlayerDrag(playerID, false);
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.top = "0px";
     thisPlayerCard.style.left = "0px";

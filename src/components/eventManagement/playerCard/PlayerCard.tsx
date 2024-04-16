@@ -1,6 +1,13 @@
 import "./playerCard.css";
 import { useEventContext } from "~/context/EventContext";
-import { createSignal, Switch, Match, onMount, createEffect } from "solid-js";
+import {
+  createSignal,
+  Switch,
+  Match,
+  onMount,
+  createEffect,
+  onCleanup,
+} from "solid-js";
 
 interface PlayerCardInputs {
   playerID: number;
@@ -21,11 +28,10 @@ export default function PlayerCard({
   const [eventState] = useEventContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
-  const [playerCardParent, setPlayerCardParent] =
-    createSignal<HTMLDivElement>();
   //refs
 
   let thisPlayerCard!: HTMLDivElement;
+  let xOffset: number, yOffset: number;
 
   const thisPlayerState = () => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
@@ -46,8 +52,6 @@ export default function PlayerCard({
     }
   };
 
-  onMount(() => {});
-
   const targetSeat = () => {
     if (playerPodId() > 0) {
       return eventState()
@@ -63,19 +67,54 @@ export default function PlayerCard({
     targetSeat()?.appendChild(thisPlayerCard);
   };
 
-  // onMount(() => {
-  //   setTimeout(updateChild, 1);
-  // });
-
   createEffect(() => {
     if (thisPlayerCard.parentNode !== targetSeat()) {
-      console.log("triggered", thisPlayerState(), "tgt ID", playerPodId());
       setTimeout(updateChild, 1);
     }
   });
 
+  const dragInit = (event: MouseEvent) => {
+    if (playerCardMode() !== "dragging") {
+      setPlayerCardMode("dragging");
+      console.log("drag init");
+      event.preventDefault;
+      xOffset = event.clientX - thisPlayerCard.offsetLeft;
+      yOffset = event.clientY - thisPlayerCard.offsetTop;
+      thisPlayerCard.style.position = "absolute";
+      document.addEventListener("mousemove", dragging);
+      document.addEventListener("mouseup", dragEnd);
+    }
+  };
+  const dragging = (event: MouseEvent) => {
+    if (playerCardMode() === "dragging") {
+      event.preventDefault;
+      const x = event.clientX - xOffset;
+      const y = event.clientY - yOffset;
+      thisPlayerCard.style.left = `${x}px`;
+      thisPlayerCard.style.top = `${y}px`;
+    }
+  };
+  const dragEnd = () => {
+    setPlayerCardMode("noSeat");
+    console.log("drag end");
+    thisPlayerCard.style.position = "static";
+    thisPlayerCard.style.top = "0px";
+    thisPlayerCard.style.left = "0px";
+    document.removeEventListener("mousemove", dragging);
+    document.removeEventListener("mouseup", dragEnd);
+  };
+
   return (
-    <div class="playerCardCont" ref={thisPlayerCard} onclick={() => {}}>
+    <div
+      class="playerCardCont"
+      ref={thisPlayerCard}
+      onMouseDown={(event) => {
+        dragInit(event);
+      }}
+      onMouseMove={(event) => {
+        dragging(event);
+      }}
+    >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
           <div class="playerName" onclick={() => {}}>
@@ -83,13 +122,19 @@ export default function PlayerCard({
           </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
-          <></>
+          <div class="playerName" onclick={() => {}}>
+            {playerName}
+          </div>
         </Match>
         <Match when={playerCardMode() === "hoveringSeat"}>
-          <></>
+          <div class="playerName" onclick={() => {}}>
+            {playerName}
+          </div>
         </Match>
         <Match when={playerCardMode() === "seated"}>
-          <></>
+          <div class="playerName" onclick={() => {}}>
+            {playerName}
+          </div>
         </Match>
       </Switch>
     </div>

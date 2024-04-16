@@ -69,6 +69,11 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                   setPodSizeDrop("open");
                 }
               }}
+              onfocusout={() => {
+                if (podSizeDrop() === "open") {
+                  setPodSizeDrop("close");
+                }
+              }}
             >
               {podSizeBtn()}
               <div

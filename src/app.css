@@ -4,6 +4,7 @@
   padding: 0;
   text-decoration: none;
   color: inherit;
+  user-select: none;
 }
 
 /*CUSTOM FONTS*/

@@ -1,4 +1,5 @@
 .playerSeatCont {
+  position: relative;
   background-color: rgb(25, 25, 39);
   width: 2rem;
   height: 2rem;

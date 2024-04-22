@@ -8,7 +8,7 @@ import {
   SeatUpdateParam,
   FullSeat,
   ProxySeat,
-  PlayerUpdateOptions,
+  PlayerUpdateParam,
 } from "~/typing/eventTypes";
 
 //Typing
@@ -28,8 +28,7 @@ type EventState = [
     ) => void;
     updatePlayer: (
       inputPlayerId: number,
-      option: PlayerUpdateOptions,
-      input: any
+      updateParam: PlayerUpdateParam
     ) => void;
     setPlayerHopperEl: (inputElement: HTMLElement) => void;
     setPlayerDrag: (playerId: number, inputBoolean: boolean) => void;
@@ -240,35 +239,47 @@ export function EventContextProvider(props: any) {
             (seat) => seat.seatNumber === inputSeatNumber
           );
 
-          if (seatIndex !== -1) {
-            if ("ref" in updateParam) {
-              const scopedParam: HTMLDivElement = updateParam.ref;
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+            if (seatIndex !== -1) {
+              if ("ref" in updateParam) {
+                const scopedParam: HTMLDivElement = updateParam.ref;
 
-              event().evtPods[podIndex].podSeats[seatIndex].seatRef =
-                scopedParam;
-            } else if ("filled" in updateParam) {
-              const scopedParam: boolean = updateParam.filled;
+                newEvt.evtPods[podIndex].podSeats[seatIndex].seatRef =
+                  scopedParam;
+              } else if ("filled" in updateParam) {
+                const scopedParam: boolean = updateParam.filled;
 
-              event().evtPods[podIndex].podSeats[seatIndex].filled =
-                scopedParam;
-            } else if ("hovered" in updateParam) {
-              const scopedParam: boolean = updateParam.hovered;
-              event().evtPods[podIndex].podSeats[seatIndex].filled =
-                scopedParam;
+                newEvt.evtPods[podIndex].podSeats[seatIndex].filled =
+                  scopedParam;
+              } else if ("hovered" in updateParam) {
+                const scopedParam: boolean = updateParam.hovered;
+
+                newEvt.evtPods[podIndex].podSeats[seatIndex] = {
+                  ...event().evtPods[podIndex].podSeats[seatIndex],
+                  hovered: scopedParam,
+                };
+              }
             }
-          }
+            return newEvt;
+          });
         },
 
         //UPDATE PLAYER
-        updatePlayer(inputPlayerId, option, input) {
+        updatePlayer(inputPlayerId, updateParam) {
+          const playerIndex = event().evtPlayerList.findIndex(
+            (player) => player.id === inputPlayerId
+          );
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
-            const playerIndexToEdit = newEvt.evtPlayerList.findIndex(
-              (player) => player.id === inputPlayerId
-            );
 
-            if (playerIndexToEdit !== -1) {
-              if (option === "seatHovered") {
+            if (playerIndex !== -1) {
+              if ("address" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  pod: updateParam.address.pod,
+                  seat: updateParam.address.seat,
+                };
               }
             }
             return newEvt;

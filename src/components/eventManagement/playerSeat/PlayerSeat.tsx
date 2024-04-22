@@ -2,6 +2,7 @@ import { createEffect, onCleanup, onMount } from "solid-js";
 import "./playerSeat.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
+import { useHovRefContext } from "~/context/HovRefContext";
 
 interface PlayerSlotInput {
   podId: number;
@@ -16,6 +17,7 @@ export default function PlayerSeat({
 }: PlayerSlotInput) {
   //Context State
   const [eventState, { updateSeat, updatePlayer }] = useEventContext();
+  const [hovRefState, { updateHovRef }] = useHovRefContext();
 
   const thisSeatState = () => {
     return eventState()
@@ -76,13 +78,11 @@ export default function PlayerSeat({
       class="playerSeatCont"
       ref={thisSeat}
       onMouseEnter={() => {
-        thisSeat.style.backgroundColor = "red";
         if (draggedPlayer()?.dragging === true) {
           updateSeat(podId, seatNumber, { hovered: true });
         }
       }}
       onMouseLeave={() => {
-        thisSeat.style.backgroundColor = "black";
         updateSeat(podId, seatNumber, { hovered: false });
       }}
     >

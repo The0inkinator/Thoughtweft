@@ -6,7 +6,9 @@ import { Suspense } from "solid-js";
 import { TestProvider } from "./context/TestContext";
 
 import { EventContextProvider } from "./context/EventContext";
+
 import "./app.css";
+import { HovRefContextProvider } from "./context/HovRefContext";
 
 export default function App() {
   return (
@@ -16,7 +18,9 @@ export default function App() {
           <Title>Thoughtweft</Title>
           <TestProvider>
             <EventContextProvider>
-              <Suspense>{props.children}</Suspense>
+              <HovRefContextProvider>
+                <Suspense>{props.children}</Suspense>
+              </HovRefContextProvider>
             </EventContextProvider>
           </TestProvider>
         </MetaProvider>

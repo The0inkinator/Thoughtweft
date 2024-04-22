@@ -7,12 +7,7 @@ export type SeatUpdateParam =
   | { filled: boolean }
   | { hovered: boolean };
 
-export type PlayerUpdateOptions =
-  | "id"
-  | "name"
-  | "pod"
-  | "seat"
-  | "seatHovered";
+export type PlayerUpdateParam = { address: { pod: number; seat: number } };
 
 export type Player = {
   id: number;

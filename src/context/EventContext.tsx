@@ -239,15 +239,22 @@ export function EventContextProvider(props: any) {
           const seatIndex = event().evtPods[podIndex].podSeats.findIndex(
             (seat) => seat.seatNumber === inputSeatNumber
           );
-          if (updateParam instanceof HTMLDivElement) {
-            if (seatIndex !== -1) {
+
+          if (seatIndex !== -1) {
+            if ("ref" in updateParam) {
+              const scopedParam: HTMLDivElement = updateParam.ref;
+
               event().evtPods[podIndex].podSeats[seatIndex].seatRef =
-                updateParam;
-            }
-          } else if (typeof updateParam === "boolean") {
-            if (seatIndex !== -1) {
+                scopedParam;
+            } else if ("filled" in updateParam) {
+              const scopedParam: boolean = updateParam.filled;
+
               event().evtPods[podIndex].podSeats[seatIndex].filled =
-                updateParam;
+                scopedParam;
+            } else if ("hovered" in updateParam) {
+              const scopedParam: boolean = updateParam.hovered;
+              event().evtPods[podIndex].podSeats[seatIndex].filled =
+                scopedParam;
             }
           }
         },

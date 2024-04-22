@@ -10,6 +10,7 @@ import {
   createMemo,
 } from "solid-js";
 import { Portal } from "solid-js/web";
+import { FullSeat } from "~/typing/eventTypes";
 
 interface PlayerCardInputs {
   playerID: number;
@@ -54,6 +55,22 @@ export default function PlayerCard({
     }
   };
 
+  const hoveredSeat = () => {
+    let allSeats: FullSeat[] = [];
+    eventState().evtPods.map((pod) => {
+      pod.podSeats.map((seat) => {
+        allSeats.push(seat);
+      });
+    });
+    const tempHoveredSeat = allSeats.find((seat) => seat.hovered === true)!;
+
+    return tempHoveredSeat;
+  };
+
+  createEffect(() => {
+    // console.log(hoveredSeat());
+  });
+
   const targetSeat = () => {
     if (playerPodId() > 0) {
       return eventState()
@@ -83,6 +100,7 @@ export default function PlayerCard({
       xOffset = event.clientX - thisPlayerCard.offsetLeft;
       yOffset = event.clientY - thisPlayerCard.offsetTop;
       thisPlayerCard.style.position = "absolute";
+      thisPlayerCard.style.pointerEvents = "none";
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
     }
@@ -103,6 +121,7 @@ export default function PlayerCard({
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.top = "0px";
     thisPlayerCard.style.left = "0px";
+    thisPlayerCard.style.pointerEvents = "intial";
     document.removeEventListener("mousemove", dragging);
     document.removeEventListener("mouseup", dragEnd);
   };

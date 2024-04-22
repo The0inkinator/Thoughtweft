@@ -24,18 +24,20 @@ export default function PlayerSeat({
   };
 
   const draggedPlayer = () => {
-    return eventState().evtPlayerList.find((player) => player.dragging);
+    return eventState().evtPlayerList.find(
+      (player) => player.dragging === true
+    );
   };
 
   createEffect(() => {
     if (thisSeatState().seatRef !== thisSeat) {
-      updateSeat(podId, seatNumber, thisSeat);
+      updateSeat(podId, seatNumber, { ref: thisSeat });
     }
   });
 
   createEffect(() => {
     if (thisSeatState().filled === true && thisSeat.children.length < 1) {
-      updateSeat(podId, seatNumber, false);
+      updateSeat(podId, seatNumber, { filled: false });
     }
   });
 
@@ -74,12 +76,17 @@ export default function PlayerSeat({
       class="playerSeatCont"
       ref={thisSeat}
       onMouseEnter={() => {
-        if (draggedPlayer()) {
+        thisSeat.style.backgroundColor = "red";
+        if (draggedPlayer()?.dragging === true) {
+          updateSeat(podId, seatNumber, { hovered: true });
         }
+      }}
+      onMouseLeave={() => {
+        thisSeat.style.backgroundColor = "black";
+        updateSeat(podId, seatNumber, { hovered: false });
       }}
     >
       {seatNumber}
-      {/* <PlayerCard></PlayerCard> */}
     </div>
   );
 }

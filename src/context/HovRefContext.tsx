@@ -1,11 +1,20 @@
 import { createContext, useContext, createSignal } from "solid-js";
 
-const HovRefContext = createContext<any>();
+type HovRefState = [
+  () => HTMLDivElement,
+  {
+    updateHovRef: (input: HTMLDivElement) => void;
+  }
+];
+
+const HovRefContext = createContext<HovRefState | undefined>();
+
+let proxElement: HTMLDivElement;
 
 export function HovRefContextProvider(props: any) {
-  const [hovRef, setHovRef] = createSignal<HTMLDivElement>(),
-    hovRefState = [
-      hovRef(),
+  const [hovRef, setHovRef] = createSignal<HTMLDivElement>(proxElement),
+    hovRefState: HovRefState = [
+      () => hovRef(),
       {
         updateHovRef(input: HTMLDivElement) {
           setHovRef(input);
@@ -20,5 +29,5 @@ export function HovRefContextProvider(props: any) {
 }
 
 export function useHovRefContext() {
-  return useContext(HovRefContext);
+  return useContext(HovRefContext)!;
 }

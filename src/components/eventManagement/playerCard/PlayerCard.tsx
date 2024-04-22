@@ -1,5 +1,6 @@
 import "./playerCard.css";
 import { useEventContext } from "~/context/EventContext";
+import { useHovRefContext } from "~/context/HovRefContext";
 import {
   createSignal,
   Switch,
@@ -29,6 +30,7 @@ export default function PlayerCard({
 }: PlayerCardInputs) {
   //Context State
   const [eventState, { setPlayerDrag, updatePlayer }] = useEventContext();
+  const [hovRefState, { updateHovRef }] = useHovRefContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
   //refs
@@ -81,39 +83,39 @@ export default function PlayerCard({
     }
   };
 
-  const targetSeat = () => {
-    const targetSeatRef = eventState()
-      .evtPods.find((pod) => pod.podId === playerPodId())
-      ?.podSeats.find(
-        (seat) => seat.seatNumber === thisPlayerState().seat
-      )!.seatRef;
-    if (targetSeatRef) {
-      return targetSeatRef;
-    } else {
-      return eventState().playerHopper!;
-    }
-  };
+  // const targetSeat = () => {
+  //   const targetSeatRef = eventState()
+  //     .evtPods.find((pod) => pod.podId === playerPodId())
+  //     ?.podSeats.find(
+  //       (seat) => seat.seatNumber === thisPlayerState().seat
+  //     )!.seatRef;
+  //   if (targetSeatRef) {
+  //     return targetSeatRef;
+  //   } else {
+  //     return eventState().playerHopper!;
+  //   }
+  // };
 
-  const updateParent = () => {
-    console.log(
-      "updating Seat to:",
-      targetSeat(),
-      "address is:",
-      thisPlayerState().pod,
-      thisPlayerState().seat
-    );
-    targetSeat()?.appendChild(thisPlayerCard);
-    if (targetSeat() === eventState().playerHopper) {
-      updatePlayer(playerID, { address: { pod: 0, seat: 0 } });
-      console.log("address revised 0, 0");
-    }
-  };
+  // const updateParent = () => {
+  //   console.log(
+  //     "updating Seat to:",
+  //     targetSeat(),
+  //     "address is:",
+  //     thisPlayerState().pod,
+  //     thisPlayerState().seat
+  //   );
+  //   targetSeat()?.appendChild(thisPlayerCard);
+  //   if (targetSeat() === eventState().playerHopper) {
+  //     updatePlayer(playerID, { address: { pod: 0, seat: 0 } });
+  //     console.log("address revised 0, 0");
+  //   }
+  // };
 
-  createEffect(() => {
-    if (thisPlayerCard.parentNode !== targetSeat()) {
-      setTimeout(updateParent, 1);
-    }
-  });
+  // createEffect(() => {
+  //   if (thisPlayerCard.parentNode !== targetSeat()) {
+  //     setTimeout(updateParent, 1);
+  //   }
+  // });
 
   const dragInit = (event: MouseEvent) => {
     if (playerCardMode() !== "dragging") {
@@ -143,8 +145,10 @@ export default function PlayerCard({
     setPlayerCardMode("noSeat");
     setPlayerDrag(playerID, false);
     thisPlayerCard.style.position = "static";
+    thisPlayerCard.style.left = `0px`;
+    thisPlayerCard.style.top = `0px`;
     if (hoveredSeat().pod > 0 && hoveredSeat().seat > 0) {
-      console.log("assigning");
+      hovRefState().appendChild(thisPlayerCard);
       updatePlayer(playerID, {
         address: { pod: hoveredSeat().pod, seat: hoveredSeat().seat },
       });

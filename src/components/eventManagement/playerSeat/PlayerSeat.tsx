@@ -78,6 +78,7 @@ export default function PlayerSeat({
       class="playerSeatCont"
       ref={thisSeat}
       onMouseEnter={() => {
+        updateHovRef(thisSeat);
         if (draggedPlayer()?.dragging === true) {
           updateSeat(podId, seatNumber, { hovered: true });
         }

@@ -123,7 +123,7 @@ export default function PlayerCard({
 
     if (hoveredSeat().filled === false) {
       updatePlayer(playerID, {
-        address: { pod: hoveredSeat().podId, seat: hoveredSeat().seatNumber },
+        address: { podId: hoveredSeat().podId, seat: hoveredSeat().seatNumber },
       });
     }
 

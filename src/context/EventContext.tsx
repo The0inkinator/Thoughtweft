@@ -277,7 +277,7 @@ export function EventContextProvider(props: any) {
               if ("address" in updateParam) {
                 newEvt.evtPlayerList[playerIndex] = {
                   ...newEvt.evtPlayerList[playerIndex],
-                  pod: updateParam.address.pod,
+                  pod: updateParam.address.podId,
                   seat: updateParam.address.seat,
                 };
               }

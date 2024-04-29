@@ -2,6 +2,7 @@ import { createEffect, onCleanup, onMount } from "solid-js";
 import "./playerSeat.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
+import { playerIdFromAddress } from "~/context/EventDataFunctions";
 
 interface PlayerSlotInput {
   podId: number;
@@ -97,6 +98,9 @@ export default function PlayerSeat({
           if (seat.seatNumber < seatPosition) {
             const priorSeat = seats[seat.seatNumber - 2];
             if (priorSeat.filled === false) {
+              updatePlayer(playerIdFromAddress(podId, seat.seatNumber), {
+                address: { podId: podId, seat: priorSeat.seatNumber },
+              });
             }
           } else if (seat.seatNumber > seatPosition) {
             const nextSeat = seats[seat.seatNumber];

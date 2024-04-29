@@ -7,7 +7,7 @@ export type SeatUpdateParam =
   | { filled: boolean }
   | { hovered: boolean };
 
-export type PlayerUpdateParam = { address: { pod: number; seat: number } };
+export type PlayerUpdateParam = { address: { podId: number; seat: number } };
 
 export type Player = {
   id: number;

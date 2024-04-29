@@ -73,6 +73,24 @@ export default function PlayerSeat({
     assignToGrid();
   });
 
+  createEffect(() => {
+    if (thisSeat.childElementCount > 0 && thisSeatState().filled !== true) {
+      updateSeat(podId, seatNumber, { filled: true });
+    }
+
+    if (thisSeat.childElementCount === 0 && thisSeatState().filled === true) {
+      updateSeat(podId, seatNumber, { filled: false });
+    }
+  });
+
+  createEffect(() => {
+    if (thisSeatState().filled === true) {
+      thisSeat.style.backgroundColor = "red";
+    } else {
+      thisSeat.style.backgroundColor = "black";
+    }
+  });
+
   return (
     <div
       class="playerSeatCont"

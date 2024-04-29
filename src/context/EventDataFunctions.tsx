@@ -1,8 +1,9 @@
-import { useEventContext } from "./EventContext";
+import { Event } from "~/typing/eventTypes";
 
-export function podNumtoPodId(input: number) {
-  const [eventState] = useEventContext();
-  const foundPod = eventState().evtPods.find((pod) => pod.podNumber === input);
+export function podNumtoPodId(importedEventState: Event, input: number) {
+  const foundPod = importedEventState.evtPods.find(
+    (pod) => pod.podNumber === input
+  );
   if (foundPod) {
     return foundPod.podId;
   } else {
@@ -10,11 +11,15 @@ export function podNumtoPodId(input: number) {
   }
 }
 
-export function playerIdFromAddress(podId: number, seatNumber: number) {
-  const [eventState] = useEventContext();
-  const foundPlayer = eventState().evtPlayerList.find(
+export function playerIdFromAddress(
+  importedEventState: Event,
+  podId: number,
+  seatNumber: number
+) {
+  const foundPlayer = importedEventState.evtPlayerList.find(
     (player) =>
-      podNumtoPodId(player.pod) === podId && player.seat === seatNumber
+      podNumtoPodId(importedEventState, player.pod) === podId &&
+      player.seat === seatNumber
   );
 
   if (foundPlayer) {

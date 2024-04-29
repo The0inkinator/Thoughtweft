@@ -92,22 +92,67 @@ export default function PlayerSeat({
         podToShuffle.podSize
     ) {
       const seats = podToShuffle.podSeats;
-      console.log("triggerd");
+      let shuffleNeeded = true;
+
       seats.map((seat) => {
         if (seat.filled === true) {
+          const seatBefore = seats[seat.seatNumber - 2];
+          const seatAfter = seats[seat.seatNumber];
           if (seat.seatNumber < seatPosition) {
-            const priorSeat = seats[seat.seatNumber - 2];
-            if (priorSeat.filled === false) {
-              updatePlayer(playerIdFromAddress(podId, seat.seatNumber), {
-                address: { podId: podId, seat: priorSeat.seatNumber },
-              });
+            if (seatBefore && seatBefore.filled === false && seatAfter.filled) {
+              updatePlayer(
+                playerIdFromAddress(eventState(), podId, seat.seatNumber),
+                {
+                  address: { podId: podId, seat: seatBefore.seatNumber },
+                }
+              );
             }
-          } else if (seat.seatNumber > seatPosition) {
-            const nextSeat = seats[seat.seatNumber];
           } else if (seat.seatNumber === seatPosition) {
+            if (seatBefore && seatBefore.filled === false) {
+              shuffleNeeded = false;
+              updatePlayer(
+                playerIdFromAddress(eventState(), podId, seat.seatNumber),
+                {
+                  address: { podId: podId, seat: seatBefore.seatNumber },
+                }
+              );
+            }
           }
         }
       });
+
+      if (shuffleNeeded === true) {
+        console.log("triggered back half seat to move is:", seatPosition);
+        seats.reverse().map((seat) => {
+          const seatBefore = seats[9 - seat.seatNumber];
+          const seatAfter = seats[7 - seat.seatNumber];
+          if (seat.seatNumber > seatPosition) {
+            if (
+              seatAfter &&
+              seatAfter.filled === false &&
+              seatBefore.filled === true
+            ) {
+              updatePlayer(
+                playerIdFromAddress(eventState(), podId, seat.seatNumber),
+                {
+                  address: { podId: podId, seat: seatAfter.seatNumber },
+                }
+              );
+            }
+          } else if (seat.seatNumber === seatPosition) {
+            if (seatAfter) {
+              shuffleNeeded = false;
+              seats.reverse();
+              updatePlayer(
+                playerIdFromAddress(eventState(), podId, seat.seatNumber),
+                {
+                  address: { podId: podId, seat: seatAfter.seatNumber },
+                }
+              );
+            }
+          }
+        });
+      }
     }
   };
 

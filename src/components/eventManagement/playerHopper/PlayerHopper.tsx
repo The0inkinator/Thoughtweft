@@ -28,20 +28,9 @@ export default function PlayerHopper() {
     setStartingPlayerCards(eventState().evtPlayerList);
   });
 
-  // createEffect(() => {
-  //   if (!draggedPlayer() && hovRefState() !== playerHopper) {
-  //     updateHovRef(playerHopper);
-  //   }
-  // });
-
   return (
     <DisplayFrame>
-      <div
-        class="playerHopperCont"
-        onClick={() => {
-          // console.log(eventState());
-        }}
-      >
+      <div class="playerHopperCont" onClick={() => {}}>
         <div class="addPlayerBar">
           <input class="addPlayerInput"></input>
           <button type="submit" class="addPlayerButton"></button>

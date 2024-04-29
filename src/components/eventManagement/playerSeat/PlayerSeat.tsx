@@ -2,7 +2,6 @@ import { createEffect, onCleanup, onMount } from "solid-js";
 import "./playerSeat.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
-import { useHovRefContext } from "~/context/HovRefContext";
 
 interface PlayerSlotInput {
   podId: number;
@@ -17,7 +16,6 @@ export default function PlayerSeat({
 }: PlayerSlotInput) {
   //Context State
   const [eventState, { updateSeat, updatePlayer }] = useEventContext();
-  const [hovRefState, { updateHovRef }] = useHovRefContext();
 
   const thisSeatState = () => {
     return eventState()
@@ -77,27 +75,47 @@ export default function PlayerSeat({
     if (thisSeat.childElementCount > 0 && thisSeatState().filled !== true) {
       updateSeat(podId, seatNumber, { filled: true });
     }
-
     if (thisSeat.childElementCount === 0 && thisSeatState().filled === true) {
       updateSeat(podId, seatNumber, { filled: false });
     }
   });
 
-  createEffect(() => {
-    if (thisSeatState().filled === true) {
-      thisSeat.style.backgroundColor = "red";
-    } else {
-      thisSeat.style.backgroundColor = "black";
+  const shufflePlayersFrom = (seatPosition: number) => {
+    const podToShuffle = eventState().evtPods.find(
+      (pod) => pod.podId === podId
+    );
+
+    if (
+      podToShuffle &&
+      podToShuffle.podSeats.filter((seat) => seat.filled).length <
+        podToShuffle.podSize
+    ) {
+      const seats = podToShuffle.podSeats;
+      console.log("triggerd");
+      seats.map((seat) => {
+        if (seat.filled === true) {
+          if (seat.seatNumber < seatPosition) {
+            const priorSeat = seats[seat.seatNumber - 2];
+            if (priorSeat.filled === false) {
+            }
+          } else if (seat.seatNumber > seatPosition) {
+            const nextSeat = seats[seat.seatNumber];
+          } else if (seat.seatNumber === seatPosition) {
+          }
+        }
+      });
     }
-  });
+  };
 
   return (
     <div
       class="playerSeatCont"
       ref={thisSeat}
       onMouseEnter={() => {
-        updateHovRef(thisSeat);
         if (draggedPlayer()?.dragging === true) {
+          if (thisSeatState().filled === true) {
+            shufflePlayersFrom(seatNumber);
+          }
           updateSeat(podId, seatNumber, { hovered: true });
         }
       }}

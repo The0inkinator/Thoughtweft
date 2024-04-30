@@ -92,14 +92,19 @@ export default function PlayerSeat({
         podToShuffle.podSize
     ) {
       const seats = podToShuffle.podSeats;
+      const reverseSeats = [...podToShuffle.podSeats].reverse();
       let shuffleNeeded = true;
-
       seats.map((seat) => {
         if (seat.filled === true) {
           const seatBefore = seats[seat.seatNumber - 2];
           const seatAfter = seats[seat.seatNumber];
+          const seatSpan = seats.slice(seat.seatNumber - 1, seatPosition - 1);
           if (seat.seatNumber < seatPosition) {
-            if (seatBefore && seatBefore.filled === false && seatAfter.filled) {
+            if (
+              seatBefore &&
+              seatBefore.filled === false &&
+              seatSpan.filter((seat) => seat.filled === false).length === 0
+            ) {
               updatePlayer(
                 playerIdFromAddress(eventState(), podId, seat.seatNumber),
                 {
@@ -122,15 +127,20 @@ export default function PlayerSeat({
       });
 
       if (shuffleNeeded === true) {
-        console.log("triggered back half seat to move is:", seatPosition);
-        seats.reverse().map((seat) => {
-          const seatBefore = seats[9 - seat.seatNumber];
-          const seatAfter = seats[7 - seat.seatNumber];
+        reverseSeats.map((seat) => {
+          const seatBefore = reverseSeats[9 - seat.seatNumber];
+          const seatAfter = reverseSeats[7 - seat.seatNumber];
+          const reverseSeatSpan = reverseSeats.slice(
+            seatPosition - 1,
+            seat.seatNumber - 1
+          );
           if (seat.seatNumber > seatPosition) {
             if (
               seatAfter &&
               seatAfter.filled === false &&
-              seatBefore.filled === true
+              seatBefore.filled === true &&
+              reverseSeatSpan.filter((seat) => seat.filled === false).length ===
+                0
             ) {
               updatePlayer(
                 playerIdFromAddress(eventState(), podId, seat.seatNumber),
@@ -142,7 +152,6 @@ export default function PlayerSeat({
           } else if (seat.seatNumber === seatPosition) {
             if (seatAfter) {
               shuffleNeeded = false;
-              seats.reverse();
               updatePlayer(
                 playerIdFromAddress(eventState(), podId, seat.seatNumber),
                 {

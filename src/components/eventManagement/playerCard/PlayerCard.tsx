@@ -12,6 +12,7 @@ import {
 } from "solid-js";
 import { Portal } from "solid-js/web";
 import { FullSeat } from "~/typing/eventTypes";
+import { seatDataFromDiv } from "~/context/EventDataFunctions";
 
 interface PlayerCardInputs {
   playerID: number;
@@ -29,7 +30,8 @@ export default function PlayerCard({
   seatNumber,
 }: PlayerCardInputs) {
   //Context State
-  const [eventState, { setPlayerDrag, updatePlayer }] = useEventContext();
+  const [eventState, { setPlayerDrag, updatePlayer, updateSeat }] =
+    useEventContext();
   const [hovRefState, { updateHovRef }] = useHovRefContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
@@ -37,6 +39,8 @@ export default function PlayerCard({
 
   let thisPlayerCard!: HTMLDivElement;
   let xOffset: number, yOffset: number;
+  let storedTargetSeat: HTMLDivElement;
+  let pastTargetSeat: HTMLDivElement;
 
   const thisPlayerState = createMemo(() => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
@@ -77,16 +81,25 @@ export default function PlayerCard({
       .evtPods.find((pod) => pod.podId === thisPlayerState().pod)
       ?.podSeats.find((seat) => seat.seatNumber === thisPlayerState().seat);
 
-    if (seatRef) {
+    if (seatRef && seatRef.seatRef?.childElementCount === 0) {
+      storedTargetSeat = seatRef.seatRef;
       return seatRef.seatRef;
+    } else if (seatRef) {
+      return storedTargetSeat;
     } else {
-      return eventState().playerHopper;
+      return eventState().playerHopper!;
     }
   };
 
+  //updates target seats and their filled status
   createEffect(() => {
     if (targetSeat() !== thisPlayerCard.parentElement && targetSeat()) {
-      targetSeat()!.appendChild(thisPlayerCard);
+      targetSeat().appendChild(thisPlayerCard);
+      const currentSeat = seatDataFromDiv(eventState(), targetSeat());
+      if (currentSeat) {
+        updateSeat(currentSeat.podId, currentSeat.seatNumber, { filled: true });
+      }
+      pastTargetSeat = targetSeat();
     }
   });
 
@@ -95,6 +108,10 @@ export default function PlayerCard({
       setPlayerCardMode("dragging");
       setPlayerDrag(playerID, true);
       event.preventDefault;
+      const pastSeat = seatDataFromDiv(eventState(), pastTargetSeat);
+      if (pastSeat) {
+        updateSeat(pastSeat.podId, pastSeat.seatNumber, { filled: false });
+      }
       xOffset = event.clientX - thisPlayerCard.offsetLeft;
       yOffset = event.clientY - thisPlayerCard.offsetTop;
       thisPlayerCard.style.position = "absolute";

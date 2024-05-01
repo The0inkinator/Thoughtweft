@@ -53,5 +53,5 @@ export type Event = {
   nextPodId: number;
   evtStage: "seating" | "staging" | number;
   evtLoading: boolean;
-  playerHopper?: HTMLElement;
+  playerHopper?: HTMLDivElement;
 };

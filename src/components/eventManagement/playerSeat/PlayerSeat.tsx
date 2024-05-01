@@ -72,14 +72,6 @@ export default function PlayerSeat({
     assignToGrid();
   });
 
-  // createEffect(() => {
-  //   if (thisSeat.childElementCount > 0 && thisSeatState().filled !== true) {
-  //     console.log("triggered");
-  //     thisSeat.style.backgroundColor = "red";
-  //     updateSeat(podId, seatNumber, { filled: true });
-  //   }
-  // });
-
   createEffect(() => {
     if (thisSeatState().filled === true) {
       thisSeat.style.backgroundColor = "red";
@@ -92,96 +84,99 @@ export default function PlayerSeat({
     }
   });
 
-  const shufflePlayersFrom = (seatPosition: number) => {
-    const podToShuffle = eventState().evtPods.find(
-      (pod) => pod.podId === podId
-    );
+  // const shufflePlayersFrom = (seatPosition: number) => {
+  //   const podToShuffle = eventState().evtPods.find(
+  //     (pod) => pod.podId === podId
+  //   );
 
-    if (
-      podToShuffle &&
-      podToShuffle.podSeats.filter((seat) => seat.filled).length <
-        podToShuffle.podSize
-    ) {
-      const podSize = podToShuffle.podSeats.length;
-      const seats = podToShuffle.podSeats;
-      const reverseSeats = [...podToShuffle.podSeats].reverse();
-      let shuffleNeeded = true;
+  //   if (
+  //     podToShuffle &&
+  //     podToShuffle.podSeats.filter((seat) => seat.filled).length <
+  //       podToShuffle.podSize
+  //   ) {
+  //     const podSize = podToShuffle.podSeats.length;
+  //     const seats = podToShuffle.podSeats;
+  //     const reverseSeats = [...podToShuffle.podSeats].reverse();
+  //     let shuffleNeeded = true;
 
-      seats.map((seat) => {
-        if (seat.filled === true) {
-          const seatBefore = seats[seat.seatNumber - 2];
-          const seatAfter = seats[seat.seatNumber];
-          const seatSpan = seats.slice(seat.seatNumber - 1, seatPosition - 1);
+  //     seats.map((seat) => {
+  //       if (seat.filled === true) {
+  //         const seatBefore = seats[seat.seatNumber - 2];
+  //         const seatAfter = seats[seat.seatNumber];
+  //         const seatSpan = seats.slice(seat.seatNumber - 1, seatPosition - 1);
 
-          if (
-            seat.seatNumber < seatPosition &&
-            draggedPlayer()?.seat !== seat.seatNumber &&
-            seatBefore &&
-            seatBefore.filled === false &&
-            seatSpan.filter((seat) => seat.filled === false).length === 0
-          ) {
-            updatePlayer(
-              playerIdFromAddress(eventState(), podId, seat.seatNumber),
-              {
-                address: { podId: podId, seat: seatBefore.seatNumber },
-              }
-            );
-          } else if (
-            seat.seatNumber === seatPosition &&
-            draggedPlayer()?.seat !== seat.seatNumber &&
-            seatBefore &&
-            seatBefore.filled === false
-          ) {
-            shuffleNeeded = false;
-            updatePlayer(
-              playerIdFromAddress(eventState(), podId, seat.seatNumber),
-              {
-                address: { podId: podId, seat: seatBefore.seatNumber },
-              }
-            );
-          }
-        }
-      });
+  //         if (
+  //           seat.seatNumber < seatPosition &&
+  //           draggedPlayer()?.seat !== seat.seatNumber &&
+  //           seatBefore &&
+  //           seatBefore.filled === false &&
+  //           seatSpan.filter((seat) => seat.filled === false).length === 0
+  //         ) {
+  //           updatePlayer(
+  //             playerIdFromAddress(eventState(), podId, seat.seatNumber),
+  //             {
+  //               address: { podId: podId, seat: seatBefore.seatNumber },
+  //             }
+  //           );
+  //           updateSeat(podId, seat.seatNumber, { filled: false });
+  //         } else if (
+  //           seat.seatNumber === seatPosition &&
+  //           draggedPlayer()?.seat !== seat.seatNumber &&
+  //           seatBefore &&
+  //           seatBefore.filled === false
+  //         ) {
+  //           shuffleNeeded = false;
+  //           updatePlayer(
+  //             playerIdFromAddress(eventState(), podId, seat.seatNumber),
+  //             {
+  //               address: { podId: podId, seat: seatBefore.seatNumber },
+  //             }
+  //           );
+  //           updateSeat(podId, seat.seatNumber, { filled: false });
+  //         }
+  //       }
+  //     });
 
-      if (shuffleNeeded === true) {
-        reverseSeats.map((seat) => {
-          const seatBefore = reverseSeats[podSize + 1 - seat.seatNumber];
-          const seatAfter = reverseSeats[podSize - 1 - seat.seatNumber];
-          const reverseSeatSpan = reverseSeats.slice(
-            seatPosition - 1,
-            seat.seatNumber - 1
-          );
-          if (
-            seat.seatNumber > seatPosition &&
-            draggedPlayer()?.seat !== seat.seatNumber &&
-            seatAfter &&
-            seatAfter.filled === false &&
-            seatBefore.filled === true &&
-            reverseSeatSpan.filter((seat) => seat.filled === false).length === 0
-          ) {
-            updatePlayer(
-              playerIdFromAddress(eventState(), podId, seat.seatNumber),
-              {
-                address: { podId: podId, seat: seatAfter.seatNumber },
-              }
-            );
-          } else if (
-            seat.seatNumber === seatPosition &&
-            draggedPlayer()?.seat !== seat.seatNumber &&
-            seatAfter
-          ) {
-            shuffleNeeded = false;
-            updatePlayer(
-              playerIdFromAddress(eventState(), podId, seat.seatNumber),
-              {
-                address: { podId: podId, seat: seatAfter.seatNumber },
-              }
-            );
-          }
-        });
-      }
-    }
-  };
+  //     if (shuffleNeeded === true) {
+  //       reverseSeats.map((seat) => {
+  //         const seatBefore = reverseSeats[podSize + 1 - seat.seatNumber];
+  //         const seatAfter = reverseSeats[podSize - 1 - seat.seatNumber];
+  //         const reverseSeatSpan = reverseSeats.slice(
+  //           seatPosition - 1,
+  //           seat.seatNumber - 1
+  //         );
+  //         if (
+  //           seat.seatNumber > seatPosition &&
+  //           draggedPlayer()?.seat !== seat.seatNumber &&
+  //           seatAfter &&
+  //           seatAfter.filled === false &&
+  //           seatBefore.filled === true &&
+  //           reverseSeatSpan.filter((seat) => seat.filled === false).length === 0
+  //         ) {
+  //           updateSeat(podId, seat.seatNumber, { filled: false });
+  //           updatePlayer(
+  //             playerIdFromAddress(eventState(), podId, seat.seatNumber),
+  //             {
+  //               address: { podId: podId, seat: seatAfter.seatNumber },
+  //             }
+  //           );
+  //         } else if (
+  //           seat.seatNumber === seatPosition &&
+  //           draggedPlayer()?.seat !== seat.seatNumber &&
+  //           seatAfter
+  //         ) {
+  //           shuffleNeeded = false;
+  //           updatePlayer(
+  //             playerIdFromAddress(eventState(), podId, seat.seatNumber),
+  //             {
+  //               address: { podId: podId, seat: seatAfter.seatNumber },
+  //             }
+  //           );
+  //         }
+  //       });
+  //     }
+  //   }
+  // };
 
   return (
     <div
@@ -189,17 +184,11 @@ export default function PlayerSeat({
       ref={thisSeat}
       onMouseEnter={() => {
         if (draggedPlayer() && draggedPlayer()?.dragging === true) {
-          if (thisSeatState().filled === true) {
-            shufflePlayersFrom(seatNumber);
-          }
           updateSeat(podId, seatNumber, { hovered: true });
         }
       }}
       onMouseLeave={() => {
         updateSeat(podId, seatNumber, { hovered: false });
-      }}
-      onClick={() => {
-        console.log(thisSeatState().filled);
       }}
     >
       {seatNumber}

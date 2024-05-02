@@ -30,8 +30,7 @@ type EventState = [
       inputPlayerId: number,
       updateParam: PlayerUpdateParam
     ) => void;
-    setPlayerHopperEl: (inputElement: HTMLElement) => void;
-    setPlayerDrag: (playerId: number, inputBoolean: boolean) => void;
+    setPlayerHopperEl: (inputElement: HTMLDivElement) => void;
   }
 ];
 
@@ -280,31 +279,23 @@ export function EventContextProvider(props: any) {
                   pod: updateParam.address.podId,
                   seat: updateParam.address.seat,
                 };
+              } else if ("drag" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  dragging: updateParam.drag,
+                };
               }
+              return newEvt;
+            } else {
+              return newEvt;
             }
-            return newEvt;
           });
         },
 
         //SET ELEMENT FOR PLAYER HOPPER
         setPlayerHopperEl(inputElement) {
           setEvent((prevEvt) => {
-            const newEvt = { ...prevEvt, playerHopper: inputElement };
-            return newEvt;
-          });
-        },
-
-        //SET PLAYER DRAG BOOLEAN
-        setPlayerDrag(playerId, inputBoolean) {
-          setEvent((prevEvt) => {
-            const newEvt = { ...prevEvt };
-            const playerIndexToEdit = newEvt.evtPlayerList.findIndex(
-              (player) => player.id === playerId
-            );
-            newEvt.evtPlayerList[playerIndexToEdit] = {
-              ...newEvt.evtPlayerList[playerIndexToEdit],
-              dragging: inputBoolean,
-            };
+            const newEvt: Event = { ...prevEvt, playerHopper: inputElement };
             return newEvt;
           });
         },

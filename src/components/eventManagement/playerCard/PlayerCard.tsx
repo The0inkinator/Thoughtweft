@@ -30,8 +30,7 @@ export default function PlayerCard({
   seatNumber,
 }: PlayerCardInputs) {
   //Context State
-  const [eventState, { setPlayerDrag, updatePlayer, updateSeat }] =
-    useEventContext();
+  const [eventState, { updatePlayer, updateSeat }] = useEventContext();
   const [hovRefState, { updateHovRef }] = useHovRefContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
@@ -100,7 +99,7 @@ export default function PlayerCard({
 
   //updates target seats and their filled status
   createEffect(() => {
-    if (targetSeat() !== thisPlayerCard.parentElement && targetSeat()) {
+    if (targetSeat() && targetSeat() !== thisPlayerCard.parentElement) {
       if (
         thisPlayerCard.parentElement instanceof HTMLDivElement &&
         thisPlayerCard.parentElement !== targetSeat()
@@ -115,18 +114,34 @@ export default function PlayerCard({
     }
   });
 
+  createEffect(() => {
+    const seatToCheck = seatDataFromDiv(eventState(), targetSeat());
+    if (
+      seatToCheck &&
+      seatToCheck.podId ===
+        podNumtoPodId(eventState(), thisPlayerState().pod) &&
+      seatToCheck.seatNumber === thisPlayerState().seat &&
+      thisPlayerState().dragging === false &&
+      seatToCheck.filled === false
+    ) {
+      updateSeat(seatToCheck.podId, seatToCheck.seatNumber, { filled: true });
+    }
+  });
+
   const dragInit = (event: MouseEvent) => {
     if (playerCardMode() !== "dragging") {
       setPlayerCardMode("dragging");
-      setPlayerDrag(playerID, true);
+      updatePlayer(playerID, { drag: true });
       event.preventDefault;
       xOffset = event.clientX - thisPlayerCard.offsetLeft;
       yOffset = event.clientY - thisPlayerCard.offsetTop;
       thisPlayerCard.style.position = "absolute";
       thisPlayerCard.style.pointerEvents = "none";
-      const pastSeat = seatDataFromDiv(eventState(), pastTargetSeat);
-      if (pastSeat) {
-        updateSeat(pastSeat.podId, pastSeat.seatNumber, { filled: false });
+      const currentSeat = seatDataFromDiv(eventState(), targetSeat());
+      if (currentSeat) {
+        updateSeat(currentSeat.podId, currentSeat.seatNumber, {
+          filled: false,
+        });
       }
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
@@ -145,7 +160,7 @@ export default function PlayerCard({
   const dragEnd = () => {
     thisPlayerCard.style.pointerEvents = "auto";
     setPlayerCardMode("noSeat");
-    setPlayerDrag(playerID, false);
+    updatePlayer(playerID, { drag: false });
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.left = `0px`;
     thisPlayerCard.style.top = `0px`;

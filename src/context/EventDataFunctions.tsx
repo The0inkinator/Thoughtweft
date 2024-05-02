@@ -11,6 +11,17 @@ export function podNumtoPodId(importedEventState: Event, input: number) {
   }
 }
 
+export function podIdtoPodNum(importedEventState: Event, input: number) {
+  const foundPod = importedEventState.evtPods.find(
+    (pod) => pod.podId === input
+  );
+  if (foundPod) {
+    return foundPod.podNumber;
+  } else {
+    return input;
+  }
+}
+
 export function playerIdFromAddress(
   importedEventState: Event,
   podId: number,

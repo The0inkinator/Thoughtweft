@@ -3,6 +3,7 @@ import "./playerSeat.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
 import { playerIdFromAddress } from "~/context/EventDataFunctions";
+import { FullSeat } from "~/typing/eventTypes";
 
 interface PlayerSlotInput {
   podId: number;
@@ -92,87 +93,130 @@ export default function PlayerSeat({
     if (
       podToShuffle &&
       podToShuffle.podSeats.filter((seat) => seat.filled).length <
-        podToShuffle.podSize
+        podToShuffle.podSize &&
+      podToShuffle.podSeats.find((seat) => seat.seatNumber === seatPosition)
+        ?.filled === true
     ) {
-      const podSize = podToShuffle.podSeats.length;
-      const seats = podToShuffle.podSeats;
-      const reverseSeats = [...podToShuffle.podSeats].reverse();
-      let shuffleNeeded = true;
+      const fullSeatGroup = podToShuffle.podSeats;
+      const seatGroupBefore = podToShuffle.podSeats.filter(
+        (seat) => seat.seatNumber < seatPosition
+      );
+      const seatGroupAfter = podToShuffle.podSeats.filter(
+        (seat) => seat.seatNumber > seatPosition
+      );
 
-      seats.map((seat) => {
-        if (seat.filled === true) {
-          const seatBefore = seats[seat.seatNumber - 2];
-          const seatAfter = seats[seat.seatNumber];
-          const seatSpan = seats.slice(seat.seatNumber - 1, seatPosition - 1);
+      const shuffleGroupBefore = () => {
+        [...seatGroupBefore].map((seat) => {
+          const smallerSeat = fullSeatGroup[seat.seatNumber - 2];
+          const largerSeat = fullSeatGroup[seat.seatNumber];
+          const spanToSeat = fullSeatGroup.slice(
+            seat.seatNumber - 1,
+            seatPosition - 1
+          );
 
           if (
-            seat.seatNumber < seatPosition &&
-            draggedPlayer()?.seat !== seat.seatNumber &&
-            seatBefore &&
-            seatBefore.filled === false &&
-            seatSpan.filter((seat) => seat.filled === false).length === 0
+            smallerSeat &&
+            !smallerSeat.filled &&
+            largerSeat.filled &&
+            spanToSeat.filter((seat) => !seat.filled).length === 0
           ) {
             updatePlayer(
               playerIdFromAddress(eventState(), podId, seat.seatNumber),
-              {
-                address: { podId: podId, seat: seatBefore.seatNumber },
-              }
+              { address: { podId: podId, seat: smallerSeat.seatNumber } }
             );
-            updateSeat(podId, seat.seatNumber, { filled: false });
-          } else if (
-            seat.seatNumber === seatPosition &&
-            draggedPlayer()?.seat !== seat.seatNumber &&
-            seatBefore &&
-            seatBefore.filled === false
-          ) {
-            shuffleNeeded = false;
-            updatePlayer(
-              playerIdFromAddress(eventState(), podId, seat.seatNumber),
-              {
-                address: { podId: podId, seat: seatBefore.seatNumber },
-              }
-            );
-            updateSeat(podId, seat.seatNumber, { filled: false });
           }
-        }
-      });
+        });
+      };
 
-      if (shuffleNeeded === true) {
-        reverseSeats.map((seat) => {
-          const seatBefore = reverseSeats[podSize + 1 - seat.seatNumber];
-          const seatAfter = reverseSeats[podSize - 1 - seat.seatNumber];
-          const reverseSeatSpan = reverseSeats.slice(
+      const shuffleGroupAfter = () => {
+        [...seatGroupAfter].reverse().map((seat) => {
+          const smallerSeat = fullSeatGroup[seat.seatNumber - 2];
+          const largerSeat = fullSeatGroup[seat.seatNumber];
+          const spanToSeat = fullSeatGroup.slice(
             seatPosition - 1,
             seat.seatNumber - 1
           );
+
           if (
-            seat.seatNumber > seatPosition &&
-            draggedPlayer()?.seat !== seat.seatNumber &&
-            seatAfter &&
-            seatAfter.filled === false &&
-            seatBefore.filled === true &&
-            reverseSeatSpan.filter((seat) => seat.filled === false).length === 0
+            largerSeat &&
+            !largerSeat.filled &&
+            smallerSeat.filled &&
+            spanToSeat.filter((seat) => !seat.filled).length === 0
           ) {
-            updateSeat(podId, seat.seatNumber, { filled: false });
             updatePlayer(
               playerIdFromAddress(eventState(), podId, seat.seatNumber),
-              {
-                address: { podId: podId, seat: seatAfter.seatNumber },
-              }
-            );
-          } else if (
-            seat.seatNumber === seatPosition &&
-            draggedPlayer()?.seat !== seat.seatNumber &&
-            seatAfter
-          ) {
-            shuffleNeeded = false;
-            updatePlayer(
-              playerIdFromAddress(eventState(), podId, seat.seatNumber),
-              {
-                address: { podId: podId, seat: seatAfter.seatNumber },
-              }
+              { address: { podId: podId, seat: largerSeat.seatNumber } }
             );
           }
+        });
+      };
+
+      let longSeatGroup,
+        shuffleLongSeatGroup: () => void,
+        shortSeatGroup,
+        shuffleShortSeatGroup: () => void;
+
+      let shuffleNeeded = true;
+
+      if (seatGroupBefore.length < seatGroupAfter.length) {
+        shortSeatGroup = seatGroupBefore;
+        shuffleShortSeatGroup = () => {
+          shuffleGroupBefore();
+        };
+        longSeatGroup = seatGroupAfter;
+        shuffleLongSeatGroup = () => {
+          shuffleGroupAfter();
+        };
+      } else {
+        shortSeatGroup = seatGroupAfter;
+        shuffleShortSeatGroup = () => {
+          shuffleGroupAfter();
+        };
+        longSeatGroup = seatGroupBefore;
+        shuffleLongSeatGroup = () => {
+          shuffleGroupBefore();
+        };
+      }
+
+      if (
+        shortSeatGroup.length >
+        shortSeatGroup.filter((seat) => seat.filled).length
+      ) {
+        shuffleShortSeatGroup();
+        shuffleNeeded = false;
+      } else if (
+        longSeatGroup.length >
+          longSeatGroup.filter((seat) => seat.filled).length &&
+        shuffleNeeded
+      ) {
+        shuffleLongSeatGroup();
+        shuffleNeeded = false;
+      }
+
+      const hoveredSeat = fullSeatGroup[seatPosition - 1];
+      const vacantSeats = fullSeatGroup.filter(
+        (seat) =>
+          !seat.filled &&
+          (seat.seatNumber === hoveredSeat.seatNumber + 1 ||
+            seat.seatNumber === hoveredSeat.seatNumber - 1)
+      );
+      let targetSeat: FullSeat | undefined;
+
+      if (vacantSeats.length > 1) {
+        vacantSeats.map((vSeat) => {
+          if (
+            shortSeatGroup.find((seat) => seat.seatNumber === vSeat.seatNumber)
+          ) {
+            targetSeat = vSeat;
+          }
+        });
+      } else {
+        targetSeat = vacantSeats[0];
+      }
+
+      if (targetSeat) {
+        updatePlayer(playerIdFromAddress(eventState(), podId, seatPosition), {
+          address: { podId: podId, seat: targetSeat.seatNumber },
         });
       }
     }

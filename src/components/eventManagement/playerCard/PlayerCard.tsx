@@ -106,6 +106,12 @@ export default function PlayerCard({
       ) {
         pastTargetSeat = thisPlayerCard.parentElement;
       }
+      console.log(
+        `moving ${thisPlayerState().name} from seat:`,
+        seatDataFromDiv(eventState(), pastTargetSeat)?.seatNumber,
+        "to:",
+        seatDataFromDiv(eventState(), targetSeat())?.seatNumber
+      );
       targetSeat().appendChild(thisPlayerCard);
       const currentSeat = seatDataFromDiv(eventState(), targetSeat());
       if (currentSeat && currentSeat.filled === false) {

@@ -99,19 +99,17 @@ export default function PlayerCard({
 
   //updates target seats and their filled status
   createEffect(() => {
-    if (targetSeat() && targetSeat() !== thisPlayerCard.parentElement) {
+    if (
+      targetSeat() &&
+      targetSeat() !== thisPlayerCard.parentElement &&
+      !thisPlayerState().dragging
+    ) {
       if (
         thisPlayerCard.parentElement instanceof HTMLDivElement &&
         thisPlayerCard.parentElement !== targetSeat()
       ) {
         pastTargetSeat = thisPlayerCard.parentElement;
       }
-      console.log(
-        `moving ${thisPlayerState().name} from seat:`,
-        seatDataFromDiv(eventState(), pastTargetSeat)?.seatNumber,
-        "to:",
-        seatDataFromDiv(eventState(), targetSeat())?.seatNumber
-      );
       targetSeat().appendChild(thisPlayerCard);
       const currentSeat = seatDataFromDiv(eventState(), targetSeat());
       if (currentSeat && currentSeat.filled === false) {
@@ -120,19 +118,19 @@ export default function PlayerCard({
     }
   });
 
-  createEffect(() => {
-    const seatToCheck = seatDataFromDiv(eventState(), targetSeat());
-    if (
-      seatToCheck &&
-      seatToCheck.podId ===
-        podNumtoPodId(eventState(), thisPlayerState().pod) &&
-      seatToCheck.seatNumber === thisPlayerState().seat &&
-      thisPlayerState().dragging === false &&
-      seatToCheck.filled === false
-    ) {
-      updateSeat(seatToCheck.podId, seatToCheck.seatNumber, { filled: true });
-    }
-  });
+  // createEffect(() => {
+  //   const seatToCheck = seatDataFromDiv(eventState(), targetSeat());
+  //   if (
+  //     seatToCheck &&
+  //     seatToCheck.podId ===
+  //       podNumtoPodId(eventState(), thisPlayerState().pod) &&
+  //     seatToCheck.seatNumber === thisPlayerState().seat &&
+  //     thisPlayerState().dragging === false &&
+  //     seatToCheck.filled === false
+  //   ) {
+  //     updateSeat(seatToCheck.podId, seatToCheck.seatNumber, { filled: true });
+  //   }
+  // });
 
   const dragInit = (event: MouseEvent) => {
     if (playerCardMode() !== "dragging") {
@@ -149,6 +147,7 @@ export default function PlayerCard({
           filled: false,
         });
       }
+      updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
     }

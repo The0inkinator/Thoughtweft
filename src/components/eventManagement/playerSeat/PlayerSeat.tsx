@@ -227,12 +227,14 @@ export default function PlayerSeat({
       class="playerSeatCont"
       ref={thisSeat}
       onMouseEnter={() => {
+        thisSeat.style.outline = "solid blue";
         if (draggedPlayer() && draggedPlayer()?.dragging === true) {
           updateSeat(podId, seatNumber, { hovered: true });
           shufflePlayersFrom(seatNumber);
         }
       }}
       onMouseLeave={() => {
+        thisSeat.style.outline = "none";
         updateSeat(podId, seatNumber, { hovered: false });
       }}
     >

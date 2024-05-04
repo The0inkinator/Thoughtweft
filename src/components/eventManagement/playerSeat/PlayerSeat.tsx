@@ -75,18 +75,6 @@ export default function PlayerSeat({
     assignToGrid();
   });
 
-  // createEffect(() => {
-  //   if (thisSeatState().filled === true) {
-  //     thisSeat.style.backgroundColor = "red";
-  //   }
-  // });
-
-  // createEffect(() => {
-  //   if (thisSeatState().filled === false) {
-  //     thisSeat.style.backgroundColor = "black";
-  //   }
-  // });
-
   const shufflePlayersFrom = (seatPosition: number) => {
     const podToShuffle = eventState().evtPods.find(
       (pod) => pod.podId === podId

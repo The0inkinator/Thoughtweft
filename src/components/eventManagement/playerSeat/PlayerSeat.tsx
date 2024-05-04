@@ -1,4 +1,4 @@
-import { createEffect, onCleanup, onMount } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import "./playerSeat.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
@@ -18,6 +18,8 @@ export default function PlayerSeat({
 }: PlayerSlotInput) {
   //Context State
   const [eventState, { updateSeat, updatePlayer }] = useEventContext();
+  //Local State
+  const [mouseOver, setMouseOver] = createSignal<boolean>(false);
 
   const thisSeatState = () => {
     return eventState()
@@ -73,17 +75,17 @@ export default function PlayerSeat({
     assignToGrid();
   });
 
-  createEffect(() => {
-    if (thisSeatState().filled === true) {
-      thisSeat.style.backgroundColor = "red";
-    }
-  });
+  // createEffect(() => {
+  //   if (thisSeatState().filled === true) {
+  //     thisSeat.style.backgroundColor = "red";
+  //   }
+  // });
 
-  createEffect(() => {
-    if (thisSeatState().filled === false) {
-      thisSeat.style.backgroundColor = "black";
-    }
-  });
+  // createEffect(() => {
+  //   if (thisSeatState().filled === false) {
+  //     thisSeat.style.backgroundColor = "black";
+  //   }
+  // });
 
   const shufflePlayersFrom = (seatPosition: number) => {
     const podToShuffle = eventState().evtPods.find(
@@ -222,22 +224,40 @@ export default function PlayerSeat({
     }
   };
 
+  const handleMouseMove = (event: MouseEvent) => {
+    const boundingBox = thisSeat.getBoundingClientRect();
+    if (
+      event.clientX >= boundingBox.left &&
+      event.clientX <= boundingBox.right &&
+      event.clientY >= boundingBox.top &&
+      event.clientY <= boundingBox.bottom &&
+      !mouseOver()
+    ) {
+      setMouseOver(true);
+      if (draggedPlayer() && draggedPlayer()?.dragging === true) {
+        updateSeat(podId, seatNumber, { hovered: true });
+        shufflePlayersFrom(seatNumber);
+      }
+    } else if (
+      (mouseOver() && event.clientX <= boundingBox.left) ||
+      event.clientX >= boundingBox.right ||
+      event.clientY <= boundingBox.top ||
+      event.clientY >= boundingBox.bottom
+    ) {
+      setMouseOver(false);
+      updateSeat(podId, seatNumber, { hovered: false });
+    }
+  };
+
+  onMount(() => {
+    document.addEventListener("mousemove", handleMouseMove);
+  });
+  onCleanup(() => {
+    document.removeEventListener("mousemove", handleMouseMove);
+  });
+
   return (
-    <div
-      class="playerSeatCont"
-      ref={thisSeat}
-      onMouseEnter={() => {
-        thisSeat.style.outline = "solid blue";
-        if (draggedPlayer() && draggedPlayer()?.dragging === true) {
-          updateSeat(podId, seatNumber, { hovered: true });
-          shufflePlayersFrom(seatNumber);
-        }
-      }}
-      onMouseLeave={() => {
-        thisSeat.style.outline = "none";
-        updateSeat(podId, seatNumber, { hovered: false });
-      }}
-    >
+    <div class="playerSeatCont" ref={thisSeat}>
       {seatNumber}
     </div>
   );

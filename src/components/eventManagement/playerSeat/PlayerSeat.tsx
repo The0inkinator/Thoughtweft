@@ -20,33 +20,35 @@ export default function PlayerSeat({
   const [eventState, { updateSeat, updatePlayer }] = useEventContext();
   //Local State
   const [mouseOver, setMouseOver] = createSignal<boolean>(false);
+  //Refs
+  let thisSeat!: HTMLDivElement;
 
+  //Returns state for the seat
   const thisSeatState = () => {
     return eventState()
       .evtPods.find((pod) => pod.podId === podId)!
       .podSeats.find((seat) => seat.seatNumber === seatNumber)!;
   };
-
+  //Returns state of a player if one is being dragged
   const draggedPlayer = () => {
     return eventState().evtPlayerList.find(
       (player) => player.dragging === true
     );
   };
-
+  //Updates the seatstate to contain a reference to the correct element
   createEffect(() => {
     if (thisSeatState().seatRef !== thisSeat) {
       updateSeat(podId, seatNumber, { ref: thisSeat });
     }
   });
-
+  //Sets filled to false if no children
   createEffect(() => {
     if (thisSeatState().filled === true && thisSeat.children.length < 1) {
       updateSeat(podId, seatNumber, { filled: false });
     }
   });
 
-  let thisSeat!: HTMLDivElement;
-
+  //Assigns seat to the correct grid location visually
   const assignToGrid = () => {
     if (tableSide === "R") {
       const vertGridPos = seatNumber;
@@ -75,6 +77,7 @@ export default function PlayerSeat({
     assignToGrid();
   });
 
+  //Shuffles players to make space for a dragged player
   const shufflePlayersFrom = (seatPosition: number) => {
     const podToShuffle = eventState().evtPods.find(
       (pod) => pod.podId === podId
@@ -212,6 +215,7 @@ export default function PlayerSeat({
     }
   };
 
+  //Handles mouse movement to trigger shuffle function
   const handleMouseMove = (event: MouseEvent) => {
     const boundingBox = thisSeat.getBoundingClientRect();
     if (

@@ -12,10 +12,9 @@ export default function PlayerHopper() {
   const [eventState, { updateSeat, setPlayerHopperEl, addPlayer }] =
     useEventContext();
   //Local State
-  const [startingPlayerCards, setStartingPlayerCards] = createSignal<Player[]>(
-    []
-  );
-
+  const [playerNameValue, setPlayerNameValue] = createSignal<string>("");
+  const [addToPod, setAddToPod] = createSignal<boolean>(true);
+  //Refs
   let playerHopper!: HTMLDivElement;
 
   const draggedPlayer = () => {
@@ -55,21 +54,52 @@ export default function PlayerHopper() {
     });
   });
 
+  const handler = (data: string, event: MouseEvent) => {
+    console.log(data);
+    createPlayerFromData(eventState().evtPlayerList[0]);
+  };
+
   return (
     <DisplayFrame>
       <div class="playerHopperCont" onClick={() => {}}>
         <div class="addPlayerBar">
-          <input class="addPlayerInput"></input>
+          <input
+            class="addPlayerName"
+            value={playerNameValue()}
+            placeholder="Player's name..."
+            onInput={(event) => {
+              setPlayerNameValue(event.target.value);
+            }}
+          ></input>
           <button
             type="submit"
             style={{ width: "1rem", height: "1rem" }}
             class="addPlayerButton"
-            onClick={() => {
-              console.log(firstOpenSeatAddress(eventState()));
-            }}
+            // on:click={() => {
+            //   // if (addToPod()) {
+            //   //   // createNewPlayer(
+            //   //   //   playerNameValue(),
+            //   //   //   firstOpenSeatAddress(eventState())
+            //   //   // );
+            //   // } else {
+            //   //   createNewPlayer(playerNameValue());
+            //   // }
+            // }}
+            onClick={[handler, "hello"]}
           ></button>
           <p></p>
-          <input type="checkbox" id="addToPod"></input>
+          <input
+            type="checkbox"
+            id="addToPod"
+            checked={addToPod()}
+            onClick={() => {
+              if (addToPod()) {
+                setAddToPod(false);
+              } else if (!addToPod()) {
+                setAddToPod(true);
+              }
+            }}
+          ></input>
           <label for="addToPod">Add to Pod?</label>
         </div>
         <div class="podlessSeat" ref={playerHopper}>

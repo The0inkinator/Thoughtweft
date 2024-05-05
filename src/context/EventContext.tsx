@@ -9,6 +9,7 @@ import {
   FullSeat,
   ProxySeat,
   PlayerUpdateParam,
+  PlayerAddress,
 } from "~/typing/eventTypes";
 
 //Typing
@@ -17,7 +18,7 @@ type EventState = [
   () => Event,
   {
     makeEvent: (newEvent: Event) => void;
-    addPlayer: ({ name }: Player) => void;
+    addPlayer: (name: string, playerAddress?: PlayerAddress) => void;
     addPod: (inputPodSize: PodSizes) => void;
     removePod: (inputPodId: number) => void;
     updatePodSize: (inputPodId: number, newPodSize: number) => void;
@@ -75,7 +76,30 @@ export function EventContextProvider(props: any) {
         },
 
         //ADD PLAYER
-        addPlayer({ name }) {},
+        addPlayer(name, playerAddress) {
+          const newPlayer: Player = (() => {
+            let tempPod: number = 0;
+            let tempSeat: number = 0;
+            if (playerAddress) {
+              tempPod = playerAddress.pod;
+              tempSeat = playerAddress.seat;
+            }
+
+            return {
+              id: event().evtPlayerList.length + 1,
+              name: name,
+              pod: tempPod,
+              seat: tempSeat,
+              dragging: false,
+            };
+          })();
+
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+            newEvt.evtPlayerList = [...newEvt.evtPlayerList, newPlayer];
+            return newEvt;
+          });
+        },
 
         //ADD POD
         addPod(inputPodSize) {

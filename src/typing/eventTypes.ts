@@ -21,6 +21,11 @@ export type Player = {
   eventRecord?: Record;
 };
 
+export interface PlayerAddress {
+  pod: number;
+  seat: number;
+}
+
 export type FullSeat = {
   podId: number;
   seatNumber: number;

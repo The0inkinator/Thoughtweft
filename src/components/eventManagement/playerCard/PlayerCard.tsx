@@ -12,7 +12,11 @@ import {
 } from "solid-js";
 import { Portal } from "solid-js/web";
 import { FullSeat } from "~/typing/eventTypes";
-import { podNumtoPodId, seatDataFromDiv } from "~/context/EventDataFunctions";
+import {
+  podIdtoPodNum,
+  podNumtoPodId,
+  seatDataFromDiv,
+} from "~/context/EventDataFunctions";
 
 interface PlayerCardInputs {
   playerID: number;
@@ -43,15 +47,6 @@ export default function PlayerCard({
   const thisPlayerState = createMemo(() => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
   });
-
-  const podIdtoPodNum = (input: number) => {
-    const foundPod = eventState().evtPods.find((pod) => pod.podId === input);
-    if (foundPod) {
-      return foundPod.podNumber;
-    } else {
-      return input;
-    }
-  };
 
   const hoveredSeat = () => {
     let allSeats: FullSeat[] = [];
@@ -152,6 +147,7 @@ export default function PlayerCard({
       document.addEventListener("mouseup", dragEnd);
     }
   };
+
   const dragging = (event: MouseEvent) => {
     if (playerCardMode() === "dragging") {
       event.preventDefault;
@@ -162,6 +158,7 @@ export default function PlayerCard({
       thisPlayerCard.style.zIndex = "4";
     }
   };
+
   const dragEnd = () => {
     thisPlayerCard.style.pointerEvents = "auto";
     setPlayerCardMode("noSeat");
@@ -193,7 +190,13 @@ export default function PlayerCard({
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
-          <div class="playerName" onclick={() => {}}>
+          <div
+            class="playerName"
+            onclick={() => {}}
+            onMouseOver={() => {
+              // thisPlayerCard.style.position = "absolute";
+            }}
+          >
             {playerName}
           </div>
         </Match>

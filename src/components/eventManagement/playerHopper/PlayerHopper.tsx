@@ -2,7 +2,7 @@ import "./playerHopper.css";
 import DisplayFrame from "../displayFrame";
 import { useEventContext } from "~/context/EventContext";
 import { For, createEffect, createSignal, onMount } from "solid-js";
-import { Player, PlayerAddress } from "~/typing/eventTypes";
+import { Player, SeatAddress } from "~/typing/eventTypes";
 import PlayerCard from "../playerCard";
 import { useHovRefContext } from "~/context/HovRefContext";
 
@@ -29,15 +29,15 @@ export default function PlayerHopper() {
         <PlayerCard
           playerID={playerInfo.id}
           playerName={playerInfo.name}
-          podNumber={playerInfo.pod}
+          podId={playerInfo.podId}
           seatNumber={playerInfo.seat}
         />
       </div>
     );
   };
 
-  const createNewPlayer = (name: string, playerAddress?: PlayerAddress) => {
-    addPlayer(name, playerAddress);
+  const createNewPlayer = (name: string, seatAddress?: SeatAddress) => {
+    addPlayer(name, seatAddress);
     const newPlayer = eventState().evtPlayerList.findLast((player) => true);
     if (newPlayer) {
       createPlayerFromData(newPlayer);
@@ -52,8 +52,6 @@ export default function PlayerHopper() {
     eventState().evtPlayerList.map((player) => {
       createPlayerFromData(player);
     });
-
-    createNewPlayer("sup");
   });
 
   return (

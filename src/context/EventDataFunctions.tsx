@@ -28,9 +28,7 @@ export function playerIdFromAddress(
   seatNumber: number
 ) {
   const foundPlayer = importedEventState.evtPlayerList.find(
-    (player) =>
-      podNumtoPodId(importedEventState, player.pod) === podId &&
-      player.seat === seatNumber
+    (player) => player.podId === podId && player.seat === seatNumber
   );
 
   if (foundPlayer) {
@@ -57,4 +55,8 @@ export function seatDataFromDiv(
   if (seatData) {
     return seatData;
   }
+}
+
+export function firstOpenSeatAddress(importedEventState: Event) {
+  importedEventState.evtPods.find((pod) => {});
 }

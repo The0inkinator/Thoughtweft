@@ -9,7 +9,7 @@ import {
   FullSeat,
   ProxySeat,
   PlayerUpdateParam,
-  PlayerAddress,
+  SeatAddress,
 } from "~/typing/eventTypes";
 
 //Typing
@@ -18,7 +18,7 @@ type EventState = [
   () => Event,
   {
     makeEvent: (newEvent: Event) => void;
-    addPlayer: (name: string, playerAddress?: PlayerAddress) => void;
+    addPlayer: (name: string, seatAddress?: SeatAddress) => void;
     addPod: (inputPodSize: PodSizes) => void;
     removePod: (inputPodId: number) => void;
     updatePodSize: (inputPodId: number, newPodSize: number) => void;
@@ -48,14 +48,14 @@ const SampleEvent: Event = {
   ],
   evtSeats: [],
   evtPlayerList: [
-    { id: 0, name: "Keldan", pod: 0, seat: 0, dragging: false },
-    { id: 1, name: "Colton", pod: 0, seat: 0, dragging: false },
-    { id: 2, name: "Aiden", pod: 0, seat: 0, dragging: false },
-    { id: 3, name: "Harrison", pod: 0, seat: 0, dragging: false },
-    { id: 4, name: "Josh", pod: 0, seat: 0, dragging: false },
-    { id: 5, name: "Daniel", pod: 0, seat: 0, dragging: false },
-    { id: 6, name: "Jesse", pod: 0, seat: 0, dragging: false },
-    { id: 7, name: "Jack", pod: 0, seat: 0, dragging: false },
+    { id: 0, name: "Keldan", podId: 0, seat: 0, dragging: false },
+    { id: 1, name: "Colton", podId: 0, seat: 0, dragging: false },
+    { id: 2, name: "Aiden", podId: 0, seat: 0, dragging: false },
+    { id: 3, name: "Harrison", podId: 0, seat: 0, dragging: false },
+    { id: 4, name: "Josh", podId: 0, seat: 0, dragging: false },
+    { id: 5, name: "Daniel", podId: 0, seat: 0, dragging: false },
+    { id: 6, name: "Jesse", podId: 0, seat: 0, dragging: false },
+    { id: 7, name: "Jack", podId: 0, seat: 0, dragging: false },
   ],
   evtSettings: { playerCap: 0 },
   evtStage: "seating",
@@ -76,19 +76,19 @@ export function EventContextProvider(props: any) {
         },
 
         //ADD PLAYER
-        addPlayer(name, playerAddress) {
+        addPlayer(name, seatAddress) {
           const newPlayer: Player = (() => {
-            let tempPod: number = 0;
+            let tempPodId: number = 0;
             let tempSeat: number = 0;
-            if (playerAddress) {
-              tempPod = playerAddress.pod;
-              tempSeat = playerAddress.seat;
+            if (seatAddress) {
+              tempPodId = seatAddress.podId;
+              tempSeat = seatAddress.seat;
             }
 
             return {
               id: event().evtPlayerList.length + 1,
               name: name,
-              pod: tempPod,
+              podId: tempPodId,
               seat: tempSeat,
               dragging: false,
             };
@@ -300,7 +300,7 @@ export function EventContextProvider(props: any) {
               if ("address" in updateParam) {
                 newEvt.evtPlayerList[playerIndex] = {
                   ...newEvt.evtPlayerList[playerIndex],
-                  pod: updateParam.address.podId,
+                  podId: updateParam.address.podId,
                   seat: updateParam.address.seat,
                 };
               } else if ("drag" in updateParam) {

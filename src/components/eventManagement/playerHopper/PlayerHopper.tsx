@@ -5,6 +5,7 @@ import { For, createEffect, createSignal, onMount } from "solid-js";
 import { Player, SeatAddress } from "~/typing/eventTypes";
 import PlayerCard from "../playerCard";
 import { useHovRefContext } from "~/context/HovRefContext";
+import { firstOpenSeatAddress } from "~/context/EventDataFunctions";
 
 export default function PlayerHopper() {
   //Context State
@@ -64,7 +65,7 @@ export default function PlayerHopper() {
             style={{ width: "1rem", height: "1rem" }}
             class="addPlayerButton"
             onClick={() => {
-              addPlayer("Da Boi");
+              console.log(firstOpenSeatAddress(eventState()));
             }}
           ></button>
           <p></p>

@@ -1,4 +1,4 @@
-import { Event, FullSeat } from "~/typing/eventTypes";
+import { Event, FullSeat, SeatAddress } from "~/typing/eventTypes";
 
 export function podNumtoPodId(importedEventState: Event, input: number) {
   const foundPod = importedEventState.evtPods.find(
@@ -58,5 +58,26 @@ export function seatDataFromDiv(
 }
 
 export function firstOpenSeatAddress(importedEventState: Event) {
-  importedEventState.evtPods.find((pod) => {});
+  const firstOpenPod = importedEventState.evtPods.find((pod) => {
+    let seatFilled = true;
+    pod.podSeats.map((seat) => {
+      if (!seat.filled) {
+        seatFilled = false;
+      }
+    });
+    if (!seatFilled) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  const firstOpenSeat = firstOpenPod?.podSeats.find((seat) => !seat.filled);
+
+  if (firstOpenPod && firstOpenSeat) {
+    return {
+      podId: firstOpenPod.podId,
+      seat: firstOpenSeat.seatNumber,
+    } as SeatAddress;
+  }
 }

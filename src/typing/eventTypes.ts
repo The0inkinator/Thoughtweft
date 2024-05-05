@@ -14,15 +14,15 @@ export type PlayerUpdateParam =
 export type Player = {
   id: number;
   name: string;
-  pod: number;
+  podId: number;
   seat: number;
   dragging: boolean;
   matchRecord?: Record;
   eventRecord?: Record;
 };
 
-export interface PlayerAddress {
-  pod: number;
+export interface SeatAddress {
+  podId: number;
   seat: number;
 }
 

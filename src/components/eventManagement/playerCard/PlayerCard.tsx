@@ -21,7 +21,7 @@ import {
 interface PlayerCardInputs {
   playerID: number;
   playerName: string;
-  podNumber: number;
+  podId: number;
   seatNumber: number;
 }
 
@@ -30,7 +30,7 @@ type CardMode = "noSeat" | "dragging" | "hoveringSeat" | "seated";
 export default function PlayerCard({
   playerID,
   playerName,
-  podNumber,
+  podId,
   seatNumber,
 }: PlayerCardInputs) {
   //Context State
@@ -71,14 +71,14 @@ export default function PlayerCard({
 
   const targetSeat = () => {
     const seatRef = eventState()
-      .evtPods.find((pod) => pod.podId === thisPlayerState().pod)
+      .evtPods.find((pod) => pod.podId === thisPlayerState().podId)
       ?.podSeats.find((seat) => seat.seatNumber === thisPlayerState().seat);
 
     if (seatRef) {
       const tempTargetSeat = seatDataFromDiv(eventState(), seatRef.seatRef!);
       const playersInSeat = eventState().evtPlayerList.filter(
         (player) =>
-          podNumtoPodId(eventState(), player.pod) === tempTargetSeat?.podId &&
+          podNumtoPodId(eventState(), player.podId) === tempTargetSeat?.podId &&
           player.seat === tempTargetSeat.seatNumber &&
           player.id !== playerID
       ).length;

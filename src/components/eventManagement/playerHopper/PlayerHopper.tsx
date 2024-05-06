@@ -1,7 +1,15 @@
 import "./playerHopper.css";
 import DisplayFrame from "../displayFrame";
 import { useEventContext } from "~/context/EventContext";
-import { For, createEffect, createSignal, onMount } from "solid-js";
+import {
+  For,
+  Owner,
+  createEffect,
+  createSignal,
+  getOwner,
+  onMount,
+  runWithOwner,
+} from "solid-js";
 import { Player, SeatAddress } from "~/typing/eventTypes";
 import PlayerCard from "../playerCard";
 import { useHovRefContext } from "~/context/HovRefContext";
@@ -16,6 +24,8 @@ export default function PlayerHopper() {
   const [addToPod, setAddToPod] = createSignal<boolean>(true);
   //Refs
   let playerHopper!: HTMLDivElement;
+  //owner
+  const hopperOwner = getOwner();
 
   const draggedPlayer = () => {
     return eventState().evtPlayerList.find(
@@ -54,9 +64,21 @@ export default function PlayerHopper() {
     });
   });
 
-  const handler = (data: string, event: MouseEvent) => {
-    console.log(data);
-    createPlayerFromData(eventState().evtPlayerList[0]);
+  const createPlayerFromSubmit = () => {
+    runWithOwner(hopperOwner, () => {
+      if (playerNameValue()) {
+        if (addToPod()) {
+          createNewPlayer(
+            playerNameValue(),
+            firstOpenSeatAddress(eventState())
+          );
+          setPlayerNameValue("");
+        } else {
+          createNewPlayer(playerNameValue());
+          setPlayerNameValue("");
+        }
+      }
+    });
   };
 
   return (
@@ -70,22 +92,19 @@ export default function PlayerHopper() {
             onInput={(event) => {
               setPlayerNameValue(event.target.value);
             }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                createPlayerFromSubmit();
+              }
+            }}
           ></input>
           <button
             type="submit"
             style={{ width: "1rem", height: "1rem" }}
             class="addPlayerButton"
-            // on:click={() => {
-            //   // if (addToPod()) {
-            //   //   // createNewPlayer(
-            //   //   //   playerNameValue(),
-            //   //   //   firstOpenSeatAddress(eventState())
-            //   //   // );
-            //   // } else {
-            //   //   createNewPlayer(playerNameValue());
-            //   // }
-            // }}
-            onClick={[handler, "hello"]}
+            onClick={() => {
+              createPlayerFromSubmit();
+            }}
           ></button>
           <p></p>
           <input

@@ -109,23 +109,11 @@ export default function PlayerCard({
       const currentSeat = seatDataFromDiv(eventState(), targetSeat());
       if (currentSeat && currentSeat.filled === false) {
         updateSeat(currentSeat.podId, currentSeat.seatNumber, { filled: true });
+      } else {
+        updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
       }
     }
   });
-
-  // createEffect(() => {
-  //   const seatToCheck = seatDataFromDiv(eventState(), targetSeat());
-  //   if (
-  //     seatToCheck &&
-  //     seatToCheck.podId ===
-  //       podNumtoPodId(eventState(), thisPlayerState().pod) &&
-  //     seatToCheck.seatNumber === thisPlayerState().seat &&
-  //     thisPlayerState().dragging === false &&
-  //     seatToCheck.filled === false
-  //   ) {
-  //     updateSeat(seatToCheck.podId, seatToCheck.seatNumber, { filled: true });
-  //   }
-  // });
 
   const dragInit = (event: MouseEvent) => {
     if (playerCardMode() !== "dragging") {

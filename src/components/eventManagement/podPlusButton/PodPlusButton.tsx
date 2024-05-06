@@ -22,7 +22,7 @@ export default function PodPlusButton() {
   const [buttonMode, setButtonMode] = createSignal<ButtonMode>("add");
   const [podSizeValue, setPodSizeValue] = createSignal<
     2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-  >(2);
+  >(8);
   //refs
   let podPlusButtonBGRef!: HTMLDivElement;
 

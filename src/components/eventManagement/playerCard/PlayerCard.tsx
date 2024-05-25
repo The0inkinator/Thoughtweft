@@ -41,6 +41,7 @@ export default function PlayerCard({
   //refs
 
   let thisPlayerCard!: HTMLDivElement;
+  let thisPlayerVis!: HTMLDivElement;
   let xOffset: number, yOffset: number;
   let pastTargetSeat: HTMLDivElement;
 
@@ -120,10 +121,17 @@ export default function PlayerCard({
       setPlayerCardMode("dragging");
       updatePlayer(playerID, { drag: true });
       event.preventDefault;
-      xOffset = event.clientX - thisPlayerCard.offsetLeft;
-      yOffset = event.clientY - thisPlayerCard.offsetTop;
-      thisPlayerCard.style.position = "absolute";
       thisPlayerCard.style.pointerEvents = "none";
+      thisPlayerVis.style.position = "absolute";
+      thisPlayerVis.style.zIndex = "10";
+      thisPlayerVis.style.left = `${
+        thisPlayerCard.getBoundingClientRect().left
+      }px`;
+      thisPlayerVis.style.top = `${
+        thisPlayerCard.getBoundingClientRect().top
+      }px`;
+      xOffset = event.clientX - thisPlayerVis.offsetLeft;
+      yOffset = event.clientY - thisPlayerVis.offsetTop;
       const currentSeat = seatDataFromDiv(eventState(), targetSeat());
       if (currentSeat) {
         updateSeat(currentSeat.podId, currentSeat.seatNumber, {
@@ -131,9 +139,6 @@ export default function PlayerCard({
         });
       }
       updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
-      // eventState().playerHopper?.parentElement?.appendChild(thisPlayerCard);
-      // thisPlayerCard.style.left = `${xOffset}px`;
-      // thisPlayerCard.style.top = `${yOffset}px`;
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
     }
@@ -144,8 +149,8 @@ export default function PlayerCard({
       event.preventDefault;
       const x = event.clientX - xOffset;
       const y = event.clientY - yOffset;
-      thisPlayerCard.style.left = `${x}px`;
-      thisPlayerCard.style.top = `${y}px`;
+      thisPlayerVis.style.left = `${x}px`;
+      thisPlayerVis.style.top = `${y}px`;
     }
   };
 
@@ -153,9 +158,9 @@ export default function PlayerCard({
     thisPlayerCard.style.pointerEvents = "auto";
     setPlayerCardMode("noSeat");
     updatePlayer(playerID, { drag: false });
-    thisPlayerCard.style.position = "static";
-    thisPlayerCard.style.left = `0px`;
-    thisPlayerCard.style.top = `0px`;
+    thisPlayerVis.style.position = "static";
+    thisPlayerVis.style.left = `0px`;
+    thisPlayerVis.style.top = `0px`;
 
     if (hoveredSeat().filled === false) {
       updatePlayer(playerID, {
@@ -180,20 +185,16 @@ export default function PlayerCard({
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
-          <div
-            class="playerName"
-            onclick={() => {}}
-            onMouseOver={() => {
-              // thisPlayerCard.style.position = "absolute";
-            }}
-          >
+          <div class="playerName" onclick={() => {}}>
             {playerName}
           </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
-          <div class="playerName" onclick={() => {}}>
-            {playerName}
-          </div>
+          <Portal>
+            <div class="playerName" ref={thisPlayerVis} onclick={() => {}}>
+              {playerName}
+            </div>
+          </Portal>
         </Match>
         <Match when={playerCardMode() === "hoveringSeat"}>
           <div class="playerName" onclick={() => {}}>

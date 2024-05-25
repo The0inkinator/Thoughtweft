@@ -88,7 +88,9 @@ export default function PlayerSeat({
       podToShuffle.podSeats.filter((seat) => seat.filled).length <
         podToShuffle.podSize &&
       podToShuffle.podSeats.find((seat) => seat.seatNumber === seatPosition)
-        ?.filled === true
+        ?.filled === true &&
+      podToShuffle.podSeats.find((seat) => seat.seatNumber === seatPosition)
+        ?.hovered === true
     ) {
       const fullSeatGroup = podToShuffle.podSeats;
       const seatGroupBefore = podToShuffle.podSeats.filter(
@@ -228,7 +230,9 @@ export default function PlayerSeat({
       setMouseOver(true);
       if (draggedPlayer() && draggedPlayer()?.dragging === true) {
         updateSeat(podId, seatNumber, { hovered: true });
-        shufflePlayersFrom(seatNumber);
+        setTimeout(() => {
+          shufflePlayersFrom(seatNumber);
+        }, 600);
       }
     } else if (
       (mouseOver() && event.clientX <= boundingBox.left) ||

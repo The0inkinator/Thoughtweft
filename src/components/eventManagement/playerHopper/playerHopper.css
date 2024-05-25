@@ -1,6 +1,10 @@
 .playerHopperCont {
+  position: relative;
 }
 
 .podlessSeat {
   position: relative;
+  max-height: 10rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }

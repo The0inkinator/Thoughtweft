@@ -131,6 +131,9 @@ export default function PlayerCard({
         });
       }
       updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+      // eventState().playerHopper?.parentElement?.appendChild(thisPlayerCard);
+      // thisPlayerCard.style.left = `${xOffset}px`;
+      // thisPlayerCard.style.top = `${yOffset}px`;
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
     }
@@ -143,7 +146,6 @@ export default function PlayerCard({
       const y = event.clientY - yOffset;
       thisPlayerCard.style.left = `${x}px`;
       thisPlayerCard.style.top = `${y}px`;
-      thisPlayerCard.style.zIndex = "4";
     }
   };
 

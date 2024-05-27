@@ -5,6 +5,7 @@ import {
   Player,
   PodSizes,
   Event,
+  PodUpdateParam,
   SeatUpdateParam,
   FullSeat,
   ProxySeat,
@@ -22,6 +23,7 @@ type EventState = [
     addPod: (inputPodSize: PodSizes) => void;
     removePod: (inputPodId: number) => void;
     updatePodSize: (inputPodId: number, newPodSize: number) => void;
+    updatePod: (inputPodId: number, updateParam: PodUpdateParam) => void;
     updateSeat: (
       inputPodId: number,
       inputSeatNumber: number,
@@ -249,6 +251,28 @@ export function EventContextProvider(props: any) {
               console.log(`No updates to pod ID: ${inputPodId}`);
             }
           }
+        },
+
+        //UPDATE SEAT
+        updatePod(inputPodId: number, updateParam: PodUpdateParam) {
+          const podIndex = event().evtPods.findIndex(
+            (pod) => pod.podId === inputPodId
+          );
+
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+            if (podIndex !== -1) {
+              if ("status" in updateParam) {
+                const scopedParam = updateParam.status;
+
+                newEvt.evtPods[podIndex] = {
+                  ...newEvt.evtPods[podIndex],
+                  podStatus: scopedParam,
+                };
+              }
+            }
+            return newEvt;
+          });
         },
 
         //UPDATE SEAT

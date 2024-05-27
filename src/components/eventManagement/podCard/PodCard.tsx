@@ -25,7 +25,7 @@ interface PodCardInputs {
 //MAIN FUNCTION
 export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   //Context State
-  const [eventState, { updatePodSize, removePod, updatePlayer }] =
+  const [eventState, { updatePodSize, removePod, updatePlayer, updatePod }] =
     useEventContext();
   //Local State
   const [localPodNumber, setLocalPodNumber] = createSignal(podNumber);
@@ -121,7 +121,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
       <ErrorBoundary fallback={<>oops!</>}>
         <div class="podCardCont">
           <div class="podTitle">
-            Pod {thisPodState()?.podNumber} Id {thisPodState()?.podId}
+            Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
+            {thisPodState()?.podStatus}
             <p></p>
             <button
               class="podSizeDrop"

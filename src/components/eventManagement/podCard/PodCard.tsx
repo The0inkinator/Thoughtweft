@@ -110,6 +110,9 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             >
               Remove Pod
             </button>
+            <button type="submit" style={{ color: "red" }} onClick={() => {}}>
+              Shuffle Players
+            </button>
           </div>
           <div class="tableCont">
             <div class="podSeats">

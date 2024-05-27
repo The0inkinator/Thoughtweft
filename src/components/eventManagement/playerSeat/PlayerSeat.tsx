@@ -231,8 +231,10 @@ export default function PlayerSeat({
       if (draggedPlayer() && draggedPlayer()?.dragging === true) {
         updateSeat(podId, seatNumber, { hovered: true });
         setTimeout(() => {
-          shufflePlayersFrom(seatNumber);
-        }, 600);
+          if (draggedPlayer()) {
+            shufflePlayersFrom(seatNumber);
+          }
+        }, 400);
       }
     } else if (
       (mouseOver() && event.clientX <= boundingBox.left) ||

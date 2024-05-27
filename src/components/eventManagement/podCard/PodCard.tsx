@@ -94,6 +94,27 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     });
   };
 
+  const shrinkPod = () => {
+    const playersInPod = eventState().evtPlayerList.filter(
+      (player) => player.podId === podId
+    );
+    const seatsInPod = eventState().evtPods.find(
+      (pod) => pod.podId === podId
+    )!.podSeats;
+
+    playersInPod.map((player, index) => {
+      const firstOpenSeat = seatsInPod.find((seat) => !seat.filled);
+
+      if (firstOpenSeat && firstOpenSeat.seatNumber < player.seat) {
+        updatePlayer(player.id, {
+          address: { podId: podId, seat: firstOpenSeat.seatNumber },
+        });
+      }
+    });
+
+    updatePodSize(podId, playersInPod.length);
+  };
+
   return (
     <DisplayFrame>
       <ErrorBoundary fallback={<>oops!</>}>
@@ -149,6 +170,16 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
               }}
             >
               Remove Pod
+            </button>
+            <p></p>
+            <button
+              type="submit"
+              style={{ color: "red" }}
+              onClick={() => {
+                shrinkPod();
+              }}
+            >
+              Shrink Pod
             </button>
             <Switch fallback={<></>}>
               <Match when={shuffleMode() === "default"}>

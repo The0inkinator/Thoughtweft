@@ -113,6 +113,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     });
 
     updatePodSize(podId, playersInPod.length);
+    setPodSizeBtn(playersInPod.length as PodSizes);
   };
 
   return (

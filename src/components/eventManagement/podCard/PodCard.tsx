@@ -7,6 +7,8 @@ import {
   Index,
   createMemo,
   ErrorBoundary,
+  Switch,
+  Match,
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
@@ -23,9 +25,13 @@ interface PodCardInputs {
 //MAIN FUNCTION
 export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   //Context State
-  const [eventState, { updatePodSize, removePod }] = useEventContext();
+  const [eventState, { updatePodSize, removePod, updatePlayer }] =
+    useEventContext();
   //Local State
   const [localPodNumber, setLocalPodNumber] = createSignal(podNumber);
+  const [shuffleMode, setShuffleMode] = createSignal<"default" | "confirm">(
+    "default"
+  );
 
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
@@ -53,6 +59,40 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   onMount(() => {
     updatePodSize(podId, thisPodState()!.podSize);
   });
+
+  const shufflePod = () => {
+    const shuffleArray = eventState().evtPlayerList.filter(
+      (player) => player.podId === podId
+    );
+    for (let i = shuffleArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffleArray[i], shuffleArray[j]] = [shuffleArray[j], shuffleArray[i]];
+    }
+
+    shuffleArray.map((shuffledPlayer, index) => {
+      const playerToEdit = eventState().evtPlayerList.find(
+        (player) => shuffledPlayer.id === player.id
+      );
+
+      if (playerToEdit) {
+        updatePlayer(playerToEdit.id, {
+          address: { podId: 0, seat: 0 },
+        });
+      }
+    });
+
+    shuffleArray.map((shuffledPlayer, index) => {
+      const playerToEdit = eventState().evtPlayerList.find(
+        (player) => shuffledPlayer.id === player.id
+      );
+
+      if (playerToEdit) {
+        updatePlayer(playerToEdit.id, {
+          address: { podId: podId, seat: index + 1 },
+        });
+      }
+    });
+  };
 
   return (
     <DisplayFrame>
@@ -110,9 +150,43 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             >
               Remove Pod
             </button>
-            <button type="submit" style={{ color: "red" }} onClick={() => {}}>
-              Shuffle Players
-            </button>
+            <Switch fallback={<></>}>
+              <Match when={shuffleMode() === "default"}>
+                <button
+                  type="submit"
+                  style={{ color: "red" }}
+                  onClick={() => {
+                    setShuffleMode("confirm");
+                  }}
+                >
+                  Shuffle Players
+                </button>
+              </Match>
+              <Match when={shuffleMode() === "confirm"}>
+                <button type="submit" style={{ color: "black" }}>
+                  Are you Sure?
+                </button>
+                <button
+                  type="submit"
+                  style={{ color: "green" }}
+                  onClick={() => {
+                    shufflePod();
+                    setShuffleMode("default");
+                  }}
+                >
+                  ✔
+                </button>
+                <button
+                  type="submit"
+                  style={{ color: "red" }}
+                  onClick={() => {
+                    setShuffleMode("default");
+                  }}
+                >
+                  X
+                </button>
+              </Match>
+            </Switch>
           </div>
           <div class="tableCont">
             <div class="podSeats">

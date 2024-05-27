@@ -121,6 +121,7 @@ export default function PlayerCard({
       setPlayerCardMode("dragging");
       updatePlayer(playerID, { drag: true });
       event.preventDefault;
+      thisPlayerCard.style.position = "absolute";
       thisPlayerCard.style.pointerEvents = "none";
       thisPlayerVis.style.position = "absolute";
       thisPlayerVis.style.zIndex = "10";
@@ -132,7 +133,9 @@ export default function PlayerCard({
       }px`;
       xOffset = event.clientX - thisPlayerVis.offsetLeft;
       yOffset = event.clientY - thisPlayerVis.offsetTop;
+
       const currentSeat = seatDataFromDiv(eventState(), targetSeat());
+
       if (currentSeat) {
         updateSeat(currentSeat.podId, currentSeat.seatNumber, {
           filled: false,
@@ -155,6 +158,7 @@ export default function PlayerCard({
   };
 
   const dragEnd = () => {
+    thisPlayerCard.style.position = "static";
     thisPlayerCard.style.pointerEvents = "auto";
     setPlayerCardMode("noSeat");
     updatePlayer(playerID, { drag: false });

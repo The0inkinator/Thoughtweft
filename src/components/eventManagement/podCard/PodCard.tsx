@@ -33,6 +33,10 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     "default"
   );
 
+  const [localPodStatus, setLocalPodStatus] = createSignal<
+    "drafting" | "pairing" | "playing" | "complete"
+  >("drafting");
+
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
   };
@@ -116,135 +120,166 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     setPodSizeBtn(playersInPod.length as PodSizes);
   };
 
-  return (
-    <DisplayFrame>
-      <ErrorBoundary fallback={<>oops!</>}>
-        <div class="podCardCont">
-          <div class="podTitle">
-            Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
-            {thisPodState()?.podStatus}
-            <p></p>
-            <button
-              class="podSizeDrop"
-              type="button"
-              onMouseUp={() => {
-                if (podSizeDrop() === "close") {
-                  setPodSizeDrop("open");
-                }
-              }}
-              onfocusout={() => {
-                if (podSizeDrop() === "open") {
-                  setPodSizeDrop("close");
-                }
-              }}
-            >
-              {podSizeBtn()}
-              <div
-                class="podSizeMenu"
-                style={{
-                  display: podSizeDrop() === "open" ? "block" : "none",
-                }}
-              >
-                <For each={podOptions}>
-                  {(option: PodSizes) => (
-                    <div
-                      class="podSizeOption"
-                      style={{
-                        display: podSizeDrop() === "open" ? "block" : "none",
-                      }}
-                      onClick={() => {
-                        setPodSizeBtn(option);
-                        setPodSizeDrop("close");
-                        updatePodSize(podId, option);
-                      }}
-                    >
-                      {option}
-                    </div>
-                  )}
-                </For>
-              </div>
-            </button>
-            <button
-              type="submit"
-              style={{ color: "red" }}
-              onClick={() => {
-                removePod(podId);
+  const DraftingPodCard = () => {
+    return (
+      <div class="podCardCont">
+        <div class="podTitle">
+          Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
+          {thisPodState()?.podStatus}
+          <p></p>
+          <button
+            class="podSizeDrop"
+            type="button"
+            onMouseUp={() => {
+              if (podSizeDrop() === "close") {
+                setPodSizeDrop("open");
+              }
+            }}
+            onfocusout={() => {
+              if (podSizeDrop() === "open") {
+                setPodSizeDrop("close");
+              }
+            }}
+          >
+            {podSizeBtn()}
+            <div
+              class="podSizeMenu"
+              style={{
+                display: podSizeDrop() === "open" ? "block" : "none",
               }}
             >
-              Remove Pod
-            </button>
-            <p></p>
-            <button
-              type="submit"
-              style={{ color: "red" }}
-              onClick={() => {
-                shrinkPod();
-              }}
-            >
-              Shrink Pod
-            </button>
-            <Switch fallback={<></>}>
-              <Match when={shuffleMode() === "default"}>
-                <button
-                  type="submit"
-                  style={{ color: "red" }}
-                  onClick={() => {
-                    setShuffleMode("confirm");
-                  }}
-                >
-                  Shuffle Players
-                </button>
-              </Match>
-              <Match when={shuffleMode() === "confirm"}>
-                <button type="submit" style={{ color: "black" }}>
-                  Are you Sure?
-                </button>
-                <button
-                  type="submit"
-                  style={{ color: "green" }}
-                  onClick={() => {
-                    shufflePod();
-                    setShuffleMode("default");
-                  }}
-                >
-                  ✔
-                </button>
-                <button
-                  type="submit"
-                  style={{ color: "red" }}
-                  onClick={() => {
-                    setShuffleMode("default");
-                  }}
-                >
-                  X
-                </button>
-              </Match>
-            </Switch>
-          </div>
-          <div class="tableCont">
-            <div class="podSeats">
-              <For each={rightSeats()}>
-                {(seat) => (
-                  <PlayerSeat
-                    seatNumber={seat.seatNumber}
-                    podId={podId}
-                    tableSide="R"
-                  ></PlayerSeat>
-                )}
-              </For>
-              <div class="podTable"></div>
-              <For each={leftSeats()}>
-                {(seat) => (
-                  <PlayerSeat
-                    seatNumber={seat.seatNumber}
-                    podId={podId}
-                    tableSide="L"
-                  ></PlayerSeat>
+              <For each={podOptions}>
+                {(option: PodSizes) => (
+                  <div
+                    class="podSizeOption"
+                    style={{
+                      display: podSizeDrop() === "open" ? "block" : "none",
+                    }}
+                    onClick={() => {
+                      setPodSizeBtn(option);
+                      setPodSizeDrop("close");
+                      updatePodSize(podId, option);
+                    }}
+                  >
+                    {option}
+                  </div>
                 )}
               </For>
             </div>
+          </button>
+          <button
+            type="submit"
+            style={{ color: "red" }}
+            onClick={() => {
+              removePod(podId);
+            }}
+          >
+            Remove Pod
+          </button>
+          <p></p>
+          <button
+            type="submit"
+            style={{ color: "red" }}
+            onClick={() => {
+              shrinkPod();
+            }}
+          >
+            Shrink Pod
+          </button>
+          <Switch fallback={<></>}>
+            <Match when={shuffleMode() === "default"}>
+              <button
+                type="submit"
+                style={{ color: "red" }}
+                onClick={() => {
+                  setShuffleMode("confirm");
+                }}
+              >
+                Shuffle Players
+              </button>
+            </Match>
+            <Match when={shuffleMode() === "confirm"}>
+              <button type="submit" style={{ color: "black" }}>
+                Are you Sure?
+              </button>
+              <button
+                type="submit"
+                style={{ color: "green" }}
+                onClick={() => {
+                  shufflePod();
+                  setShuffleMode("default");
+                }}
+              >
+                ✔
+              </button>
+              <button
+                type="submit"
+                style={{ color: "red" }}
+                onClick={() => {
+                  setShuffleMode("default");
+                }}
+              >
+                X
+              </button>
+            </Match>
+          </Switch>
+        </div>
+        <div class="tableCont">
+          <div class="podSeats">
+            <For each={rightSeats()}>
+              {(seat) => (
+                <PlayerSeat
+                  seatNumber={seat.seatNumber}
+                  podId={podId}
+                  tableSide="R"
+                ></PlayerSeat>
+              )}
+            </For>
+            <div class="podTable"></div>
+            <For each={leftSeats()}>
+              {(seat) => (
+                <PlayerSeat
+                  seatNumber={seat.seatNumber}
+                  podId={podId}
+                  tableSide="L"
+                ></PlayerSeat>
+              )}
+            </For>
           </div>
         </div>
+      </div>
+    );
+  };
+
+  const PairingSettings = () => {
+    return <></>;
+  };
+
+  const PlayingPodCard = () => {
+    return <></>;
+  };
+
+  const CompletePodCard = () => {
+    return <></>;
+  };
+
+  return (
+    <DisplayFrame>
+      <ErrorBoundary fallback={<>oops!</>}>
+        <Switch fallback={<>oops!</>}>
+          <Match when={localPodStatus() === "drafting"}>
+            <DraftingPodCard />
+          </Match>
+          <Match when={localPodStatus() === "pairing"}>
+            <PairingSettings />
+          </Match>
+          <Match when={localPodStatus() === "playing"}>
+            <PlayingPodCard />
+          </Match>
+          <Match when={localPodStatus() === "complete"}>
+            <CompletePodCard />
+          </Match>
+        </Switch>
       </ErrorBoundary>
     </DisplayFrame>
   );

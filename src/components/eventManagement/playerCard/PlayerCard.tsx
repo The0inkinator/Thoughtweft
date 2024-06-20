@@ -49,6 +49,12 @@ export default function PlayerCard({
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
   });
 
+  const thisPlayerPodState = createMemo(() => {
+    return eventState().evtPods.find(
+      (pod) => pod.podId === thisPlayerState().podId
+    );
+  });
+
   const hoveredSeat = () => {
     let allSeats: FullSeat[] = [];
     eventState().evtPods.map((pod) => {
@@ -181,7 +187,12 @@ export default function PlayerCard({
       class="playerCardCont"
       ref={thisPlayerCard}
       onMouseDown={(event) => {
-        dragInit(event);
+        if (
+          !thisPlayerPodState() ||
+          thisPlayerPodState()!.podStatus === "seating"
+        ) {
+          dragInit(event);
+        }
       }}
       onMouseMove={(event) => {
         dragging(event);

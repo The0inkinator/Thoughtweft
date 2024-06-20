@@ -126,6 +126,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
           {thisPodState()?.podStatus}
           <p></p>
+          {/* POD SIZE DROP DOWN */}
           <button
             class="podSizeDrop"
             type="button"
@@ -166,6 +167,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
               </For>
             </div>
           </button>
+          {/* REMOVE POD */}
           <button
             type="submit"
             style={{ color: "red" }}
@@ -176,6 +178,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             Remove Pod
           </button>
           <p></p>
+          {/* SHRINK POD */}
           <button
             type="submit"
             style={{ color: "red" }}
@@ -185,6 +188,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           >
             Shrink Pod
           </button>
+          {/* SHUFFLE PLAYERS */}
           <Switch fallback={<></>}>
             <Match when={shuffleMode() === "default"}>
               <button
@@ -223,6 +227,17 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             </Match>
           </Switch>
         </div>
+        {/* ADVANCE TO DRAFTING */}
+        <button
+          type="submit"
+          style={{ color: "red" }}
+          onClick={() => {
+            shrinkPod();
+            updatePod(podId, { status: "drafting" });
+          }}
+        >
+          Advance to Drafting
+        </button>
         <div class="tableCont">
           <div class="podSeats">
             <For each={rightSeats()}>

@@ -14,7 +14,7 @@ import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import PlayerSeat from "../playerSeat";
 import TestElement from "~/components/Test/TestElement";
-import { PodSizes } from "~/typing/eventTypes";
+import { PodSizes, PodStatusModes } from "~/typing/eventTypes";
 import TestBox from "~/components/Test/TestBox";
 interface PodCardInputs {
   podSize: PodSizes;
@@ -33,9 +33,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     "default"
   );
 
-  const [localPodStatus, setLocalPodStatus] = createSignal<
-    "drafting" | "pairing" | "playing" | "complete"
-  >("drafting");
+  const [localPodStatus, setLocalPodStatus] =
+    createSignal<PodStatusModes>("seating");
 
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
@@ -120,7 +119,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     setPodSizeBtn(playersInPod.length as PodSizes);
   };
 
-  const DraftingPodCard = () => {
+  const SeatingPodCard = () => {
     return (
       <div class="podCardCont">
         <div class="podTitle">
@@ -251,7 +250,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     );
   };
 
-  const PairingSettings = () => {
+  const DraftingPodCard = () => {
     return <></>;
   };
 
@@ -259,7 +258,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     return <></>;
   };
 
-  const CompletePodCard = () => {
+  const FinishedPodCard = () => {
     return <></>;
   };
 
@@ -267,17 +266,17 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     <DisplayFrame>
       <ErrorBoundary fallback={<>oops!</>}>
         <Switch fallback={<>oops!</>}>
+          <Match when={localPodStatus() === "seating"}>
+            <SeatingPodCard />
+          </Match>
           <Match when={localPodStatus() === "drafting"}>
             <DraftingPodCard />
-          </Match>
-          <Match when={localPodStatus() === "pairing"}>
-            <PairingSettings />
           </Match>
           <Match when={localPodStatus() === "playing"}>
             <PlayingPodCard />
           </Match>
-          <Match when={localPodStatus() === "complete"}>
-            <CompletePodCard />
+          <Match when={localPodStatus() === "finished"}>
+            <FinishedPodCard />
           </Match>
         </Switch>
       </ErrorBoundary>

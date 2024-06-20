@@ -46,7 +46,7 @@ const SampleEvent: Event = {
       podNumber: 1,
       podSize: 8,
       podSeats: [],
-      podStatus: "drafting",
+      podStatus: "seating",
     },
   ],
   evtSeats: [],
@@ -143,7 +143,7 @@ export function EventContextProvider(props: any) {
               podNumber: newEvt.evtPods.length + 1,
               podSize: inputPodSize,
               podSeats: newFullSeats,
-              podStatus: "drafting",
+              podStatus: "seating",
             };
 
             newEvt.evtPods = [...newEvt.evtPods, newPod];

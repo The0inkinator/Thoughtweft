@@ -238,6 +238,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         >
           Advance to Drafting
         </button>
+        {/* Table Display */}
         <div class="tableCont">
           <div class="podSeats">
             <For each={rightSeats()}>
@@ -266,11 +267,51 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   };
 
   const DraftingPodCard = () => {
-    return <></>;
+    return (
+      <>
+        <button
+          type="submit"
+          style={{ color: "red" }}
+          onClick={() => {
+            shrinkPod();
+            updatePod(podId, { status: "playing" });
+          }}
+        >
+          Advance to Round 1
+        </button>
+      </>
+    );
   };
 
   const PlayingPodCard = () => {
-    return <></>;
+    return (
+      <>
+        {/* Table Display */}
+        <div class="tableCont">
+          <div class="podSeats">
+            <For each={rightSeats()}>
+              {(seat) => (
+                <PlayerSeat
+                  seatNumber={seat.seatNumber}
+                  podId={podId}
+                  tableSide="R"
+                ></PlayerSeat>
+              )}
+            </For>
+            <div class="podTable"></div>
+            <For each={leftSeats()}>
+              {(seat) => (
+                <PlayerSeat
+                  seatNumber={seat.seatNumber}
+                  podId={podId}
+                  tableSide="L"
+                ></PlayerSeat>
+              )}
+            </For>
+          </div>
+        </div>
+      </>
+    );
   };
 
   const FinishedPodCard = () => {
@@ -281,16 +322,16 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     <DisplayFrame>
       <ErrorBoundary fallback={<>oops!</>}>
         <Switch fallback={<>oops!</>}>
-          <Match when={localPodStatus() === "seating"}>
+          <Match when={thisPodState()?.podStatus === "seating"}>
             <SeatingPodCard />
           </Match>
-          <Match when={localPodStatus() === "drafting"}>
+          <Match when={thisPodState()?.podStatus === "drafting"}>
             <DraftingPodCard />
           </Match>
-          <Match when={localPodStatus() === "playing"}>
+          <Match when={thisPodState()?.podStatus === "playing"}>
             <PlayingPodCard />
           </Match>
-          <Match when={localPodStatus() === "finished"}>
+          <Match when={thisPodState()?.podStatus === "finished"}>
             <FinishedPodCard />
           </Match>
         </Switch>

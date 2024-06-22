@@ -11,6 +11,7 @@ import {
   ProxySeat,
   PlayerUpdateParam,
   SeatAddress,
+  Match,
 } from "~/typing/eventTypes";
 
 //Typing
@@ -289,6 +290,13 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPods[podIndex],
                   currentRound: scopedParam,
                 };
+              } else if ("match" in updateParam) {
+                const scopedParam = updateParam.match as Match;
+
+                newEvt.evtPods[podIndex].podMatches = [
+                  ...newEvt.evtPods[podIndex].podMatches,
+                  scopedParam,
+                ];
               }
             }
             return newEvt;

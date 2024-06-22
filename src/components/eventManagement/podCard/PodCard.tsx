@@ -320,7 +320,11 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           type="submit"
           style={{ color: "red" }}
           onClick={() => {
-            pairPlayers(eventState(), podId);
+            updatePod(podId, { round: 1 });
+            pairPlayers(eventState(), podId).map((match) => {
+              updatePod(podId, { newMatch: match });
+            });
+            console.log(thisPodState()?.podMatches);
             updatePod(podId, { status: "playing" });
           }}
         >

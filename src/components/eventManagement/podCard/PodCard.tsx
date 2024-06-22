@@ -124,7 +124,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
       <div class="podCardCont">
         <div class="podTitle">
           Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
-          {thisPodState()?.podStatus}
+          {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}
           <p></p>
           {/* POD SIZE DROP DOWN */}
           <button

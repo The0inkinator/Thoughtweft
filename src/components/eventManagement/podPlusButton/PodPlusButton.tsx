@@ -23,6 +23,7 @@ export default function PodPlusButton() {
   const [podSizeValue, setPodSizeValue] = createSignal<
     2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
   >(8);
+  const [podRoundsValue, setPodRoundsValue] = createSignal<number>(3);
   //refs
   let podPlusButtonBGRef!: HTMLDivElement;
 
@@ -43,6 +44,7 @@ export default function PodPlusButton() {
           </Match>
           <Match when={buttonMode() === "settings"}>
             <div class="settingsCont">
+              Pod Size
               <input
                 type="number"
                 min={2}
@@ -67,6 +69,17 @@ export default function PodPlusButton() {
                   }
                 }}
               ></input>
+              Pod Rounds
+              <input
+                type="number"
+                min={1}
+                value={podRoundsValue()}
+                onInput={(event) => {
+                  const inputValue = event.target.valueAsNumber;
+
+                  setPodRoundsValue(inputValue);
+                }}
+              ></input>
               <button
                 class="confirmSettingsButton"
                 type="submit"
@@ -74,7 +87,7 @@ export default function PodPlusButton() {
                   if (eventState().evtSettings.playerCap > 0) {
                     setButtonMode("podsFull");
                   } else {
-                    addPod(podSizeValue());
+                    addPod(podSizeValue(), podRoundsValue());
                     setButtonMode("add");
                   }
                 }}

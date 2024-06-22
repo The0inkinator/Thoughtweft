@@ -49,6 +49,7 @@ export type Pod = {
   podSize: PodSizes;
   podSeats: FullSeat[];
   podStatus: PodStatusModes;
+  podRounds: number;
   podName?: string;
   podCube?: URL;
 };

@@ -20,7 +20,7 @@ type EventState = [
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: (name: string, seatAddress?: SeatAddress) => void;
-    addPod: (inputPodSize: PodSizes) => void;
+    addPod: (inputPodSize: PodSizes, inputPodRounds: number) => void;
     removePod: (inputPodId: number) => void;
     updatePodSize: (inputPodId: number, newPodSize: number) => void;
     updatePod: (inputPodId: number, updateParam: PodUpdateParam) => void;
@@ -47,6 +47,7 @@ const SampleEvent: Event = {
       podSize: 8,
       podSeats: [],
       podStatus: "seating",
+      podRounds: 3,
     },
   ],
   evtSeats: [],
@@ -105,7 +106,7 @@ export function EventContextProvider(props: any) {
         },
 
         //ADD POD
-        addPod(inputPodSize) {
+        addPod(inputPodSize, inputPodRounds) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
 
@@ -144,6 +145,7 @@ export function EventContextProvider(props: any) {
               podSize: inputPodSize,
               podSeats: newFullSeats,
               podStatus: "seating",
+              podRounds: inputPodRounds,
             };
 
             newEvt.evtPods = [...newEvt.evtPods, newPod];

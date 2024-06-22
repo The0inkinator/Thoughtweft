@@ -50,6 +50,8 @@ export type Pod = {
   podSeats: FullSeat[];
   podStatus: PodStatusModes;
   podRounds: number;
+  podDraftTime: number;
+  podRoundTime: number;
   podName?: string;
   podCube?: URL;
 };

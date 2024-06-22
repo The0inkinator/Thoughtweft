@@ -24,6 +24,8 @@ export default function PodPlusButton() {
     2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
   >(8);
   const [podRoundsValue, setPodRoundsValue] = createSignal<number>(3);
+  const [draftTimeValue, setDraftTimeValue] = createSignal<number>(50);
+  const [roundTimeValue, setRoundTimeValue] = createSignal<number>(50);
   //refs
   let podPlusButtonBGRef!: HTMLDivElement;
 
@@ -80,6 +82,28 @@ export default function PodPlusButton() {
                   setPodRoundsValue(inputValue);
                 }}
               ></input>
+              Draft Time
+              <input
+                type="number"
+                min={1}
+                value={draftTimeValue()}
+                onInput={(event) => {
+                  const inputValue = event.target.valueAsNumber;
+
+                  setDraftTimeValue(inputValue);
+                }}
+              ></input>
+              Round Time
+              <input
+                type="number"
+                min={1}
+                value={roundTimeValue()}
+                onInput={(event) => {
+                  const inputValue = event.target.valueAsNumber;
+
+                  setRoundTimeValue(inputValue);
+                }}
+              ></input>
               <button
                 class="confirmSettingsButton"
                 type="submit"
@@ -87,7 +111,12 @@ export default function PodPlusButton() {
                   if (eventState().evtSettings.playerCap > 0) {
                     setButtonMode("podsFull");
                   } else {
-                    addPod(podSizeValue(), podRoundsValue());
+                    addPod(
+                      podSizeValue(),
+                      podRoundsValue(),
+                      draftTimeValue(),
+                      roundTimeValue()
+                    );
                     setButtonMode("add");
                   }
                 }}

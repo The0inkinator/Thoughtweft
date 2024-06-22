@@ -23,6 +23,7 @@ export type Player = {
   dragging: boolean;
   matchRecord?: Record;
   eventRecord?: Record;
+  currentOpponentId?: number;
 };
 
 export interface SeatAddress {
@@ -52,8 +53,20 @@ export type Pod = {
   podRounds: number;
   podDraftTime: number;
   podRoundTime: number;
+  podMatches: Match[];
   podName?: string;
   podCube?: URL;
+};
+
+export type Match = {
+  matchPodId: number;
+  matchRound: number;
+  matchTable: number;
+  player1Id: number;
+  player2Id: number;
+  player1Record: Record;
+  player2Record: Record;
+  matchCompleted: boolean;
 };
 
 export type EventSettings = {

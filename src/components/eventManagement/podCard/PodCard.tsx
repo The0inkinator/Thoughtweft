@@ -272,8 +272,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const [draftTimerSec, setDraftTimerSec] = createSignal<number>(0);
   let draftTimerStarted = false;
 
-  const countTimerDown = () => {};
-
   createEffect(() => {
     if (
       draftTimerStarted === false &&

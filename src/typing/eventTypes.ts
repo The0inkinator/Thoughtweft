@@ -13,7 +13,7 @@ export type PlayerUpdateParam =
 
 export type PodStatusModes = "seating" | "drafting" | "playing" | "finished";
 
-export type PodUpdateParam = { status: PodStatusModes };
+export type PodUpdateParam = { status: PodStatusModes } | { round: number };
 
 export type Player = {
   id: number;
@@ -54,6 +54,7 @@ export type Pod = {
   podDraftTime: number;
   podRoundTime: number;
   podMatches: Match[];
+  currentRound?: number;
   podName?: string;
   podCube?: URL;
 };

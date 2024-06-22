@@ -4,7 +4,6 @@ import {
   createSignal,
   For,
   onMount,
-  Index,
   createMemo,
   ErrorBoundary,
   Switch,
@@ -13,9 +12,8 @@ import {
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import PlayerSeat from "../playerSeat";
-import TestElement from "~/components/Test/TestElement";
 import { PodSizes, PodStatusModes } from "~/typing/eventTypes";
-import TestBox from "~/components/Test/TestBox";
+import pairPlayers from "../dataFunctions/pairPlayers";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -322,11 +320,11 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           type="submit"
           style={{ color: "red" }}
           onClick={() => {
-            shrinkPod();
+            pairPlayers(eventState(), podId);
             updatePod(podId, { status: "playing" });
           }}
         >
-          Advance to Round 1
+          Advance to Matches
         </button>
         <div>
           {draftTimerHou()} {draftTimerMin()} {draftTimerSec()}

@@ -55,6 +55,7 @@ const SampleEvent: Event = {
       podRounds: 3,
       podDraftTime: 50,
       podRoundTime: 50,
+      podMatches: [],
     },
   ],
   evtSeats: [],
@@ -155,6 +156,7 @@ export function EventContextProvider(props: any) {
               podRounds: inputPodRounds,
               podDraftTime: inputDraftTime,
               podRoundTime: inputRoundTime,
+              podMatches: [],
             };
 
             newEvt.evtPods = [...newEvt.evtPods, newPod];
@@ -264,7 +266,7 @@ export function EventContextProvider(props: any) {
           }
         },
 
-        //UPDATE SEAT
+        //UPDATE POD
         updatePod(inputPodId: number, updateParam: PodUpdateParam) {
           const podIndex = event().evtPods.findIndex(
             (pod) => pod.podId === inputPodId
@@ -279,6 +281,13 @@ export function EventContextProvider(props: any) {
                 newEvt.evtPods[podIndex] = {
                   ...newEvt.evtPods[podIndex],
                   podStatus: scopedParam,
+                };
+              } else if ("round" in updateParam) {
+                const scopedParam = updateParam.round;
+
+                newEvt.evtPods[podIndex] = {
+                  ...newEvt.evtPods[podIndex],
+                  currentRound: scopedParam,
                 };
               }
             }

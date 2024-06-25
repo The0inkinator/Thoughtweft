@@ -354,7 +354,13 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
               (match) => match.matchRound === thisPodState()?.currentRound
             )}
           >
-            {(match) => <MatchCard podId={podId} matchInfo={match}></MatchCard>}
+            {(match) => (
+              <MatchCard
+                podId={podId}
+                matchInfo={match}
+                matchCardState="pairing"
+              ></MatchCard>
+            )}
           </For>
         </div>
       </>
@@ -391,7 +397,13 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
               (match) => match.matchRound === thisPodState()?.currentRound
             )}
           >
-            {(match) => <MatchCard podId={podId} matchInfo={match}></MatchCard>}
+            {(match) => (
+              <MatchCard
+                podId={podId}
+                matchInfo={match}
+                matchCardState="playing"
+              ></MatchCard>
+            )}
           </For>
         </div>
       </>

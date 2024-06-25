@@ -1,10 +1,10 @@
-import { Event, Match, PlayerUpdateParam } from "~/typing/eventTypes";
+import { Event, MatchData, PlayerUpdateParam } from "~/typing/eventTypes";
 
 export function PairPlayers(eventData: Event, podId: number) {
   const pod = eventData.evtPods.find((pod) => pod.podId === podId)!;
   const round = pod.currentRound;
   const halfTable = pod.podSize / 2;
-  const newMatches: Match[] = [];
+  const newMatches: MatchData[] = [];
   const currentMatches = eventData.evtPods.find(
     (pod) => pod.podId === podId
   )?.podMatches;
@@ -24,7 +24,7 @@ export function PairPlayers(eventData: Event, podId: number) {
               player.seat === seat.seatNumber + halfTable
           );
           let tempSeat = seat;
-          const newMatch: Match = {
+          const newMatch: MatchData = {
             matchPodId: podId,
             matchRound: round!,
             matchId: currentMatches?.length

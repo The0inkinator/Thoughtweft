@@ -12,7 +12,7 @@ import {
   PlayerUpdateParam,
   SeatAddress,
   MatchUpdateParam,
-  Match,
+  MatchData,
 } from "~/typing/eventTypes";
 
 //Typing

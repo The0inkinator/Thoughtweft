@@ -15,9 +15,3 @@
   grid-template-areas: "a b c" "a b c" "a b c" "a b c" "a b c" "a b c";
   place-items: center;
 }
-
-.matchCont {
-  display: flex;
-  flex-direction: row;
-  background-color: red;
-}

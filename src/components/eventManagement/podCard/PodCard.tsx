@@ -32,10 +32,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const [shuffleMode, setShuffleMode] = createSignal<"default" | "confirm">(
     "default"
   );
-
-  const [localPodStatus, setLocalPodStatus] =
-    createSignal<PodStatusModes>("seating");
-
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
   };
@@ -387,21 +383,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         {/* Table Display */}
         <div class={styles.pairingTableCont}>
           <For each={thisPodState()?.podMatches}>
-            {(match) => (
-              <div class={styles.matchCont}>
-                <PlayerSeat
-                  seatNumber={match.player1Seat}
-                  podId={podId}
-                  tableSide="L"
-                ></PlayerSeat>
-                VS matchid: {match.matchId}
-                <PlayerSeat
-                  seatNumber={match.player2Seat}
-                  podId={podId}
-                  tableSide="R"
-                ></PlayerSeat>
-              </div>
-            )}
+            {(match) => <MatchCard podId={podId} matchInfo={match}></MatchCard>}
           </For>
         </div>
       </>

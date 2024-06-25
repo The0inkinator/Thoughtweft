@@ -23,11 +23,13 @@ export type PodStatusModes =
 export type PodUpdateParam =
   | { status: PodStatusModes }
   | { round: number }
-  | { newMatch: Match }
-  | {
-      updateMatchId: number;
-      updateValue: Match["matchCompleted"] | Match["matchId"];
-    };
+  | { newMatch: Match };
+
+export type MatchUpdateParam =
+  | { player1Record: Record }
+  | { player2Record: Record }
+  | { matchCompleted: boolean }
+  | { winner: 1 | 2 };
 
 export type Player = {
   id: number;
@@ -85,6 +87,7 @@ export type Match = {
   player2Record: Record;
   player2Seat: number;
   matchCompleted: boolean;
+  winner?: 1 | 2;
 };
 
 export type EventSettings = {

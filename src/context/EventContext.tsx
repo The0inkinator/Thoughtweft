@@ -11,6 +11,7 @@ import {
   ProxySeat,
   PlayerUpdateParam,
   SeatAddress,
+  MatchUpdateParam,
   Match,
 } from "~/typing/eventTypes";
 
@@ -30,6 +31,11 @@ type EventState = [
     removePod: (inputPodId: number) => void;
     updatePodSize: (inputPodId: number, newPodSize: number) => void;
     updatePod: (inputPodId: number, updateParam: PodUpdateParam) => void;
+    updateMatch: (
+      inputPodId: number,
+      inputMatchId: number,
+      updateParam: MatchUpdateParam
+    ) => void;
     updateSeat: (
       inputPodId: number,
       inputSeatNumber: number,
@@ -297,22 +303,57 @@ export function EventContextProvider(props: any) {
                   scopedParam,
                 ];
               }
-              //               else if ("updateMatch" in updateParam) {
-              //                 const matchId = updateParam.matchId;
-              //                 const updateMatch = updateParam.updateValue;
-              //                 const matchIndex = newEvt.evtPods[
-              //                   podIndex
-              //                 ].podMatches.findIndex((match) => match.matchId === matchId);
+            }
+            return newEvt;
+          });
+        },
 
-              // if (matchIndex) {
-              //   newEvt.evtPods[podIndex].podMatches[matchIndex]
-              // }
+        //UPDATE Match
+        updateMatch(
+          inputPodId: number,
+          inputMatchId: number,
+          updateParam: MatchUpdateParam
+        ) {
+          const podIndex = event().evtPods.findIndex(
+            (pod) => pod.podId === inputPodId
+          );
 
-              //                 newEvt.evtPods[podIndex].podMatches = [
-              //                   ...newEvt.evtPods[podIndex].podMatches,
-              //                   scopedParam,
-              //                 ];
-              //               }
+          const matchIndex = event().evtPods[podIndex].podMatches.findIndex(
+            (match) => match.matchId === inputMatchId
+          );
+
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+            if (podIndex !== -1 && matchIndex !== -1) {
+              if ("player1Record" in updateParam) {
+                const scopedParam = updateParam.player1Record;
+
+                newEvt.evtPods[podIndex].podMatches[matchIndex] = {
+                  ...newEvt.evtPods[podIndex].podMatches[matchIndex],
+                  player1Record: scopedParam,
+                };
+              } else if ("player2Record" in updateParam) {
+                const scopedParam = updateParam.player2Record;
+
+                newEvt.evtPods[podIndex].podMatches[matchIndex] = {
+                  ...newEvt.evtPods[podIndex].podMatches[matchIndex],
+                  player2Record: scopedParam,
+                };
+              } else if ("matchCompleted" in updateParam) {
+                const scopedParam = updateParam.matchCompleted;
+
+                newEvt.evtPods[podIndex].podMatches[matchIndex] = {
+                  ...newEvt.evtPods[podIndex].podMatches[matchIndex],
+                  matchCompleted: scopedParam,
+                };
+              } else if ("winner" in updateParam) {
+                const scopedParam = updateParam.winner;
+
+                newEvt.evtPods[podIndex].podMatches[matchIndex] = {
+                  ...newEvt.evtPods[podIndex].podMatches[matchIndex],
+                  winner: scopedParam,
+                };
+              }
             }
             return newEvt;
           });

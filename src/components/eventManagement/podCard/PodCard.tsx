@@ -351,6 +351,12 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 <PlayerSeat
                   seatNumber={match.player1Seat}
                   podId={podId}
+                  tableSide="L"
+                ></PlayerSeat>
+                VS
+                <PlayerSeat
+                  seatNumber={match.player2Seat}
+                  podId={podId}
                   tableSide="R"
                 ></PlayerSeat>
               </div>

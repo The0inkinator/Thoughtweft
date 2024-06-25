@@ -262,7 +262,6 @@ export function EventContextProvider(props: any) {
                 return newEvt;
               });
             } else {
-              console.log(`No updates to pod ID: ${inputPodId}`);
             }
           }
         },

@@ -349,7 +349,11 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         </button>
         {/* Match Cards */}
         <div class={styles.pairingTableCont}>
-          <For each={thisPodState()?.podMatches}>
+          <For
+            each={thisPodState()?.podMatches.filter(
+              (match) => match.matchRound === thisPodState()?.currentRound
+            )}
+          >
             {(match) => <MatchCard podId={podId} matchInfo={match}></MatchCard>}
           </For>
         </div>
@@ -382,7 +386,11 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         </button>
         {/* Table Display */}
         <div class={styles.pairingTableCont}>
-          <For each={thisPodState()?.podMatches}>
+          <For
+            each={thisPodState()?.podMatches.filter(
+              (match) => match.matchRound === thisPodState()?.currentRound
+            )}
+          >
             {(match) => <MatchCard podId={podId} matchInfo={match}></MatchCard>}
           </For>
         </div>

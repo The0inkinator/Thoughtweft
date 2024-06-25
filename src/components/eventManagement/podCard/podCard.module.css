@@ -1,0 +1,23 @@
+.pairingTableCont {
+  width: 100%;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* outline: solid red; */
+}
+
+.podSeatsPairing {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: repeat(6, auto);
+  grid-template-areas: "a b c" "a b c" "a b c" "a b c" "a b c" "a b c";
+  place-items: center;
+}
+
+.matchCont {
+  width: 4rem;
+  height: 2rem;
+  background-color: red;
+}

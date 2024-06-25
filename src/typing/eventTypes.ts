@@ -73,9 +73,11 @@ export type Match = {
   matchRound: number;
   matchTable: number;
   player1Id: number;
-  player2Id: number;
   player1Record: Record;
+  player1Seat: number;
+  player2Id: number;
   player2Record: Record;
+  player2Seat: number;
   matchCompleted: boolean;
 };
 

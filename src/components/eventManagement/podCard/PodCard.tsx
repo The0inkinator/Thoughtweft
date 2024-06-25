@@ -13,7 +13,8 @@ import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import PlayerSeat from "../playerSeat";
 import { PodSizes, PodStatusModes } from "~/typing/eventTypes";
-import pairPlayers from "../dataFunctions/pairPlayers";
+import { PairPlayers } from "./playerManagement";
+import styles from "./podCard.module.css";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -321,7 +322,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           style={{ color: "red" }}
           onClick={() => {
             updatePod(podId, { round: 1 });
-            pairPlayers(eventState(), podId).map((match) => {
+            PairPlayers(eventState(), podId).map((match) => {
               updatePod(podId, { newMatch: match });
             });
 
@@ -341,10 +342,21 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const PairingPodCard = () => {
     return (
       <>
-        <div>Pairing {thisPodState()?.currentRound}</div>
+        <div>Pairing Round {thisPodState()?.currentRound}</div>
         {/* Table Display */}
-        <div class="tableCont">
-          <div class="podSeats">
+        <div class={styles.pairingTableCont}>
+          <For each={thisPodState()?.podMatches}>
+            {(match) => (
+              <div class={styles.matchCont}>
+                <PlayerSeat
+                  seatNumber={match.player1Seat}
+                  podId={podId}
+                  tableSide="R"
+                ></PlayerSeat>
+              </div>
+            )}
+          </For>
+          {/* <div class="podSeats">
             <For each={rightSeats()}>
               {(seat) => (
                 <PlayerSeat
@@ -364,7 +376,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 ></PlayerSeat>
               )}
             </For>
-          </div>
+          </div> */}
         </div>
       </>
     );

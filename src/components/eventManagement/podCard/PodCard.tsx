@@ -324,8 +324,9 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             pairPlayers(eventState(), podId).map((match) => {
               updatePod(podId, { newMatch: match });
             });
+
             console.log(thisPodState()?.podMatches);
-            updatePod(podId, { status: "playing" });
+            updatePod(podId, { status: "pairing" });
           }}
         >
           Advance to Matches
@@ -337,9 +338,42 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     );
   };
 
+  const PairingPodCard = () => {
+    return (
+      <>
+        <div>Pairing {thisPodState()?.currentRound}</div>
+        {/* Table Display */}
+        <div class="tableCont">
+          <div class="podSeats">
+            <For each={rightSeats()}>
+              {(seat) => (
+                <PlayerSeat
+                  seatNumber={seat.seatNumber}
+                  podId={podId}
+                  tableSide="R"
+                ></PlayerSeat>
+              )}
+            </For>
+            <div class="podTable"></div>
+            <For each={leftSeats()}>
+              {(seat) => (
+                <PlayerSeat
+                  seatNumber={seat.seatNumber}
+                  podId={podId}
+                  tableSide="L"
+                ></PlayerSeat>
+              )}
+            </For>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   const PlayingPodCard = () => {
     return (
       <>
+        <div>Round {thisPodState()?.currentRound}</div>
         {/* Table Display */}
         <div class="tableCont">
           <div class="podSeats">
@@ -381,6 +415,9 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           </Match>
           <Match when={thisPodState()?.podStatus === "drafting"}>
             <DraftingPodCard />
+          </Match>
+          <Match when={thisPodState()?.podStatus === "pairing"}>
+            <PairingPodCard />
           </Match>
           <Match when={thisPodState()?.podStatus === "playing"}>
             <PlayingPodCard />

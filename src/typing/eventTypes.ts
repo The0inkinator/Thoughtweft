@@ -11,7 +11,12 @@ export type PlayerUpdateParam =
   | { address: { podId: number; seat: number } }
   | { drag: boolean };
 
-export type PodStatusModes = "seating" | "drafting" | "playing" | "finished";
+export type PodStatusModes =
+  | "seating"
+  | "drafting"
+  | "playing"
+  | "pairing"
+  | "finished";
 
 export type PodUpdateParam =
   | { status: PodStatusModes }

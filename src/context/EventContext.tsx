@@ -290,8 +290,8 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPods[podIndex],
                   currentRound: scopedParam,
                 };
-              } else if ("match" in updateParam) {
-                const scopedParam = updateParam.match as Match;
+              } else if ("newMatch" in updateParam) {
+                const scopedParam = updateParam.newMatch;
 
                 newEvt.evtPods[podIndex].podMatches = [
                   ...newEvt.evtPods[podIndex].podMatches,

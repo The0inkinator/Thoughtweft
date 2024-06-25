@@ -1,3 +1,5 @@
+import { Match } from "solid-js";
+
 export type Record = [number, number, number];
 
 export type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -21,7 +23,11 @@ export type PodStatusModes =
 export type PodUpdateParam =
   | { status: PodStatusModes }
   | { round: number }
-  | { newMatch: Match };
+  | { newMatch: Match }
+  | {
+      updateMatchId: number;
+      updateValue: Match["matchCompleted"] | Match["matchId"];
+    };
 
 export type Player = {
   id: number;

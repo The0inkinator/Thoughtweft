@@ -297,6 +297,22 @@ export function EventContextProvider(props: any) {
                   scopedParam,
                 ];
               }
+              //               else if ("updateMatch" in updateParam) {
+              //                 const matchId = updateParam.matchId;
+              //                 const updateMatch = updateParam.updateValue;
+              //                 const matchIndex = newEvt.evtPods[
+              //                   podIndex
+              //                 ].podMatches.findIndex((match) => match.matchId === matchId);
+
+              // if (matchIndex) {
+              //   newEvt.evtPods[podIndex].podMatches[matchIndex]
+              // }
+
+              //                 newEvt.evtPods[podIndex].podMatches = [
+              //                   ...newEvt.evtPods[podIndex].podMatches,
+              //                   scopedParam,
+              //                 ];
+              //               }
             }
             return newEvt;
           });

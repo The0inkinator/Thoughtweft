@@ -15,6 +15,7 @@ import PlayerSeat from "../playerSeat";
 import { PodSizes, PodStatusModes } from "~/typing/eventTypes";
 import { PairPlayers } from "./playerManagement";
 import styles from "./podCard.module.css";
+import MatchCard from "../matchCard";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -350,24 +351,10 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         >
           Begin Round {thisPodState()?.currentRound}
         </button>
-        {/* Table Display */}
+        {/* Match Cards */}
         <div class={styles.pairingTableCont}>
           <For each={thisPodState()?.podMatches}>
-            {(match) => (
-              <div class={styles.matchCont}>
-                <PlayerSeat
-                  seatNumber={match.player1Seat}
-                  podId={podId}
-                  tableSide="L"
-                ></PlayerSeat>
-                VS
-                <PlayerSeat
-                  seatNumber={match.player2Seat}
-                  podId={podId}
-                  tableSide="R"
-                ></PlayerSeat>
-              </div>
-            )}
+            {(match) => <MatchCard podId={podId} matchInfo={match}></MatchCard>}
           </For>
         </div>
       </>

@@ -325,12 +325,10 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             PairPlayers(eventState(), podId).map((match) => {
               updatePod(podId, { newMatch: match });
             });
-
-            console.log(thisPodState()?.podMatches);
             updatePod(podId, { status: "pairing" });
           }}
         >
-          Advance to Matches
+          Pair Round 1
         </button>
         <div>
           {draftTimerHou()} {draftTimerMin()} {draftTimerSec()}
@@ -343,6 +341,15 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     return (
       <>
         <div>Pairing Round {thisPodState()?.currentRound}</div>
+        <button
+          type="submit"
+          style={{ color: "red" }}
+          onClick={() => {
+            updatePod(podId, { status: "playing" });
+          }}
+        >
+          Begin Round {thisPodState()?.currentRound}
+        </button>
         {/* Table Display */}
         <div class={styles.pairingTableCont}>
           <For each={thisPodState()?.podMatches}>
@@ -362,27 +369,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
               </div>
             )}
           </For>
-          {/* <div class="podSeats">
-            <For each={rightSeats()}>
-              {(seat) => (
-                <PlayerSeat
-                  seatNumber={seat.seatNumber}
-                  podId={podId}
-                  tableSide="R"
-                ></PlayerSeat>
-              )}
-            </For>
-            <div class="podTable"></div>
-            <For each={leftSeats()}>
-              {(seat) => (
-                <PlayerSeat
-                  seatNumber={seat.seatNumber}
-                  podId={podId}
-                  tableSide="L"
-                ></PlayerSeat>
-              )}
-            </For>
-          </div> */}
         </div>
       </>
     );
@@ -391,30 +377,45 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const PlayingPodCard = () => {
     return (
       <>
-        <div>Round {thisPodState()?.currentRound}</div>
+        <div> Round {thisPodState()?.currentRound}</div>
+        <div>timer</div>
+        <button
+          type="submit"
+          style={{ color: "red" }}
+          onClick={() => {
+            const remainingMatches = thisPodState()?.podMatches.filter(
+              (match) => match.matchCompleted === false
+            );
+            if (remainingMatches?.length === 0) {
+              let newRound = thisPodState()!.currentRound! + 1;
+              updatePod(podId, { round: newRound });
+              updatePod(podId, { status: "pairing" });
+            } else {
+              console.log("Ongoing Matches");
+            }
+          }}
+        >
+          Pair Round {thisPodState()!.currentRound! + 1}
+        </button>
         {/* Table Display */}
-        <div class="tableCont">
-          <div class="podSeats">
-            <For each={rightSeats()}>
-              {(seat) => (
+        <div class={styles.pairingTableCont}>
+          <For each={thisPodState()?.podMatches}>
+            {(match) => (
+              <div class={styles.matchCont}>
                 <PlayerSeat
-                  seatNumber={seat.seatNumber}
-                  podId={podId}
-                  tableSide="R"
-                ></PlayerSeat>
-              )}
-            </For>
-            <div class="podTable"></div>
-            <For each={leftSeats()}>
-              {(seat) => (
-                <PlayerSeat
-                  seatNumber={seat.seatNumber}
+                  seatNumber={match.player1Seat}
                   podId={podId}
                   tableSide="L"
                 ></PlayerSeat>
-              )}
-            </For>
-          </div>
+                VS matchid: {match.matchId}
+                <PlayerSeat
+                  seatNumber={match.player2Seat}
+                  podId={podId}
+                  tableSide="R"
+                ></PlayerSeat>
+              </div>
+            )}
+          </For>
         </div>
       </>
     );

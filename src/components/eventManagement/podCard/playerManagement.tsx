@@ -4,8 +4,10 @@ export function PairPlayers(eventData: Event, podId: number) {
   const pod = eventData.evtPods.find((pod) => pod.podId === podId)!;
   const round = pod.currentRound;
   const halfTable = pod.podSize / 2;
-  let table = 1;
   const newMatches: Match[] = [];
+  const currentMatches = eventData.evtPods.find(
+    (pod) => pod.podId === podId
+  )?.podMatches;
 
   const pairCrossPod = () => {
     if (pod.podSize % 2 === 0) {
@@ -25,7 +27,9 @@ export function PairPlayers(eventData: Event, podId: number) {
           const newMatch: Match = {
             matchPodId: podId,
             matchRound: round!,
-            matchTable: table,
+            matchId: currentMatches?.length
+              ? currentMatches.length
+              : 0 + newMatches.length + 1,
             player1Id: player1!.id,
             player1Record: [0, 0, 0],
             player1Seat: seat.seatNumber,

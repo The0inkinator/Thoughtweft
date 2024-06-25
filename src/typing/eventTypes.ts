@@ -71,7 +71,7 @@ export type Pod = {
 export type Match = {
   matchPodId: number;
   matchRound: number;
-  matchTable: number;
+  matchId: number;
   player1Id: number;
   player1Record: Record;
   player1Seat: number;

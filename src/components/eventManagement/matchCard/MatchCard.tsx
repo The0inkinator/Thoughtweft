@@ -2,7 +2,7 @@ import styles from "./matchCard.module.css";
 import PlayerSeat from "../playerSeat/PlayerSeat";
 import { MatchData } from "~/typing/eventTypes";
 import { useEventContext } from "~/context/EventContext";
-import { Match, Switch, createSignal } from "solid-js";
+import { Match, Show, Switch, createSignal } from "solid-js";
 
 interface MatchCardInputs {
   podId: number;
@@ -23,6 +23,15 @@ export default function MatchCard({
     return eventState()
       .evtPods.find((pod) => pod.podId === podId)
       ?.podMatches.find((match) => match.matchId === matchInfo.matchId);
+  };
+
+  const report = (p1r: number, p2r: number, drawR?: boolean) => {
+    updateMatch(podId, thisMatchState()!.matchId, {
+      matchRecord: { p1: p1r, p2: p2r, draw: drawR },
+    });
+    updateMatch(podId, thisMatchState()!.matchId, {
+      matchCompleted: true,
+    });
   };
 
   return (
@@ -73,6 +82,8 @@ export default function MatchCard({
               ></PlayerSeat>
               {thisMatchState()?.matchRecord.p1} VS{" "}
               {thisMatchState()?.matchRecord.p2}
+              <p></p>
+              <Show when={thisMatchState()?.matchRecord.draw}>Match Drawn</Show>
               <PlayerSeat
                 seatNumber={matchInfo.player2Seat}
                 podId={podId}
@@ -96,12 +107,7 @@ export default function MatchCard({
                     type="submit"
                     value="p1-2-0"
                     onClick={() => {
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchRecord: { p1: 2, p2: 0 },
-                      });
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchCompleted: true,
-                      });
+                      report(2, 0);
                     }}
                   >
                     2-0
@@ -110,12 +116,7 @@ export default function MatchCard({
                     type="submit"
                     value="p1-2-1"
                     onClick={() => {
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchRecord: { p1: 2, p2: 1 },
-                      });
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchCompleted: true,
-                      });
+                      report(2, 1);
                     }}
                   >
                     2-1
@@ -124,12 +125,7 @@ export default function MatchCard({
                     type="submit"
                     value="1-1"
                     onClick={() => {
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchRecord: { p1: 0, p2: 0 },
-                      });
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchCompleted: true,
-                      });
+                      report(1, 1, true);
                     }}
                   >
                     1-1
@@ -138,12 +134,7 @@ export default function MatchCard({
                     type="submit"
                     value="p2-2-1"
                     onClick={() => {
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchRecord: { p1: 1, p2: 2 },
-                      });
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchCompleted: true,
-                      });
+                      report(1, 2);
                     }}
                   >
                     1-2
@@ -152,12 +143,7 @@ export default function MatchCard({
                     type="submit"
                     value="p2-2-0"
                     onClick={() => {
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchRecord: { p1: 0, p2: 2 },
-                      });
-                      updateMatch(podId, thisMatchState()!.matchId, {
-                        matchCompleted: true,
-                      });
+                      report(0, 2);
                     }}
                   >
                     0-2

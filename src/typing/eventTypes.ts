@@ -2,7 +2,7 @@ import { Match } from "solid-js";
 
 export type Record = [number, number, number];
 
-export type MatchRecord = { p1: number; p2: number };
+export type MatchRecord = { p1: number; p2: number; draw?: boolean };
 
 export type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
@@ -29,7 +29,7 @@ export type PodUpdateParam =
 
 export type MatchUpdateParam =
   | { matchCompleted: boolean }
-  | { matchRecord: { p1: number; p2: number } };
+  | { matchRecord: MatchRecord };
 
 export type Player = {
   id: number;

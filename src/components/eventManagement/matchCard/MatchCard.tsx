@@ -71,7 +71,8 @@ export default function MatchCard({
                 podId={podId}
                 tableSide="L"
               ></PlayerSeat>
-              VS
+              {thisMatchState()?.matchRecord.p1} VS{" "}
+              {thisMatchState()?.matchRecord.p2}
               <PlayerSeat
                 seatNumber={matchInfo.player2Seat}
                 podId={podId}

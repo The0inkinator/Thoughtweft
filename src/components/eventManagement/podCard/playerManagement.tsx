@@ -31,10 +31,9 @@ export function PairPlayers(eventData: Event, podId: number) {
               ? currentMatches.length
               : 0 + newMatches.length + 1,
             player1Id: player1!.id,
-            player1Record: [0, 0, 0],
             player1Seat: seat.seatNumber,
             player2Id: player2!.id,
-            player2Record: [0, 0, 0],
+            matchRecord: { p1: 0, p2: 0 },
             player2Seat: seat.seatNumber + halfTable,
             matchCompleted: false,
           };

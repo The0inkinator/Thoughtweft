@@ -2,6 +2,8 @@ import { Match } from "solid-js";
 
 export type Record = [number, number, number];
 
+export type MatchRecord = { p1: number; p2: number };
+
 export type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export type SeatUpdateParam =
@@ -26,10 +28,8 @@ export type PodUpdateParam =
   | { newMatch: MatchData };
 
 export type MatchUpdateParam =
-  | { player1Record: Record }
-  | { player2Record: Record }
   | { matchCompleted: boolean }
-  | { winner: 1 | 2 };
+  | { matchRecord: { p1: number; p2: number } };
 
 export type Player = {
   id: number;
@@ -80,14 +80,12 @@ export type MatchData = {
   matchPodId: number;
   matchRound: number;
   matchId: number;
+  matchRecord: MatchRecord;
   player1Id: number;
-  player1Record: Record;
   player1Seat: number;
   player2Id: number;
-  player2Record: Record;
   player2Seat: number;
   matchCompleted: boolean;
-  winner?: 1 | 2;
 };
 
 export type EventSettings = {

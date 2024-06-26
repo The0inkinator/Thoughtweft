@@ -325,33 +325,19 @@ export function EventContextProvider(props: any) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
             if (podIndex !== -1 && matchIndex !== -1) {
-              if ("player1Record" in updateParam) {
-                const scopedParam = updateParam.player1Record;
-
-                newEvt.evtPods[podIndex].podMatches[matchIndex] = {
-                  ...newEvt.evtPods[podIndex].podMatches[matchIndex],
-                  player1Record: scopedParam,
-                };
-              } else if ("player2Record" in updateParam) {
-                const scopedParam = updateParam.player2Record;
-
-                newEvt.evtPods[podIndex].podMatches[matchIndex] = {
-                  ...newEvt.evtPods[podIndex].podMatches[matchIndex],
-                  player2Record: scopedParam,
-                };
-              } else if ("matchCompleted" in updateParam) {
+              if ("matchCompleted" in updateParam) {
                 const scopedParam = updateParam.matchCompleted;
 
                 newEvt.evtPods[podIndex].podMatches[matchIndex] = {
                   ...newEvt.evtPods[podIndex].podMatches[matchIndex],
                   matchCompleted: scopedParam,
                 };
-              } else if ("winner" in updateParam) {
-                const scopedParam = updateParam.winner;
+              } else if ("matchRecord" in updateParam) {
+                const scopedParam = updateParam.matchRecord;
 
                 newEvt.evtPods[podIndex].podMatches[matchIndex] = {
                   ...newEvt.evtPods[podIndex].podMatches[matchIndex],
-                  winner: scopedParam,
+                  matchRecord: scopedParam,
                 };
               }
             }

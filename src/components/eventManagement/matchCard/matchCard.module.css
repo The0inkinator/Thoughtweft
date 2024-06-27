@@ -1,0 +1,10 @@
+.matchCont {
+}
+
+.matchSeatCont {
+  display: flex;
+  flex-direction: row;
+  background-color: red;
+}
+.reportOptionCont {
+}

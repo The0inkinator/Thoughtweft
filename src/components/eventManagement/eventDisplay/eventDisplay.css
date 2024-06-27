@@ -1,35 +1,13 @@
-.eventDisplayContainer {
+.eventDisplayCont {
   width: 70vw;
-  height: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: row;
-}
-
-#eventDisplayHeader {
-  position: relative;
-  width: 100vw;
-  height: 10rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
-#playerNameInputContainer {
-  position: relative;
-}
-
-#playerNameInput {
-  color: red;
-  width: 10rem;
-}
-
-#playerNameInput::placeholder {
-  color: red;
-}
-
-#playerNameSubmit {
-  width: 1rem;
-  height: 1rem;
+.podDisplayCont {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
 }

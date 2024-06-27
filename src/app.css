@@ -4,6 +4,7 @@
   padding: 0;
   text-decoration: none;
   color: inherit;
+  user-select: none;
 }
 
 /*CUSTOM FONTS*/
@@ -23,6 +24,10 @@
   /*Global Sizing*/
   --PlayerCard: 4rem;
   --PodCard: 20rem;
+  --PodCardAR: 2/3;
+  --LargeBorderRadius: 2rem;
+  --MedBorderRadius: 1rem;
+  --SmallBorderRadius: 0.5rem;
 
   /*Global Styling*/
   background-color: var(--BackgroundColor);

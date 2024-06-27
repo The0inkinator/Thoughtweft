@@ -1,0 +1,41 @@
+.podPlusButtonCont {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.addButton {
+  all: unset;
+  width: 25%;
+  aspect-ratio: 1/1;
+  background-color: rgb(25, 25, 39);
+  border-radius: var(--MedBorderRadius);
+  cursor: pointer;
+  text-align: center;
+  color: aliceblue;
+  font-weight: bolder;
+}
+
+.settingsCont {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmSettingsButton {
+  all: unset;
+  width: 50%;
+  aspect-ratio: 3/1;
+  background-color: rgb(25, 25, 39);
+  border-radius: var(--MedBorderRadius);
+  cursor: pointer;
+  text-align: center;
+  color: aliceblue;
+  font-weight: bolder;
+}

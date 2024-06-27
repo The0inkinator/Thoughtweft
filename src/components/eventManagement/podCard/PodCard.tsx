@@ -322,6 +322,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             PairPlayers(eventState(), podId).map((match) => {
               updatePod(podId, { newMatch: match });
             });
+            console.log(thisPodState()?.podMatches);
             updatePod(podId, { status: "pairing" });
           }}
         >

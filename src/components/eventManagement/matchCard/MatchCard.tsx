@@ -2,7 +2,7 @@ import styles from "./matchCard.module.css";
 import PlayerSeat from "../playerSeat/PlayerSeat";
 import { MatchData } from "~/typing/eventTypes";
 import { useEventContext } from "~/context/EventContext";
-import { Match, Show, Switch, createSignal } from "solid-js";
+import { Match, Show, Switch, createSignal, onMount } from "solid-js";
 
 interface MatchCardInputs {
   podId: number;
@@ -15,7 +15,7 @@ export default function MatchCard({
   matchInfo,
   matchCardState,
 }: MatchCardInputs) {
-  const [eventState, { updateMatch }] = useEventContext();
+  const [eventState, { updateMatch, addPlayer }] = useEventContext();
   const [optionDisplayVisable, setOptionDisplayVisable] =
     createSignal<boolean>(false);
 
@@ -54,19 +54,6 @@ export default function MatchCard({
         </Match>
         <Match when={matchCardState === "playing"}>
           <div class={styles.matchCont}>
-            {/* <button
-              type="submit"
-              style={{
-                "background-color": thisMatchState()?.matchCompleted
-                  ? "green"
-                  : "red",
-              }}
-              onclick={() => {
-                updateMatch(podId, matchInfo.matchId, { matchCompleted: true });
-              }}
-            >
-              Complete Match
-            </button> */}
             <div
               class={styles.matchSeatCont}
               style={{

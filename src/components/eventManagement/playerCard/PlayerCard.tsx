@@ -114,6 +114,7 @@ export default function PlayerCard({
       }
       targetSeat().appendChild(thisPlayerCard);
       const currentSeat = seatDataFromDiv(eventState(), targetSeat());
+      // console.log(thisPlayerState().name, currentSeat);
       if (currentSeat && currentSeat.filled === false) {
         updateSeat(currentSeat.podId, currentSeat.seatNumber, { filled: true });
       } else {

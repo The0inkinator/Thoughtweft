@@ -11,7 +11,7 @@ import {
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
-import PlayerSeat from "../playerSeat";
+import Seat from "../seat";
 import { PodSizes, PodStatusModes } from "~/typing/eventTypes";
 import { PairPlayers } from "./playerManagement";
 import styles from "./podCard.module.css";
@@ -239,21 +239,21 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           <div class="podSeats">
             <For each={rightSeats()}>
               {(seat) => (
-                <PlayerSeat
+                <Seat
                   seatNumber={seat.seatNumber}
                   podId={podId}
                   tableSide="R"
-                ></PlayerSeat>
+                ></Seat>
               )}
             </For>
             <div class="podTable"></div>
             <For each={leftSeats()}>
               {(seat) => (
-                <PlayerSeat
+                <Seat
                   seatNumber={seat.seatNumber}
                   podId={podId}
                   tableSide="L"
-                ></PlayerSeat>
+                ></Seat>
               )}
             </For>
           </div>

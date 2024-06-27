@@ -11,7 +11,7 @@ interface PlayerSlotInput {
   tableSide: "L" | "R";
 }
 
-export default function PlayerSeat({
+export default function Seat({
   podId,
   seatNumber,
   tableSide,

@@ -1,5 +1,5 @@
 import styles from "./matchCard.module.css";
-import PlayerSeat from "../playerSeat/PlayerSeat";
+import Seat from "../seat";
 import { MatchData } from "~/typing/eventTypes";
 import { useEventContext } from "~/context/EventContext";
 import { Match, Show, Switch, createSignal, onMount } from "solid-js";
@@ -39,17 +39,17 @@ export default function MatchCard({
       <Switch fallback={<></>}>
         <Match when={matchCardState === "pairing"}>
           <div class={styles.matchSeatCont}>
-            <PlayerSeat
+            <Seat
               seatNumber={matchInfo.player1Seat}
               podId={podId}
               tableSide="L"
-            ></PlayerSeat>
+            ></Seat>
             VS
-            <PlayerSeat
+            <Seat
               seatNumber={matchInfo.player2Seat}
               podId={podId}
               tableSide="R"
-            ></PlayerSeat>
+            ></Seat>
           </div>
         </Match>
         <Match when={matchCardState === "playing"}>
@@ -62,20 +62,20 @@ export default function MatchCard({
                   : "red",
               }}
             >
-              <PlayerSeat
+              <Seat
                 seatNumber={matchInfo.player1Seat}
                 podId={podId}
                 tableSide="L"
-              ></PlayerSeat>
+              ></Seat>
               {thisMatchState()?.matchRecord.p1} VS{" "}
               {thisMatchState()?.matchRecord.p2}
               <p></p>
               <Show when={thisMatchState()?.matchRecord.draw}>Match Drawn</Show>
-              <PlayerSeat
+              <Seat
                 seatNumber={matchInfo.player2Seat}
                 podId={podId}
                 tableSide="R"
-              ></PlayerSeat>
+              ></Seat>
             </div>
             <Switch>
               <Match when={!optionDisplayVisable()}>

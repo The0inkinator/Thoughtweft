@@ -39,17 +39,9 @@ export default function MatchCard({
       <Switch fallback={<></>}>
         <Match when={matchCardState === "pairing"}>
           <div class={styles.matchSeatCont}>
-            <Seat
-              seatNumber={matchInfo.player1Seat}
-              podId={podId}
-              tableSide="L"
-            ></Seat>
+            <Seat seatNumber={matchInfo.player1Seat} podId={podId}></Seat>
             VS
-            <Seat
-              seatNumber={matchInfo.player2Seat}
-              podId={podId}
-              tableSide="R"
-            ></Seat>
+            <Seat seatNumber={matchInfo.player2Seat} podId={podId}></Seat>
           </div>
         </Match>
         <Match when={matchCardState === "playing"}>
@@ -62,20 +54,12 @@ export default function MatchCard({
                   : "red",
               }}
             >
-              <Seat
-                seatNumber={matchInfo.player1Seat}
-                podId={podId}
-                tableSide="L"
-              ></Seat>
+              <Seat seatNumber={matchInfo.player1Seat} podId={podId}></Seat>
               {thisMatchState()?.matchRecord.p1} VS{" "}
               {thisMatchState()?.matchRecord.p2}
               <p></p>
               <Show when={thisMatchState()?.matchRecord.draw}>Match Drawn</Show>
-              <Seat
-                seatNumber={matchInfo.player2Seat}
-                podId={podId}
-                tableSide="R"
-              ></Seat>
+              <Seat seatNumber={matchInfo.player2Seat} podId={podId}></Seat>
             </div>
             <Switch>
               <Match when={!optionDisplayVisable()}>

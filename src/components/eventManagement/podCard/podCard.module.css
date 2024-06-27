@@ -1,17 +1,59 @@
-.pairingTableCont {
-  width: 100%;
-  height: 90%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  /* outline: solid red; */
+.podTitle {
+  align-content: end;
+  font-weight: bold;
+  color: aliceblue;
+  text-align: center;
+  z-index: 1;
 }
 
-.podSeatsPairing {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  grid-template-rows: repeat(6, auto);
-  grid-template-areas: "a b c" "a b c" "a b c" "a b c" "a b c" "a b c";
-  place-items: center;
+.tableCNT {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.leftSeats {
+  display: flex;
+  flex-direction: column-reverse;
+  align-self: flex-end;
+}
+
+.tableVis {
+  background-color: rgb(25, 25, 39);
+  width: 2rem;
+  height: 80%;
+  min-height: 3rem;
+  margin-inline: 1rem;
+  padding: 1rem;
+}
+
+.rightSeats {
+  display: flex;
+  flex-direction: column;
+}
+
+.podSizeDrop {
+  all: unset;
+  background-color: white;
+  color: black;
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.podSizeMenu {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.podSizeOption {
+  background-color: white;
+  height: 100%;
+  width: 100%;
+}
+
+.podSizeOption:hover {
+  background-color: grey;
+  cursor: pointer;
 }

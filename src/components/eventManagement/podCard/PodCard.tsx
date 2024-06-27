@@ -1,4 +1,3 @@
-import "./podCard.css";
 import {
   createEffect,
   createSignal,
@@ -117,14 +116,14 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   const SeatingPodCard = () => {
     return (
-      <div class="podCardCont">
-        <div class="podTitle">
+      <>
+        <div class={styles.podTitle}>
           Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
           {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}
           <p></p>
           {/* POD SIZE DROP DOWN */}
           <button
-            class="podSizeDrop"
+            class={styles.podSizeDrop}
             type="button"
             onMouseUp={() => {
               if (podSizeDrop() === "close") {
@@ -139,7 +138,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           >
             {podSizeBtn()}
             <div
-              class="podSizeMenu"
+              class={styles.podSizeMenu}
               style={{
                 display: podSizeDrop() === "open" ? "block" : "none",
               }}
@@ -147,7 +146,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
               <For each={podOptions}>
                 {(option: PodSizes) => (
                   <div
-                    class="podSizeOption"
+                    class={styles.podSizeOption}
                     style={{
                       display: podSizeDrop() === "open" ? "block" : "none",
                     }}
@@ -222,43 +221,40 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
               </button>
             </Match>
           </Switch>
+          {/* ADVANCE TO DRAFTING */}
+          <button
+            type="submit"
+            style={{ color: "red" }}
+            onClick={() => {
+              shrinkPod();
+              updatePod(podId, { status: "drafting" });
+            }}
+          >
+            Advance to Drafting
+          </button>
         </div>
-        {/* ADVANCE TO DRAFTING */}
-        <button
-          type="submit"
-          style={{ color: "red" }}
-          onClick={() => {
-            shrinkPod();
-            updatePod(podId, { status: "drafting" });
-          }}
-        >
-          Advance to Drafting
-        </button>
         {/* Table Display */}
-        <div class="tableCont">
-          <div class="podSeats">
-            <For each={rightSeats()}>
-              {(seat) => (
-                <Seat
-                  seatNumber={seat.seatNumber}
-                  podId={podId}
-                  tableSide="R"
-                ></Seat>
-              )}
-            </For>
-            <div class="podTable"></div>
+        <div
+          class={styles.tableCNT}
+          style={{ height: `${rightSeats().length * 3}rem` }}
+        >
+          <div class={styles.leftSeats}>
             <For each={leftSeats()}>
               {(seat) => (
-                <Seat
-                  seatNumber={seat.seatNumber}
-                  podId={podId}
-                  tableSide="L"
-                ></Seat>
+                <Seat podId={podId} seatNumber={seat.seatNumber}></Seat>
+              )}
+            </For>
+          </div>
+          <div class={styles.tableVis}></div>
+          <div class={styles.rightSeats}>
+            <For each={rightSeats()}>
+              {(seat) => (
+                <Seat podId={podId} seatNumber={seat.seatNumber}></Seat>
               )}
             </For>
           </div>
         </div>
-      </div>
+      </>
     );
   };
 

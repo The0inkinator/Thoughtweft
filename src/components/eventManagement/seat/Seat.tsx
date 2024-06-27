@@ -35,7 +35,7 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
   });
 
   return (
-    <div class={styles.seatCNT} ref={thisSeat}>
+    <div class={styles.seat} ref={thisSeat}>
       {seatNumber}
     </div>
   );

@@ -1,4 +1,4 @@
-import "./displayFrame.css";
+import styles from "./displayFrame.module.css";
 import { For, createSignal, children, createEffect } from "solid-js";
 
 //MAIN FUNCTION
@@ -14,17 +14,17 @@ export default function DisplayFrame(props: any) {
 
   return (
     <div
-      class="evtDisplayFrame"
+      class={styles.evtDisplayFrame}
       ref={thisDisplayFrame}
       onMouseDown={() => {
         thisDisplayFrame.style.zIndex = "1";
         document.addEventListener("mouseup", setZInitial);
       }}
     >
-      <div class="evtDisplayFrameContent">
+      <div class={styles.evtDisplayFrameContent}>
         {props.children}
         <div
-          class="evtDisplayFrameBG"
+          class={styles.evtDisplayFrameBG}
           style={{ visibility: bgVisible() ? "visible" : "hidden" }}
         ></div>
       </div>

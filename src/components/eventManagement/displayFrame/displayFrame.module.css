@@ -1,7 +1,6 @@
 .evtDisplayFrame {
   min-width: var(--PodCard);
   min-height: var(--PodCard);
-  position: relative;
   margin: 2rem;
 }
 

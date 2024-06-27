@@ -20,6 +20,7 @@ interface SeatInputs {
 export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
   //Context State
   const [eventState, { updateSeat, updatePlayer }] = useEventContext();
+
   //Refs
   let thisSeat!: HTMLDivElement;
 

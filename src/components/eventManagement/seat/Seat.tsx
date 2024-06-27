@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
-import "./playerSeat.css";
+import styles from "./seat.module.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
 import { playerIdFromAddress } from "~/context/EventDataFunctions";
@@ -255,7 +255,7 @@ export default function Seat({
   });
 
   return (
-    <div class="playerSeatCont" ref={thisSeat}>
+    <div class={styles.seatCNT} ref={thisSeat}>
       {seatNumber}
     </div>
   );

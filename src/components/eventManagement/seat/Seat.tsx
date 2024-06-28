@@ -34,11 +34,9 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
 
   createEffect(() => {
     if (thisSeatState().filled && thisSeat.childElementCount === 0) {
-      // console.log(seatNumber, "not filled");
       updateSeat(podId, seatNumber, { filled: false });
     }
     if (thisSeatState().filled === false && thisSeat.childElementCount > 0) {
-      // console.log(seatNumber, "filled");
       updateSeat(podId, seatNumber, { filled: true });
     }
   });

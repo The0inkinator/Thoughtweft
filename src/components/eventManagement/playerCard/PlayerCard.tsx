@@ -83,7 +83,6 @@ export default function PlayerCard({
 
   createEffect(() => {
     const singleHoveredSeat = seats().find((seat) => seat.hovered);
-
     if (singleHoveredSeat !== hoveredSeat() && singleHoveredSeat) {
       setHoveredSeat(singleHoveredSeat);
     }
@@ -91,6 +90,7 @@ export default function PlayerCard({
 
   createEffect(() => {
     if (thisPlayerCard.parentElement !== targetSeatRef()) {
+      console.log("reassign triggered");
       targetSeatRef()?.appendChild(thisPlayerCard);
     }
   });

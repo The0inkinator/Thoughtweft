@@ -6,6 +6,7 @@ import {
   Match,
   createEffect,
   createMemo,
+  onMount,
 } from "solid-js";
 import { seatDataFromDiv } from "~/context/EventDataFunctions";
 import { Portal } from "solid-js/web";
@@ -164,6 +165,10 @@ export default function PlayerCard({
     document.removeEventListener("mousemove", dragging);
     document.removeEventListener("mouseup", dragEnd);
   };
+
+  onMount(() => {
+    updatePlayer(playerID, { ref: thisPlayerCard });
+  });
 
   return (
     <div

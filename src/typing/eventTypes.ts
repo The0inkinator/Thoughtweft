@@ -13,7 +13,8 @@ export type SeatUpdateParam =
 
 export type PlayerUpdateParam =
   | { address: { podId: number; seat: number } }
-  | { drag: boolean };
+  | { drag: boolean }
+  | { ref: HTMLDivElement };
 
 export type PodStatusModes =
   | "seating"
@@ -41,6 +42,7 @@ export type Player = {
   matchRecord?: Record;
   eventRecord?: Record;
   currentOpponentId?: number;
+  playerRef?: HTMLDivElement;
 };
 
 export interface SeatAddress {

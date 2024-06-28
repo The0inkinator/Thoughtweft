@@ -408,6 +408,11 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPlayerList[playerIndex],
                   dragging: updateParam.drag,
                 };
+              } else if ("ref" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  playerRef: updateParam.ref,
+                };
               }
               return newEvt;
             } else {

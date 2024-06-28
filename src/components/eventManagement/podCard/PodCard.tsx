@@ -27,12 +27,10 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const [eventState, { updatePodSize, removePod, updatePlayer, updatePod }] =
     useEventContext();
   //Local State
-  const [localPodNumber, setLocalPodNumber] = createSignal(podNumber);
   const [shuffleMode, setShuffleMode] = createSignal<"default" | "confirm">(
     "default"
   );
-  //refs
-  let thisPod!: HTMLDivElement;
+
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
   };
@@ -58,7 +56,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   onMount(() => {
     updatePodSize(podId, thisPodState()!.podSize);
-    updatePod(podId, { ref: thisPod });
   });
 
   const shufflePod = () => {
@@ -416,8 +413,18 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   return (
     <DisplayFrame>
-      <div ref={thisPod}>
-        <ErrorBoundary fallback={<>oops!</>}>
+      <ErrorBoundary fallback={<>oops!</>}>
+        <div
+          // style={{
+          //   "background-color": thisPodState()?.podHovered ? "red" : "green",
+          // }}
+          onMouseEnter={() => {
+            updatePod(podId, { hovered: true });
+          }}
+          onMouseLeave={() => {
+            updatePod(podId, { hovered: false });
+          }}
+        >
           <Switch fallback={<>oops!</>}>
             <Match when={thisPodState()?.podStatus === "seating"}>
               <SeatingPodCard />
@@ -435,8 +442,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
               <FinishedPodCard />
             </Match>
           </Switch>
-        </ErrorBoundary>
-      </div>
+        </div>
+      </ErrorBoundary>
     </DisplayFrame>
   );
 }

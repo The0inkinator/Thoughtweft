@@ -77,15 +77,43 @@ export default function PlayerCard({
   //   }
   // };
 
+  const lastHoveredSeat = () => {
+    let allSeats: FullSeat[] = [];
+    eventState().evtPods.map((pod) => {
+      pod.podSeats.map((seat) => {
+        allSeats.push(seat);
+      });
+    });
+    const tempHoveredSeat = allSeats.find((seat) => seat.hovered === true);
+    if (tempHoveredSeat) {
+      return tempHoveredSeat;
+    }
+  };
+
+  const podHovered = () => {
+    if (eventState().evtPods.find((pod) => pod.podId === podId)?.podHovered) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const targetSeat = createMemo(() => {
-    return eventState()
+    const seat = eventState()
       .evtPods.find((pod) => pod.podId === thisPlayerState().podId)
-      ?.podSeats.find((seat) => seat.seatNumber === thisPlayerState().seat)
-      ?.seatRef;
+      ?.podSeats.find(
+        (seat) => seat.seatNumber === thisPlayerState().seat
+      )?.seatRef;
+
+    if (seat) {
+      return seat;
+    } else {
+      return eventState().playerHopper;
+    }
   });
 
   createEffect(() => {
-    if (thisPlayerCard.parentElement !== targetSeat() && targetSeat()) {
+    if (thisPlayerCard.parentElement !== targetSeat()) {
       targetSeat()?.appendChild(thisPlayerCard);
     }
   });
@@ -115,6 +143,7 @@ export default function PlayerCard({
       //     filled: false,
       //   });
       // }
+
       updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
@@ -140,6 +169,10 @@ export default function PlayerCard({
     thisPlayerVis.style.left = `0px`;
     thisPlayerVis.style.top = `0px`;
 
+    if (!podHovered()) {
+      console.log("drop to hopper");
+      updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+    }
     // if (hoveredSeat().filled === false) {
     //   updatePlayer(playerID, {
     //     address: { podId: hoveredSeat().podId, seat: hoveredSeat().seatNumber },

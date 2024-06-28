@@ -36,7 +36,16 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
   });
 
   return (
-    <div class={styles.seat} ref={thisSeat}>
+    <div
+      class={styles.seat}
+      ref={thisSeat}
+      onMouseEnter={() => {
+        updateSeat(podId, seatNumber, { hovered: true });
+      }}
+      onMouseLeave={() => {
+        updateSeat(podId, seatNumber, { hovered: false });
+      }}
+    >
       {seatNumber}
     </div>
   );

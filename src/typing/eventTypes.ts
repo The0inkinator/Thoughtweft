@@ -26,7 +26,7 @@ export type PodUpdateParam =
   | { status: PodStatusModes }
   | { round: number }
   | { newMatch: MatchData }
-  | { ref: HTMLDivElement };
+  | { hovered: boolean };
 
 export type MatchUpdateParam =
   | { matchCompleted: boolean }
@@ -76,6 +76,7 @@ export type Pod = {
   podCube?: URL;
   byePlayerIds?: number[];
   podRef?: HTMLDivElement;
+  podHovered?: boolean;
 };
 
 export type MatchData = {

@@ -302,13 +302,10 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPods[podIndex].podMatches,
                   scopedParam,
                 ];
-              } else if ("ref" in updateParam) {
-                const scopedParam = updateParam.ref;
+              } else if ("hovered" in updateParam) {
+                const scopedParam = updateParam.hovered;
 
-                newEvt.evtPods[podIndex] = {
-                  ...newEvt.evtPods[podIndex],
-                  podRef: scopedParam,
-                };
+                newEvt.evtPods[podIndex].podHovered = scopedParam;
               }
             }
             return newEvt;

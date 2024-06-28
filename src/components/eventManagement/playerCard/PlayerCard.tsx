@@ -1,4 +1,4 @@
-import "./playerCard.css";
+import styles from "./playerCard.module.css";
 import { useEventContext } from "~/context/EventContext";
 import { useHovRefContext } from "~/context/HovRefContext";
 import {
@@ -185,7 +185,7 @@ export default function PlayerCard({
 
   return (
     <div
-      class="playerCardCont"
+      class={styles.playerCardCont}
       ref={thisPlayerCard}
       onMouseDown={(event) => {
         if (
@@ -201,24 +201,28 @@ export default function PlayerCard({
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
-          <div class="playerName" onclick={() => {}}>
+          <div class={styles.playerName} onclick={() => {}}>
             {playerName}
           </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
           <Portal>
-            <div class="playerName" ref={thisPlayerVis} onclick={() => {}}>
+            <div
+              class={styles.playerName}
+              ref={thisPlayerVis}
+              onclick={() => {}}
+            >
               {playerName}
             </div>
           </Portal>
         </Match>
         <Match when={playerCardMode() === "hoveringSeat"}>
-          <div class="playerName" onclick={() => {}}>
+          <div class={styles.playerName} onclick={() => {}}>
             {playerName}
           </div>
         </Match>
         <Match when={playerCardMode() === "seated"}>
-          <div class="playerName" onclick={() => {}}>
+          <div class={styles.playerName} onclick={() => {}}>
             {playerName}
           </div>
         </Match>

@@ -1,23 +1,14 @@
 import styles from "./playerCard.module.css";
 import { useEventContext } from "~/context/EventContext";
-import { useHovRefContext } from "~/context/HovRefContext";
 import {
   createSignal,
   Switch,
   Match,
-  onMount,
   createEffect,
-  onCleanup,
   createMemo,
 } from "solid-js";
 import { Portal } from "solid-js/web";
 import { FullSeat } from "~/typing/eventTypes";
-import {
-  podIdtoPodNum,
-  podNumtoPodId,
-  seatDataFromDiv,
-} from "~/context/EventDataFunctions";
-
 interface PlayerCardInputs {
   playerID: number;
   playerName: string;
@@ -35,16 +26,14 @@ export default function PlayerCard({
 }: PlayerCardInputs) {
   //Context State
   const [eventState, { updatePlayer, updateSeat }] = useEventContext();
-  const [hovRefState, { updateHovRef }] = useHovRefContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
-  const [hoveredSeat, setHoveredSeat] = createSignal<HTMLDivElement>();
   //refs
 
   let thisPlayerCard!: HTMLDivElement;
   let thisPlayerVis!: HTMLDivElement;
   let xOffset: number, yOffset: number;
-  let pastTargetSeat: HTMLDivElement;
+  let pastTargetSeatRef: HTMLDivElement;
 
   const thisPlayerState = createMemo(() => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
@@ -55,27 +44,6 @@ export default function PlayerCard({
       (pod) => pod.podId === thisPlayerState().podId
     );
   });
-
-  // const hoveredSeat = () => {
-  //   let allSeats: FullSeat[] = [];
-  //   eventState().evtPods.map((pod) => {
-  //     pod.podSeats.map((seat) => {
-  //       allSeats.push(seat);
-  //     });
-  //   });
-  //   const tempHoveredSeat = allSeats.find((seat) => seat.hovered === true);
-  //   if (tempHoveredSeat) {
-  //     return tempHoveredSeat;
-  //   } else {
-  //     return {
-  //       podId: 0,
-  //       seatNumber: 0,
-  //       filled: false,
-  //       hovered: false,
-  //       seatRef: eventState().playerHopper,
-  //     };
-  //   }
-  // };
 
   const lastHoveredSeat = () => {
     let allSeats: FullSeat[] = [];
@@ -98,7 +66,7 @@ export default function PlayerCard({
     }
   };
 
-  const targetSeat = createMemo(() => {
+  const targetSeatRef = () => {
     const seat = eventState()
       .evtPods.find((pod) => pod.podId === thisPlayerState().podId)
       ?.podSeats.find(
@@ -107,14 +75,19 @@ export default function PlayerCard({
 
     if (seat) {
       return seat;
-    } else {
+    } else if (!podHovered()) {
       return eventState().playerHopper;
     }
-  });
+  };
 
   createEffect(() => {
-    if (thisPlayerCard.parentElement !== targetSeat()) {
-      targetSeat()?.appendChild(thisPlayerCard);
+    if (thisPlayerCard.parentElement !== targetSeatRef()) {
+      targetSeatRef()?.appendChild(thisPlayerCard);
+      setTimeout(() => {
+        if (targetSeatRef() === eventState().playerHopper) {
+          updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+        }
+      }, 10);
     }
   });
 
@@ -136,15 +109,7 @@ export default function PlayerCard({
       xOffset = event.clientX - thisPlayerVis.offsetLeft;
       yOffset = event.clientY - thisPlayerVis.offsetTop;
 
-      // const currentSeat = seatDataFromDiv(eventState(), targetSeat());
-
-      // if (currentSeat) {
-      //   updateSeat(currentSeat.podId, currentSeat.seatNumber, {
-      //     filled: false,
-      //   });
-      // }
-
-      updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+      updatePlayer(playerID, { address: { podId: -1, seat: -1 } });
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
     }
@@ -169,15 +134,25 @@ export default function PlayerCard({
     thisPlayerVis.style.left = `0px`;
     thisPlayerVis.style.top = `0px`;
 
-    if (!podHovered()) {
-      console.log("drop to hopper");
-      updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+    if (
+      lastHoveredSeat() &&
+      lastHoveredSeat() !== targetSeatRef() &&
+      lastHoveredSeat()?.seatRef?.childElementCount === 0
+    ) {
+      updatePlayer(playerID, {
+        address: {
+          podId: lastHoveredSeat()!.podId,
+          seat: lastHoveredSeat()!.seatNumber,
+        },
+      });
+    } else if (!podHovered()) {
+      updatePlayer(playerID, {
+        address: {
+          podId: 0,
+          seat: 0,
+        },
+      });
     }
-    // if (hoveredSeat().filled === false) {
-    //   updatePlayer(playerID, {
-    //     address: { podId: hoveredSeat().podId, seat: hoveredSeat().seatNumber },
-    //   });
-    // }
 
     document.removeEventListener("mousemove", dragging);
     document.removeEventListener("mouseup", dragEnd);

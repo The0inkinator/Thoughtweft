@@ -76,7 +76,7 @@ export default function PlayerCard({
 
     if (seat) {
       return seat;
-    } else if (!podHovered() || thisPlayerState().seat === 0) {
+    } else {
       return eventState().playerHopper;
     }
   };
@@ -91,6 +91,12 @@ export default function PlayerCard({
   createEffect(() => {
     if (thisPlayerCard.parentElement !== targetSeatRef()) {
       targetSeatRef()?.appendChild(thisPlayerCard);
+      if (
+        targetSeatRef() === eventState().playerHopper &&
+        thisPlayerState().elMounted
+      ) {
+        updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+      }
     }
   });
 
@@ -158,7 +164,7 @@ export default function PlayerCard({
   };
 
   onMount(() => {
-    updatePlayer(playerID, { ref: thisPlayerCard });
+    updatePlayer(playerID, { elMounted: true });
   });
 
   return (

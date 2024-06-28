@@ -34,9 +34,11 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
 
   createEffect(() => {
     if (thisSeatState().filled && thisSeat.childElementCount === 0) {
+      console.log("not filled");
       updateSeat(podId, seatNumber, { filled: false });
     }
     if (thisSeatState().filled === false && thisSeat.childElementCount > 0) {
+      console.log("filled");
       updateSeat(podId, seatNumber, { filled: true });
     }
   });
@@ -63,7 +65,6 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
       podToShuffle.podSeats.find((seat) => seat.seatNumber === seatPosition)
         ?.hovered === true
     ) {
-      console.log("shuffle triggered");
       const fullSeatGroup = podToShuffle.podSeats;
       const seatGroupBefore = podToShuffle.podSeats.filter(
         (seat) => seat.seatNumber < seatPosition
@@ -234,6 +235,11 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
       style={{
         "background-color": thisSeatState().filled ? "green" : "black",
         outline: mouseOver() ? "solid red" : "none",
+      }}
+      onMouseOver={() => {
+        if (!thisSeatState().hovered) {
+          updateSeat(podId, seatNumber, { hovered: true });
+        }
       }}
       // onMouseEnter={() => {
       //   updateSeat(podId, seatNumber, { hovered: true });

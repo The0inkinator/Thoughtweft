@@ -31,7 +31,7 @@ export default function PlayerCard({
   const [eventState, { updatePlayer, updateSeat }] = useEventContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
-  const [lastSeat, setLastSeat] = createSignal<FullSeat>();
+  const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
   //refs
 
   let thisPlayerCard!: HTMLDivElement;
@@ -81,21 +81,17 @@ export default function PlayerCard({
     }
   };
 
-  const hoveredSeat = () => {
-    const foundSeat = seats().find((seat) => seat.hovered === true);
-    if (foundSeat) {
-      return foundSeat;
+  createEffect(() => {
+    const singleHoveredSeat = seats().find((seat) => seat.hovered);
+
+    if (singleHoveredSeat !== hoveredSeat() && singleHoveredSeat) {
+      setHoveredSeat(singleHoveredSeat);
     }
-  };
+  });
 
   createEffect(() => {
     if (thisPlayerCard.parentElement !== targetSeatRef()) {
       targetSeatRef()?.appendChild(thisPlayerCard);
-      setTimeout(() => {
-        if (targetSeatRef() === eventState().playerHopper) {
-          updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
-        }
-      }, 10);
     }
   });
 
@@ -130,10 +126,6 @@ export default function PlayerCard({
       const y = event.clientY - yOffset;
       thisPlayerVis.style.left = `${x}px`;
       thisPlayerVis.style.top = `${y}px`;
-
-      if (hoveredSeat()) {
-        setLastSeat(hoveredSeat());
-      }
     }
   };
 
@@ -146,16 +138,11 @@ export default function PlayerCard({
     thisPlayerVis.style.left = `0px`;
     thisPlayerVis.style.top = `0px`;
 
-    if (
-      podHovered() &&
-      lastSeat() &&
-      lastSeat()?.seatRef !== targetSeatRef() &&
-      !lastSeat()?.filled
-    ) {
+    if (podHovered() && hoveredSeat() && !hoveredSeat()?.filled) {
       updatePlayer(playerID, {
         address: {
-          podId: lastSeat()!.podId,
-          seat: lastSeat()!.seatNumber,
+          podId: hoveredSeat()!.podId,
+          seat: hoveredSeat()!.seatNumber,
         },
       });
     } else if (!podHovered()) {
@@ -205,6 +192,7 @@ export default function PlayerCard({
               onclick={() => {}}
             >
               {playerName}
+              {/* {hoveredSeat()?.podId} {hoveredSeat()?.seatNumber} */}
             </div>
           </Portal>
         </Match>

@@ -7,7 +7,7 @@ import PodPlusButton from "../podPlusButton";
 
 export default function EventController() {
   //Context State
-  const [eventState] = useEventContext();
+  const [eventState, { updateSeat, updatePlayer }] = useEventContext();
 
   // const shufflePlayersFrom = (seatPosition: number) => {
   //   const podToShuffle = eventState().evtPods.find(

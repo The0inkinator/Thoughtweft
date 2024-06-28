@@ -7,8 +7,10 @@ import {
   createEffect,
   createMemo,
 } from "solid-js";
+import { seatDataFromDiv } from "~/context/EventDataFunctions";
 import { Portal } from "solid-js/web";
 import { FullSeat } from "~/typing/eventTypes";
+import seat from "../seat";
 interface PlayerCardInputs {
   playerID: number;
   playerName: string;
@@ -28,6 +30,7 @@ export default function PlayerCard({
   const [eventState, { updatePlayer, updateSeat }] = useEventContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
+  const [lastSeat, setLastSeat] = createSignal<FullSeat>();
   //refs
 
   let thisPlayerCard!: HTMLDivElement;
@@ -45,17 +48,14 @@ export default function PlayerCard({
     );
   });
 
-  const lastHoveredSeat = () => {
+  const seats = () => {
     let allSeats: FullSeat[] = [];
     eventState().evtPods.map((pod) => {
       pod.podSeats.map((seat) => {
         allSeats.push(seat);
       });
     });
-    const tempHoveredSeat = allSeats.find((seat) => seat.hovered === true);
-    if (tempHoveredSeat) {
-      return tempHoveredSeat;
-    }
+    return allSeats;
   };
 
   const podHovered = () => {
@@ -109,7 +109,7 @@ export default function PlayerCard({
       xOffset = event.clientX - thisPlayerVis.offsetLeft;
       yOffset = event.clientY - thisPlayerVis.offsetTop;
 
-      updatePlayer(playerID, { address: { podId: -1, seat: -1 } });
+      // updatePlayer(playerID, { address: { podId: -1, seat: -1 } });
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
     }
@@ -122,6 +122,12 @@ export default function PlayerCard({
       const y = event.clientY - yOffset;
       thisPlayerVis.style.left = `${x}px`;
       thisPlayerVis.style.top = `${y}px`;
+
+      if (seats().find((seat) => seat.seatRef === event.target)) {
+        setLastSeat(
+          seatDataFromDiv(eventState(), event.target as HTMLDivElement)
+        );
+      }
     }
   };
 
@@ -135,14 +141,15 @@ export default function PlayerCard({
     thisPlayerVis.style.top = `0px`;
 
     if (
-      lastHoveredSeat() &&
-      lastHoveredSeat() !== targetSeatRef() &&
-      lastHoveredSeat()?.seatRef?.childElementCount === 0
+      podHovered() &&
+      lastSeat() &&
+      lastSeat()?.seatRef !== targetSeatRef() &&
+      !lastSeat()?.filled
     ) {
       updatePlayer(playerID, {
         address: {
-          podId: lastHoveredSeat()!.podId,
-          seat: lastHoveredSeat()!.seatNumber,
+          podId: lastSeat()!.podId,
+          seat: lastSeat()!.seatNumber,
         },
       });
     } else if (!podHovered()) {

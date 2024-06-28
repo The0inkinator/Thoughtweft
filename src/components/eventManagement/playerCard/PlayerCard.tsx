@@ -60,7 +60,7 @@ export default function PlayerCard({
   };
 
   const podHovered = () => {
-    if (eventState().evtPods.find((pod) => pod.podId === podId)?.podHovered) {
+    if (eventState().evtPods.find((pod) => pod.podHovered)) {
       return true;
     } else {
       return false;

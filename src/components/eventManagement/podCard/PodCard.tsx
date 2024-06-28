@@ -31,6 +31,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const [shuffleMode, setShuffleMode] = createSignal<"default" | "confirm">(
     "default"
   );
+  //refs
+  let thisPod!: HTMLDivElement;
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
   };
@@ -56,6 +58,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   onMount(() => {
     updatePodSize(podId, thisPodState()!.podSize);
+    updatePod(podId, { ref: thisPod });
   });
 
   const shufflePod = () => {
@@ -413,25 +416,27 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   return (
     <DisplayFrame>
-      <ErrorBoundary fallback={<>oops!</>}>
-        <Switch fallback={<>oops!</>}>
-          <Match when={thisPodState()?.podStatus === "seating"}>
-            <SeatingPodCard />
-          </Match>
-          <Match when={thisPodState()?.podStatus === "drafting"}>
-            <DraftingPodCard />
-          </Match>
-          <Match when={thisPodState()?.podStatus === "pairing"}>
-            <PairingPodCard />
-          </Match>
-          <Match when={thisPodState()?.podStatus === "playing"}>
-            <PlayingPodCard />
-          </Match>
-          <Match when={thisPodState()?.podStatus === "finished"}>
-            <FinishedPodCard />
-          </Match>
-        </Switch>
-      </ErrorBoundary>
+      <div ref={thisPod}>
+        <ErrorBoundary fallback={<>oops!</>}>
+          <Switch fallback={<>oops!</>}>
+            <Match when={thisPodState()?.podStatus === "seating"}>
+              <SeatingPodCard />
+            </Match>
+            <Match when={thisPodState()?.podStatus === "drafting"}>
+              <DraftingPodCard />
+            </Match>
+            <Match when={thisPodState()?.podStatus === "pairing"}>
+              <PairingPodCard />
+            </Match>
+            <Match when={thisPodState()?.podStatus === "playing"}>
+              <PlayingPodCard />
+            </Match>
+            <Match when={thisPodState()?.podStatus === "finished"}>
+              <FinishedPodCard />
+            </Match>
+          </Switch>
+        </ErrorBoundary>
+      </div>
     </DisplayFrame>
   );
 }

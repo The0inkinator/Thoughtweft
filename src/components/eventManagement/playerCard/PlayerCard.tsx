@@ -38,6 +38,7 @@ export default function PlayerCard({
   const [hovRefState, { updateHovRef }] = useHovRefContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
+  const [hoveredSeat, setHoveredSeat] = createSignal<HTMLDivElement>();
   //refs
 
   let thisPlayerCard!: HTMLDivElement;
@@ -55,71 +56,37 @@ export default function PlayerCard({
     );
   });
 
-  const hoveredSeat = () => {
-    let allSeats: FullSeat[] = [];
-    eventState().evtPods.map((pod) => {
-      pod.podSeats.map((seat) => {
-        allSeats.push(seat);
-      });
-    });
-    const tempHoveredSeat = allSeats.find((seat) => seat.hovered === true);
-    if (tempHoveredSeat) {
-      return tempHoveredSeat;
-    } else {
-      return {
-        podId: 0,
-        seatNumber: 0,
-        filled: false,
-        hovered: false,
-        seatRef: eventState().playerHopper,
-      };
-    }
-  };
+  // const hoveredSeat = () => {
+  //   let allSeats: FullSeat[] = [];
+  //   eventState().evtPods.map((pod) => {
+  //     pod.podSeats.map((seat) => {
+  //       allSeats.push(seat);
+  //     });
+  //   });
+  //   const tempHoveredSeat = allSeats.find((seat) => seat.hovered === true);
+  //   if (tempHoveredSeat) {
+  //     return tempHoveredSeat;
+  //   } else {
+  //     return {
+  //       podId: 0,
+  //       seatNumber: 0,
+  //       filled: false,
+  //       hovered: false,
+  //       seatRef: eventState().playerHopper,
+  //     };
+  //   }
+  // };
 
-  const targetSeat = () => {
-    const seatRef = eventState()
+  const targetSeat = createMemo(() => {
+    return eventState()
       .evtPods.find((pod) => pod.podId === thisPlayerState().podId)
-      ?.podSeats.find((seat) => seat.seatNumber === thisPlayerState().seat);
+      ?.podSeats.find((seat) => seat.seatNumber === thisPlayerState().seat)
+      ?.seatRef;
+  });
 
-    if (seatRef) {
-      const tempTargetSeat = seatDataFromDiv(eventState(), seatRef.seatRef!);
-      const playersInSeat = eventState().evtPlayerList.filter(
-        (player) =>
-          podNumtoPodId(eventState(), player.podId) === tempTargetSeat?.podId &&
-          player.seat === tempTargetSeat.seatNumber &&
-          player.id !== playerID
-      ).length;
-      if (tempTargetSeat?.seatRef && playersInSeat === 0) {
-        return tempTargetSeat.seatRef;
-      } else {
-        return pastTargetSeat;
-      }
-    } else {
-      return eventState().playerHopper!;
-    }
-  };
-
-  //updates target seats and their filled status
   createEffect(() => {
-    if (
-      targetSeat() &&
-      targetSeat() !== thisPlayerCard.parentElement &&
-      !thisPlayerState().dragging
-    ) {
-      if (
-        thisPlayerCard.parentElement instanceof HTMLDivElement &&
-        thisPlayerCard.parentElement !== targetSeat()
-      ) {
-        pastTargetSeat = thisPlayerCard.parentElement;
-      }
-      targetSeat().appendChild(thisPlayerCard);
-      const currentSeat = seatDataFromDiv(eventState(), targetSeat());
-      // console.log(thisPlayerState().name, currentSeat);
-      if (currentSeat && currentSeat.filled === false) {
-        updateSeat(currentSeat.podId, currentSeat.seatNumber, { filled: true });
-      } else {
-        updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
-      }
+    if (thisPlayerCard.parentElement !== targetSeat() && targetSeat()) {
+      targetSeat()?.appendChild(thisPlayerCard);
     }
   });
 
@@ -141,13 +108,13 @@ export default function PlayerCard({
       xOffset = event.clientX - thisPlayerVis.offsetLeft;
       yOffset = event.clientY - thisPlayerVis.offsetTop;
 
-      const currentSeat = seatDataFromDiv(eventState(), targetSeat());
+      // const currentSeat = seatDataFromDiv(eventState(), targetSeat());
 
-      if (currentSeat) {
-        updateSeat(currentSeat.podId, currentSeat.seatNumber, {
-          filled: false,
-        });
-      }
+      // if (currentSeat) {
+      //   updateSeat(currentSeat.podId, currentSeat.seatNumber, {
+      //     filled: false,
+      //   });
+      // }
       updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
@@ -173,11 +140,11 @@ export default function PlayerCard({
     thisPlayerVis.style.left = `0px`;
     thisPlayerVis.style.top = `0px`;
 
-    if (hoveredSeat().filled === false) {
-      updatePlayer(playerID, {
-        address: { podId: hoveredSeat().podId, seat: hoveredSeat().seatNumber },
-      });
-    }
+    // if (hoveredSeat().filled === false) {
+    //   updatePlayer(playerID, {
+    //     address: { podId: hoveredSeat().podId, seat: hoveredSeat().seatNumber },
+    //   });
+    // }
 
     document.removeEventListener("mousemove", dragging);
     document.removeEventListener("mouseup", dragEnd);

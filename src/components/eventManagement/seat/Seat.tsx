@@ -34,11 +34,11 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
 
   createEffect(() => {
     if (thisSeatState().filled && thisSeat.childElementCount === 0) {
-      console.log("not filled");
+      // console.log(seatNumber, "not filled");
       updateSeat(podId, seatNumber, { filled: false });
     }
     if (thisSeatState().filled === false && thisSeat.childElementCount > 0) {
-      console.log("filled");
+      // console.log(seatNumber, "filled");
       updateSeat(podId, seatNumber, { filled: true });
     }
   });
@@ -88,10 +88,12 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
             largerSeat.filled &&
             spanToSeat.filter((seat) => !seat.filled).length === 0
           ) {
+            updateSeat(podId, smallerSeat.seatNumber, { filled: false });
             updatePlayer(
               playerIdFromAddress(eventState(), podId, seat.seatNumber),
               { address: { podId: podId, seat: smallerSeat.seatNumber } }
             );
+            updateSeat(podId, seat.seatNumber, { filled: false });
           }
         });
       };
@@ -111,10 +113,12 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
             smallerSeat.filled &&
             spanToSeat.filter((seat) => !seat.filled).length === 0
           ) {
+            updateSeat(podId, largerSeat.seatNumber, { filled: false });
             updatePlayer(
               playerIdFromAddress(eventState(), podId, seat.seatNumber),
               { address: { podId: podId, seat: largerSeat.seatNumber } }
             );
+            updateSeat(podId, seat.seatNumber, { filled: false });
           }
         });
       };
@@ -183,6 +187,7 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
       }
 
       if (targetSeat) {
+        updateSeat(podId, targetSeat.seatNumber, { filled: false });
         updatePlayer(playerIdFromAddress(eventState(), podId, seatPosition), {
           address: { podId: podId, seat: targetSeat.seatNumber },
         });
@@ -232,10 +237,10 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
     <div
       class={styles.seat}
       ref={thisSeat}
-      style={{
-        "background-color": thisSeatState().filled ? "green" : "black",
-        outline: mouseOver() ? "solid red" : "none",
-      }}
+      // style={{
+      //   "background-color": thisSeatState().filled ? "green" : "black",
+      //   outline: mouseOver() ? "solid red" : "none",
+      // }}
       onMouseOver={() => {
         if (!thisSeatState().hovered) {
           updateSeat(podId, seatNumber, { hovered: true });

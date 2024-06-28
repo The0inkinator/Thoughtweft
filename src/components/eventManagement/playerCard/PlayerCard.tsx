@@ -90,7 +90,6 @@ export default function PlayerCard({
 
   createEffect(() => {
     if (thisPlayerCard.parentElement !== targetSeatRef()) {
-      console.log("reassign triggered");
       targetSeatRef()?.appendChild(thisPlayerCard);
     }
   });
@@ -145,7 +144,7 @@ export default function PlayerCard({
           seat: hoveredSeat()!.seatNumber,
         },
       });
-    } else if (!podHovered()) {
+    } else if (!podHovered() || thisPlayerState().seat === 0) {
       updatePlayer(playerID, {
         address: {
           podId: 0,

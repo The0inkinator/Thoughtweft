@@ -76,8 +76,15 @@ export default function PlayerCard({
 
     if (seat) {
       return seat;
-    } else if (!podHovered()) {
+    } else if (!podHovered() || thisPlayerState().seat === 0) {
       return eventState().playerHopper;
+    }
+  };
+
+  const hoveredSeat = () => {
+    const foundSeat = seats().find((seat) => seat.hovered === true);
+    if (foundSeat) {
+      return foundSeat;
     }
   };
 
@@ -110,7 +117,7 @@ export default function PlayerCard({
       xOffset = event.clientX - thisPlayerVis.offsetLeft;
       yOffset = event.clientY - thisPlayerVis.offsetTop;
 
-      // updatePlayer(playerID, { address: { podId: -1, seat: -1 } });
+      updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
     }
@@ -124,10 +131,8 @@ export default function PlayerCard({
       thisPlayerVis.style.left = `${x}px`;
       thisPlayerVis.style.top = `${y}px`;
 
-      if (seats().find((seat) => seat.seatRef === event.target)) {
-        setLastSeat(
-          seatDataFromDiv(eventState(), event.target as HTMLDivElement)
-        );
+      if (hoveredSeat()) {
+        setLastSeat(hoveredSeat());
       }
     }
   };

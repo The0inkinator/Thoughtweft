@@ -41,199 +41,200 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
     }
   });
 
-  // //Returns state of a player if one is being dragged
-  // const draggedPlayer = () => {
-  //   return eventState().evtPlayerList.find(
-  //     (player) => player.dragging === true
-  //   );
-  // };
+  //Returns state of a player if one is being dragged
+  const draggedPlayer = () => {
+    return eventState().evtPlayerList.find(
+      (player) => player.dragging === true
+    );
+  };
 
-  // //Shuffles players to make space for a dragged player
-  // const shufflePlayersFrom = (seatPosition: number) => {
-  //   const podToShuffle = eventState().evtPods.find(
-  //     (pod) => pod.podId === podId
-  //   );
+  //Shuffles players to make space for a dragged player
+  const shufflePlayersFrom = (seatPosition: number) => {
+    const podToShuffle = eventState().evtPods.find(
+      (pod) => pod.podId === podId
+    );
 
-  //   if (
-  //     podToShuffle &&
-  //     podToShuffle.podSeats.filter((seat) => seat.filled).length <
-  //       podToShuffle.podSize &&
-  //     podToShuffle.podSeats.find((seat) => seat.seatNumber === seatPosition)
-  //       ?.filled === true &&
-  //     podToShuffle.podSeats.find((seat) => seat.seatNumber === seatPosition)
-  //       ?.hovered === true
-  //   ) {
-  //     console.log("shuffle triggered");
-  //     const fullSeatGroup = podToShuffle.podSeats;
-  //     const seatGroupBefore = podToShuffle.podSeats.filter(
-  //       (seat) => seat.seatNumber < seatPosition
-  //     );
-  //     const seatGroupAfter = podToShuffle.podSeats.filter(
-  //       (seat) => seat.seatNumber > seatPosition
-  //     );
+    if (
+      podToShuffle &&
+      podToShuffle.podSeats.filter((seat) => seat.filled).length <
+        podToShuffle.podSize &&
+      podToShuffle.podSeats.find((seat) => seat.seatNumber === seatPosition)
+        ?.filled === true &&
+      podToShuffle.podSeats.find((seat) => seat.seatNumber === seatPosition)
+        ?.hovered === true
+    ) {
+      console.log("shuffle triggered");
+      const fullSeatGroup = podToShuffle.podSeats;
+      const seatGroupBefore = podToShuffle.podSeats.filter(
+        (seat) => seat.seatNumber < seatPosition
+      );
+      const seatGroupAfter = podToShuffle.podSeats.filter(
+        (seat) => seat.seatNumber > seatPosition
+      );
 
-  //     const shuffleGroupBefore = () => {
-  //       [...seatGroupBefore].map((seat) => {
-  //         const smallerSeat = fullSeatGroup[seat.seatNumber - 2];
-  //         const largerSeat = fullSeatGroup[seat.seatNumber];
-  //         const spanToSeat = fullSeatGroup.slice(
-  //           seat.seatNumber - 1,
-  //           seatPosition - 1
-  //         );
+      const shuffleGroupBefore = () => {
+        [...seatGroupBefore].map((seat) => {
+          const smallerSeat = fullSeatGroup[seat.seatNumber - 2];
+          const largerSeat = fullSeatGroup[seat.seatNumber];
+          const spanToSeat = fullSeatGroup.slice(
+            seat.seatNumber - 1,
+            seatPosition - 1
+          );
 
-  //         if (
-  //           smallerSeat &&
-  //           !smallerSeat.filled &&
-  //           largerSeat.filled &&
-  //           spanToSeat.filter((seat) => !seat.filled).length === 0
-  //         ) {
-  //           updatePlayer(
-  //             playerIdFromAddress(eventState(), podId, seat.seatNumber),
-  //             { address: { podId: podId, seat: smallerSeat.seatNumber } }
-  //           );
-  //         }
-  //       });
-  //     };
+          if (
+            smallerSeat &&
+            !smallerSeat.filled &&
+            largerSeat.filled &&
+            spanToSeat.filter((seat) => !seat.filled).length === 0
+          ) {
+            updatePlayer(
+              playerIdFromAddress(eventState(), podId, seat.seatNumber),
+              { address: { podId: podId, seat: smallerSeat.seatNumber } }
+            );
+          }
+        });
+      };
 
-  //     const shuffleGroupAfter = () => {
-  //       [...seatGroupAfter].reverse().map((seat) => {
-  //         const smallerSeat = fullSeatGroup[seat.seatNumber - 2];
-  //         const largerSeat = fullSeatGroup[seat.seatNumber];
-  //         const spanToSeat = fullSeatGroup.slice(
-  //           seatPosition - 1,
-  //           seat.seatNumber - 1
-  //         );
+      const shuffleGroupAfter = () => {
+        [...seatGroupAfter].reverse().map((seat) => {
+          const smallerSeat = fullSeatGroup[seat.seatNumber - 2];
+          const largerSeat = fullSeatGroup[seat.seatNumber];
+          const spanToSeat = fullSeatGroup.slice(
+            seatPosition - 1,
+            seat.seatNumber - 1
+          );
 
-  //         if (
-  //           largerSeat &&
-  //           !largerSeat.filled &&
-  //           smallerSeat.filled &&
-  //           spanToSeat.filter((seat) => !seat.filled).length === 0
-  //         ) {
-  //           updatePlayer(
-  //             playerIdFromAddress(eventState(), podId, seat.seatNumber),
-  //             { address: { podId: podId, seat: largerSeat.seatNumber } }
-  //           );
-  //         }
-  //       });
-  //     };
+          if (
+            largerSeat &&
+            !largerSeat.filled &&
+            smallerSeat.filled &&
+            spanToSeat.filter((seat) => !seat.filled).length === 0
+          ) {
+            updatePlayer(
+              playerIdFromAddress(eventState(), podId, seat.seatNumber),
+              { address: { podId: podId, seat: largerSeat.seatNumber } }
+            );
+          }
+        });
+      };
 
-  //     let longSeatGroup,
-  //       shuffleLongSeatGroup: () => void,
-  //       shortSeatGroup,
-  //       shuffleShortSeatGroup: () => void;
+      let longSeatGroup,
+        shuffleLongSeatGroup: () => void,
+        shortSeatGroup,
+        shuffleShortSeatGroup: () => void;
 
-  //     let shuffleNeeded = true;
+      let shuffleNeeded = true;
 
-  //     if (seatGroupBefore.length < seatGroupAfter.length) {
-  //       shortSeatGroup = seatGroupBefore;
-  //       shuffleShortSeatGroup = () => {
-  //         shuffleGroupBefore();
-  //       };
-  //       longSeatGroup = seatGroupAfter;
-  //       shuffleLongSeatGroup = () => {
-  //         shuffleGroupAfter();
-  //       };
-  //     } else {
-  //       shortSeatGroup = seatGroupAfter;
-  //       shuffleShortSeatGroup = () => {
-  //         shuffleGroupAfter();
-  //       };
-  //       longSeatGroup = seatGroupBefore;
-  //       shuffleLongSeatGroup = () => {
-  //         shuffleGroupBefore();
-  //       };
-  //     }
+      if (seatGroupBefore.length < seatGroupAfter.length) {
+        shortSeatGroup = seatGroupBefore;
+        shuffleShortSeatGroup = () => {
+          shuffleGroupBefore();
+        };
+        longSeatGroup = seatGroupAfter;
+        shuffleLongSeatGroup = () => {
+          shuffleGroupAfter();
+        };
+      } else {
+        shortSeatGroup = seatGroupAfter;
+        shuffleShortSeatGroup = () => {
+          shuffleGroupAfter();
+        };
+        longSeatGroup = seatGroupBefore;
+        shuffleLongSeatGroup = () => {
+          shuffleGroupBefore();
+        };
+      }
 
-  //     if (
-  //       shortSeatGroup.length >
-  //       shortSeatGroup.filter((seat) => seat.filled).length
-  //     ) {
-  //       shuffleShortSeatGroup();
-  //       shuffleNeeded = false;
-  //     } else if (
-  //       longSeatGroup.length >
-  //         longSeatGroup.filter((seat) => seat.filled).length &&
-  //       shuffleNeeded
-  //     ) {
-  //       shuffleLongSeatGroup();
-  //       shuffleNeeded = false;
-  //     }
+      if (
+        shortSeatGroup.length >
+        shortSeatGroup.filter((seat) => seat.filled).length
+      ) {
+        shuffleShortSeatGroup();
+        shuffleNeeded = false;
+      } else if (
+        longSeatGroup.length >
+          longSeatGroup.filter((seat) => seat.filled).length &&
+        shuffleNeeded
+      ) {
+        shuffleLongSeatGroup();
+        shuffleNeeded = false;
+      }
 
-  //     const hoveredSeat = fullSeatGroup[seatPosition - 1];
-  //     const vacantSeats = fullSeatGroup.filter(
-  //       (seat) =>
-  //         !seat.filled &&
-  //         (seat.seatNumber === hoveredSeat.seatNumber + 1 ||
-  //           seat.seatNumber === hoveredSeat.seatNumber - 1)
-  //     );
-  //     let targetSeat: FullSeat | undefined;
+      const hoveredSeat = fullSeatGroup[seatPosition - 1];
+      const vacantSeats = fullSeatGroup.filter(
+        (seat) =>
+          !seat.filled &&
+          (seat.seatNumber === hoveredSeat.seatNumber + 1 ||
+            seat.seatNumber === hoveredSeat.seatNumber - 1)
+      );
+      let targetSeat: FullSeat | undefined;
 
-  //     if (vacantSeats.length > 1) {
-  //       vacantSeats.map((vSeat) => {
-  //         if (
-  //           shortSeatGroup.find((seat) => seat.seatNumber === vSeat.seatNumber)
-  //         ) {
-  //           targetSeat = vSeat;
-  //         }
-  //       });
-  //     } else {
-  //       targetSeat = vacantSeats[0];
-  //     }
+      if (vacantSeats.length > 1) {
+        vacantSeats.map((vSeat) => {
+          if (
+            shortSeatGroup.find((seat) => seat.seatNumber === vSeat.seatNumber)
+          ) {
+            targetSeat = vSeat;
+          }
+        });
+      } else {
+        targetSeat = vacantSeats[0];
+      }
 
-  //     if (targetSeat) {
-  //       updatePlayer(playerIdFromAddress(eventState(), podId, seatPosition), {
-  //         address: { podId: podId, seat: targetSeat.seatNumber },
-  //       });
-  //     }
-  //   }
-  // };
+      if (targetSeat) {
+        updatePlayer(playerIdFromAddress(eventState(), podId, seatPosition), {
+          address: { podId: podId, seat: targetSeat.seatNumber },
+        });
+      }
+    }
+  };
 
-  // //Handles mouse movement to trigger shuffle function
-  // const handleMouseMove = (event: MouseEvent) => {
-  //   const boundingBox = thisSeat.getBoundingClientRect();
-  //   if (
-  //     event.clientX >= boundingBox.left &&
-  //     event.clientX <= boundingBox.right &&
-  //     event.clientY >= boundingBox.top &&
-  //     event.clientY <= boundingBox.bottom &&
-  //     !mouseOver()
-  //   ) {
-  //     setMouseOver(true);
-  //     if (draggedPlayer() && draggedPlayer()?.dragging === true) {
-  //       updateSeat(podId, seatNumber, { hovered: true });
-  //       setTimeout(() => {
-  //         if (draggedPlayer()) {
-  //           shufflePlayersFrom(seatNumber);
-  //         }
-  //       }, 400);
-  //     }
-  //   } else if (
-  //     (mouseOver() && event.clientX <= boundingBox.left) ||
-  //     event.clientX >= boundingBox.right ||
-  //     event.clientY <= boundingBox.top ||
-  //     event.clientY >= boundingBox.bottom
-  //   ) {
-  //     setMouseOver(false);
-  //     updateSeat(podId, seatNumber, { hovered: false });
-  //   }
-  // };
+  //Handles mouse movement to trigger shuffle function
+  const handleMouseMove = (event: MouseEvent) => {
+    const boundingBox = thisSeat.getBoundingClientRect();
+    if (
+      event.clientX >= boundingBox.left &&
+      event.clientX <= boundingBox.right &&
+      event.clientY >= boundingBox.top &&
+      event.clientY <= boundingBox.bottom &&
+      !mouseOver()
+    ) {
+      setMouseOver(true);
+      if (draggedPlayer() && draggedPlayer()?.dragging === true) {
+        updateSeat(podId, seatNumber, { hovered: true });
+        setTimeout(() => {
+          if (draggedPlayer()) {
+            shufflePlayersFrom(seatNumber);
+          }
+        }, 400);
+      }
+    } else if (
+      (mouseOver() && event.clientX <= boundingBox.left) ||
+      event.clientX >= boundingBox.right ||
+      event.clientY <= boundingBox.top ||
+      event.clientY >= boundingBox.bottom
+    ) {
+      setMouseOver(false);
+      updateSeat(podId, seatNumber, { hovered: false });
+    }
+  };
 
   onMount(() => {
-    // document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mousemove", handleMouseMove);
     updateSeat(podId, seatNumber, { ref: thisSeat });
   });
   onCleanup(() => {
-    // document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mousemove", handleMouseMove);
   });
 
   return (
     <div
       class={styles.seat}
       ref={thisSeat}
-      // style={{
-      //   "background-color": thisSeatState().filled ? "green" : "black",
-      // }}
+      style={{
+        "background-color": thisSeatState().filled ? "green" : "black",
+        outline: mouseOver() ? "solid red" : "none",
+      }}
       // onMouseEnter={() => {
       //   updateSeat(podId, seatNumber, { hovered: true });
       // }}

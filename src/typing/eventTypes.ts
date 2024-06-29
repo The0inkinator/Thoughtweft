@@ -39,9 +39,6 @@ export type Player = {
   podId: number;
   seat: number;
   dragging: boolean;
-  matchRecord?: Record;
-  eventRecord?: Record;
-  currentOpponentId?: number;
   elMounted?: boolean;
 };
 

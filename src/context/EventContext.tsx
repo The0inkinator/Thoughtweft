@@ -22,6 +22,7 @@ type EventState = [
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: (name: string, seatAddress?: SeatAddress) => void;
+    addSeat: (podId: number, seatNumber: number) => void;
     addPod: (
       inputPodSize: PodSizes,
       inputPodRounds: number,
@@ -118,6 +119,39 @@ export function EventContextProvider(props: any) {
             newEvt.evtPlayerList = [...newEvt.evtPlayerList, newPlayer];
             return newEvt;
           });
+        },
+
+        //ADD SEAT
+        addSeat(podId, seatNumber) {
+          const newProxySeat: ProxySeat = {
+            podId: podId,
+            seatNumber: seatNumber,
+          };
+
+          const newFullSeat: FullSeat = {
+            podId: podId,
+            seatNumber: seatNumber,
+            filled: false,
+            hovered: false,
+          };
+
+          const podIndex = event().evtPods.findIndex(
+            (pod) => pod.podId === podId
+          );
+
+          if (podIndex !== -1) {
+            setEvent((prevEvt) => {
+              const newEvt = { ...prevEvt };
+
+              newEvt.evtSeats = [...newEvt.evtSeats, newProxySeat];
+
+              newEvt.evtPods[podIndex].podSeats = [
+                ...newEvt.evtPods[podIndex].podSeats,
+                newFullSeat,
+              ];
+              return newEvt;
+            });
+          }
         },
 
         //ADD POD

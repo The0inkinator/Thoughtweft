@@ -15,7 +15,7 @@ export default function MatchCard({
   matchInfo,
   matchCardState,
 }: MatchCardInputs) {
-  const [eventState, { updateMatch, addPlayer }] = useEventContext();
+  const [eventState, { updateMatch, addPlayer, addSeat }] = useEventContext();
   const [optionDisplayVisable, setOptionDisplayVisable] =
     createSignal<boolean>(false);
 
@@ -34,6 +34,24 @@ export default function MatchCard({
     });
   };
 
+  onMount(() => {
+    const player1Seat = eventState().evtSeats.find(
+      (seat) => seat.seatNumber === matchInfo.player1Seat
+    );
+
+    if (!player1Seat) {
+      addSeat(podId, matchInfo.player1Seat);
+    }
+
+    const player2Seat = eventState().evtSeats.find(
+      (seat) => seat.seatNumber === matchInfo.player2Seat
+    );
+
+    if (!player2Seat) {
+      addSeat(podId, matchInfo.player2Seat);
+    }
+  });
+
   return (
     <>
       <Switch fallback={<></>}>
@@ -44,6 +62,7 @@ export default function MatchCard({
             <Seat seatNumber={matchInfo.player2Seat} podId={podId}></Seat>
           </div>
         </Match>
+
         <Match when={matchCardState === "playing"}>
           <div class={styles.matchCont}>
             <div

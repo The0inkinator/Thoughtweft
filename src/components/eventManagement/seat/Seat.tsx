@@ -14,14 +14,21 @@ import { FullSeat } from "~/typing/eventTypes";
 interface SeatInputs {
   podId: number;
   seatNumber: number;
+  byeSeat?: boolean;
   justifyRight?: boolean;
 }
 
-export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
+export default function Seat({
+  podId,
+  seatNumber,
+  byeSeat,
+  justifyRight,
+}: SeatInputs) {
   //Context State
   const [eventState, { updateSeat, updatePlayer }] = useEventContext();
   //Local State
   const [mouseOver, setMouseOver] = createSignal<boolean>(false);
+  const [isByeSeat, setIsByeSeat] = createSignal<boolean>(false);
   //Refs
   let thisSeat!: HTMLDivElement;
 
@@ -226,10 +233,21 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
   onMount(() => {
     document.addEventListener("mousemove", handleMouseMove);
     updateSeat(podId, seatNumber, { ref: thisSeat });
+    if (byeSeat) {
+      setIsByeSeat(true);
+    }
   });
   onCleanup(() => {
     document.removeEventListener("mousemove", handleMouseMove);
   });
+
+  const ByeSeatDisplay = () => {
+    if (isByeSeat()) {
+      return <div>Bye</div>;
+    } else {
+      return <></>;
+    }
+  };
 
   return (
     <div
@@ -252,6 +270,7 @@ export default function Seat({ podId, seatNumber, justifyRight }: SeatInputs) {
       // }}
     >
       {seatNumber}
+      <ByeSeatDisplay />
     </div>
   );
 }

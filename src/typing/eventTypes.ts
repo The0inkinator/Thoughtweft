@@ -14,7 +14,7 @@ export type SeatUpdateParam =
 export type PlayerUpdateParam =
   | { address: { podId: number; seat: number } }
   | { drag: boolean }
-  | { ref: HTMLDivElement };
+  | { elMounted: boolean };
 
 export type PodStatusModes =
   | "seating"
@@ -42,7 +42,7 @@ export type Player = {
   matchRecord?: Record;
   eventRecord?: Record;
   currentOpponentId?: number;
-  playerRef?: HTMLDivElement;
+  elMounted?: boolean;
 };
 
 export interface SeatAddress {
@@ -56,6 +56,7 @@ export type FullSeat = {
   filled: boolean;
   hovered: boolean;
   seatRef?: HTMLDivElement;
+  byeSeat?: boolean;
 };
 
 export type ProxySeat = {
@@ -90,6 +91,7 @@ export type MatchData = {
   player1Seat: number;
   player2Id: number;
   player2Seat: number;
+  byeMatch?: boolean;
   matchCompleted: boolean;
 };
 

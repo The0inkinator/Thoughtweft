@@ -38,15 +38,12 @@ export default function MatchCard({
     const player1Seat = eventState().evtSeats.find(
       (seat) => seat.seatNumber === matchInfo.player1Seat
     );
-
     if (!player1Seat) {
       addSeat(podId, matchInfo.player1Seat);
     }
-
     const player2Seat = eventState().evtSeats.find(
       (seat) => seat.seatNumber === matchInfo.player2Seat
     );
-
     if (!player2Seat) {
       addSeat(podId, matchInfo.player2Seat);
     }

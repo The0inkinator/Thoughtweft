@@ -55,6 +55,18 @@ export function PairPlayers(eventData: Event, podId: number) {
     // });
     pod.podSeats.map((seat) => {
       if (seat.seatNumber <= halfTable) {
+        const stockMatchData = {
+          matchPodId: podId,
+          matchRound: round!,
+          matchRecord: { p1: 0, p2: 0 },
+          matchId: currentMatches?.length
+            ? currentMatches.length
+            : 0 + newMatches.length + 1,
+          matchCompleted: false,
+          player1Seat: seat.seatNumber,
+          player2Seat: seat.seatNumber + halfTable,
+        };
+
         const player1HasOpponent = () => {
           const opponentSeat = pod.podSeats.find(
             (localSeat) => localSeat.seatNumber === seat.seatNumber + halfTable
@@ -80,17 +92,9 @@ export function PairPlayers(eventData: Event, podId: number) {
 
           if (player1 && player2) {
             const newMatch: MatchData = {
-              matchPodId: podId,
-              matchRound: round!,
-              matchRecord: { p1: 0, p2: 0 },
-              matchId: currentMatches?.length
-                ? currentMatches.length
-                : 0 + newMatches.length + 1,
+              ...stockMatchData,
               player1Id: player1.id,
-              player1Seat: seat.seatNumber,
               player2Id: player2.id,
-              player2Seat: seat.seatNumber + halfTable,
-              matchCompleted: false,
             };
 
             newMatches.push(newMatch);
@@ -102,17 +106,12 @@ export function PairPlayers(eventData: Event, podId: number) {
           );
           if (player1) {
             const newMatch: MatchData = {
-              matchPodId: podId,
-              matchRound: round!,
-              matchRecord: { p1: 0, p2: 0 },
-              matchId: currentMatches?.length
-                ? currentMatches.length
-                : 0 + newMatches.length + 1,
+              ...stockMatchData,
               player1Id: player1.id,
-              player1Seat: seat.seatNumber,
               player2Id: -1,
-              player2Seat: seat.seatNumber + halfTable,
-              matchCompleted: false,
+              byeMatch: true,
+              matchRecord: { p1: 2, p2: 0 },
+              matchCompleted: true,
             };
 
             newMatches.push(newMatch);

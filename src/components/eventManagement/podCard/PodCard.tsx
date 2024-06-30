@@ -374,7 +374,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           style={{ color: "red" }}
           onClick={() => {
             const remainingMatches = thisPodState()?.podMatches.filter(
-              (match) => match.matchCompleted === false
+              (match) => !match.winner
             );
             if (remainingMatches?.length === 0) {
               let newRound = thisPodState()!.currentRound! + 1;

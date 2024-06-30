@@ -14,19 +14,42 @@ export function PairPlayers(eventData: Event, podId: number) {
     (pod) => pod.podId === podId
   )?.podMatches;
 
+  // const podPlayers = () => {
+  //   let playerIdList: number[] = [];
+  //   newMatches.map((match) => {
+  //     if (match.player1Id >= 0) {
+  //       playerIdList.push(match.player1Id);
+  //     }
+  //     if (match.player2Id >= 0) {
+  //       playerIdList.push(match.player2Id);
+  //     }
+  //   });
+  //   const podPlayers = playerIdList.map((playerId) => {
+  //     return eventData.evtPlayerList.find(
+  //       (fullPlayer) => fullPlayer.id === playerId
+  //     );
+  //   });
+  //   return podPlayers;
+  // };
+
+  const recordSheet = () => {
+    let tempRecordSheet = [];
+    pod.podMatches.map((match) => {});
+  };
+
   const pairCrossPod = () => {
     pod.podSeats.map((seat) => {
       if (seat.seatNumber <= halfTable) {
         const stockMatchData = {
           matchPodId: podId,
           matchRound: round!,
-          matchRecord: { p1: 0, p2: 0 },
           matchId: allPodMatches?.length
             ? allPodMatches.length
             : 0 + newMatches.length + 1,
-          matchCompleted: false,
-          player1Seat: seat.seatNumber,
-          player2Seat: seat.seatNumber + halfTable,
+          p1Seat: seat.seatNumber,
+          p1Score: 0,
+          p2Seat: seat.seatNumber + halfTable,
+          p2Score: 0,
         };
 
         const player1HasOpponent = () => {
@@ -55,8 +78,8 @@ export function PairPlayers(eventData: Event, podId: number) {
           if (player1 && player2) {
             const newMatch: MatchData = {
               ...stockMatchData,
-              player1Id: player1.id,
-              player2Id: player2.id,
+              p1Id: player1.id,
+              p2Id: player2.id,
             };
 
             newMatches.push(newMatch);
@@ -69,11 +92,12 @@ export function PairPlayers(eventData: Event, podId: number) {
           if (player1) {
             const newMatch: MatchData = {
               ...stockMatchData,
-              player1Id: player1.id,
-              player2Id: -1,
+              p1Id: player1.id,
+              p1Score: 2,
+              p2Id: -1,
+              p2Score: 0,
               byeMatch: true,
-              matchRecord: { p1: 2, p2: 0 },
-              matchCompleted: true,
+              winner: "p1",
             };
 
             newMatches.push(newMatch);
@@ -82,6 +106,7 @@ export function PairPlayers(eventData: Event, podId: number) {
       }
     });
   };
+
   const pairOnRecord = () => {};
 
   if (round === 1) {

@@ -1,6 +1,7 @@
 import {
   Event,
   MatchData,
+  MatchRecord,
   Player,
   PlayerUpdateParam,
 } from "~/typing/eventTypes";
@@ -32,9 +33,59 @@ export function PairPlayers(eventData: Event, podId: number) {
   //   return podPlayers;
   // };
 
-  const recordSheet = () => {
-    let tempRecordSheet = [];
-    pod.podMatches.map((match) => {});
+  const recordSheet: () => MatchRecord[] = () => {
+    const tempRecordSheet: MatchRecord[] = [];
+
+    eventData.evtPlayerList
+      .filter((player) => player.podId === podId)
+      .map((playerInPod) => {
+        pod.podMatches.forEach((match) => {
+          for (const [key, value] of Object.entries(match)) {
+            if (
+              (value === playerInPod.id && key === "p1Id") ||
+              key === "p2Id"
+            ) {
+              const tempEntry1: MatchRecord = {
+                matchId: match.matchId,
+                playerId: match.p1Id,
+                playerRecord: match.p1Score,
+                matchWinner: match.winner,
+              };
+
+              const tempEntry2: MatchRecord = {
+                matchId: match.matchId,
+                playerId: match.p2Id,
+                playerRecord: match.p2Score,
+                matchWinner: match.winner,
+              };
+
+              if (
+                match.p1Id === playerInPod.id &&
+                !tempRecordSheet.some(
+                  (entry) =>
+                    entry.matchId === tempEntry1.matchId &&
+                    entry.playerId === tempEntry1.playerId
+                )
+              ) {
+                tempRecordSheet.push(tempEntry1);
+              }
+
+              if (
+                match.p2Id === playerInPod.id &&
+                !tempRecordSheet.some(
+                  (entry) =>
+                    entry.matchId === tempEntry2.matchId &&
+                    entry.playerId === tempEntry2.playerId
+                )
+              ) {
+                tempRecordSheet.push(tempEntry2);
+              }
+            }
+          }
+        });
+      });
+
+    return tempRecordSheet;
   };
 
   const pairCrossPod = () => {
@@ -113,6 +164,7 @@ export function PairPlayers(eventData: Event, podId: number) {
     pairCrossPod();
   } else {
     pairOnRecord();
+    recordSheet();
   }
 
   return newMatches;

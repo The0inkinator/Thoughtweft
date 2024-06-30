@@ -378,6 +378,9 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             if (remainingMatches?.length === 0) {
               let newRound = thisPodState()!.currentRound! + 1;
               updatePod(podId, { round: newRound });
+              PairPlayers(eventState(), podId).map((match) => {
+                updatePod(podId, { newMatch: match });
+              });
               updatePod(podId, { status: "pairing" });
             } else {
               console.log("Ongoing Matches");

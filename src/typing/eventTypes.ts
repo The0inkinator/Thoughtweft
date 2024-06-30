@@ -1,7 +1,5 @@
 import { Match } from "solid-js";
 
-export type Record = [number, number, number];
-
 export type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export type SeatUpdateParam =
@@ -90,6 +88,13 @@ export type MatchData = {
   p2Score: number;
   winner?: "p1" | "p2" | "draw";
   byeMatch?: boolean;
+};
+
+export type MatchRecord = {
+  matchId: number;
+  playerId: number;
+  playerRecord: number;
+  matchWinner: MatchData["winner"];
 };
 
 export type EventSettings = {

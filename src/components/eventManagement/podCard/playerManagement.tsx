@@ -7,6 +7,7 @@ import {
 } from "~/typing/eventTypes";
 
 export function PairPlayers(eventData: Event, podId: number) {
+  //Static Values
   const pod = eventData.evtPods.find((pod) => pod.podId === podId)!;
   const round = pod.currentRound;
   const halfTable = Math.ceil(pod.podSize / 2);
@@ -14,74 +15,72 @@ export function PairPlayers(eventData: Event, podId: number) {
   const allPodMatches = eventData.evtPods.find(
     (pod) => pod.podId === podId
   )?.podMatches;
+  const podPlayers = eventData.evtPlayerList.filter(
+    (player) => player.podId === podId
+  );
 
   const generateRecordSheet: () => MatchRecord[] = () => {
     const tempRecordSheet: MatchRecord[] = [];
 
-    eventData.evtPlayerList
-      .filter((player) => player.podId === podId)
-      .map((playerInPod) => {
-        pod.podMatches.forEach((match) => {
-          for (const [key, value] of Object.entries(match)) {
+    podPlayers.map((playerInPod) => {
+      pod.podMatches.forEach((match) => {
+        for (const [key, value] of Object.entries(match)) {
+          if ((value === playerInPod.id && key === "p1Id") || key === "p2Id") {
+            const convertWinData = (
+              playerNum: 1 | 2,
+              data: MatchData["winner"]
+            ) => {
+              if (data === "draw") {
+                return "d";
+              } else if (
+                (playerNum === 1 && data === "p1") ||
+                (playerNum === 2 && data === "p2")
+              ) {
+                return "w";
+              } else {
+                return "l";
+              }
+            };
+
+            const tempEntry1: MatchRecord = {
+              matchId: match.matchId,
+              playerId: match.p1Id,
+              playerRecord: match.p1Score,
+              matchResult: convertWinData(1, match.winner),
+            };
+
+            const tempEntry2: MatchRecord = {
+              matchId: match.matchId,
+              playerId: match.p2Id,
+              playerRecord: match.p2Score,
+              matchResult: convertWinData(2, match.winner),
+            };
+
             if (
-              (value === playerInPod.id && key === "p1Id") ||
-              key === "p2Id"
+              match.p1Id === playerInPod.id &&
+              !tempRecordSheet.some(
+                (entry) =>
+                  entry.matchId === tempEntry1.matchId &&
+                  entry.playerId === tempEntry1.playerId
+              )
             ) {
-              const convertWinData = (
-                playerNum: 1 | 2,
-                data: MatchData["winner"]
-              ) => {
-                if (data === "draw") {
-                  return "d";
-                } else if (
-                  (playerNum === 1 && data === "p1") ||
-                  (playerNum === 2 && data === "p2")
-                ) {
-                  return "w";
-                } else {
-                  return "l";
-                }
-              };
+              tempRecordSheet.push(tempEntry1);
+            }
 
-              const tempEntry1: MatchRecord = {
-                matchId: match.matchId,
-                playerId: match.p1Id,
-                playerRecord: match.p1Score,
-                matchResult: convertWinData(1, match.winner),
-              };
-
-              const tempEntry2: MatchRecord = {
-                matchId: match.matchId,
-                playerId: match.p2Id,
-                playerRecord: match.p2Score,
-                matchResult: convertWinData(2, match.winner),
-              };
-
-              if (
-                match.p1Id === playerInPod.id &&
-                !tempRecordSheet.some(
-                  (entry) =>
-                    entry.matchId === tempEntry1.matchId &&
-                    entry.playerId === tempEntry1.playerId
-                )
-              ) {
-                tempRecordSheet.push(tempEntry1);
-              }
-
-              if (
-                match.p2Id === playerInPod.id &&
-                !tempRecordSheet.some(
-                  (entry) =>
-                    entry.matchId === tempEntry2.matchId &&
-                    entry.playerId === tempEntry2.playerId
-                )
-              ) {
-                tempRecordSheet.push(tempEntry2);
-              }
+            if (
+              match.p2Id === playerInPod.id &&
+              !tempRecordSheet.some(
+                (entry) =>
+                  entry.matchId === tempEntry2.matchId &&
+                  entry.playerId === tempEntry2.playerId
+              )
+            ) {
+              tempRecordSheet.push(tempEntry2);
             }
           }
-        });
+        }
       });
+    });
 
     return tempRecordSheet;
   };
@@ -158,7 +157,73 @@ export function PairPlayers(eventData: Event, podId: number) {
 
   const pairOnRecord = () => {
     const recordSheet = generateRecordSheet();
-    console.log(recordSheet);
+    const playerRecordArray = podPlayers.map((player) => {
+      const playerWins = recordSheet.filter(
+        (entry) => entry.playerId === player.id && entry.matchResult === "w"
+      ).length;
+      const playerLosses = recordSheet.filter(
+        (entry) => entry.playerId === player.id && entry.matchResult === "l"
+      ).length;
+      const playerDraws = recordSheet.filter(
+        (entry) => entry.playerId === player.id && entry.matchResult === "d"
+      ).length;
+      const playerRecordEntry = {
+        pId: player.id,
+        pWins: playerWins,
+        pLosses: playerLosses,
+        pDraws: playerDraws,
+      };
+      return playerRecordEntry;
+    });
+
+    let playersToPair = playerRecordArray
+      .map((entry) => {
+        const points = entry.pWins * 3 + entry.pDraws;
+        return { player: entry.pId, points: points };
+      })
+      .sort((a, b) => b.points - a.points);
+
+    const remainingTopPlayers = () => {
+      const topPlayerList = playersToPair.filter(
+        (entry) =>
+          entry.points >=
+          Math.max(
+            ...playersToPair.map((entry) => {
+              return entry.points;
+            })
+          )
+      );
+
+      const secondaryPlayerList = playersToPair
+        .filter((entry) => !topPlayerList.includes(entry))
+        .filter(
+          (entry2) =>
+            entry2.points >=
+            Math.max(
+              ...playersToPair
+                .filter((entry) => !topPlayerList.includes(entry))
+                .map((topPlayer) => {
+                  return topPlayer.points;
+                })
+            )
+        );
+      if (topPlayerList.length > 1) {
+        return topPlayerList;
+      } else {
+        return topPlayerList.concat(secondaryPlayerList);
+      }
+    };
+
+    const createMatch = () => {};
+
+    createMatch();
+
+    // while (playersToPair.length > 0) {
+    //   createMatch();
+    // }
+
+    // console.log(playerRecordArray);
+    // console.log(topPlayers);
   };
 
   if (round === 1) {

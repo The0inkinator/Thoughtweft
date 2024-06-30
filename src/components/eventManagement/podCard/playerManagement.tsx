@@ -15,25 +15,7 @@ export function PairPlayers(eventData: Event, podId: number) {
     (pod) => pod.podId === podId
   )?.podMatches;
 
-  // const podPlayers = () => {
-  //   let playerIdList: number[] = [];
-  //   newMatches.map((match) => {
-  //     if (match.player1Id >= 0) {
-  //       playerIdList.push(match.player1Id);
-  //     }
-  //     if (match.player2Id >= 0) {
-  //       playerIdList.push(match.player2Id);
-  //     }
-  //   });
-  //   const podPlayers = playerIdList.map((playerId) => {
-  //     return eventData.evtPlayerList.find(
-  //       (fullPlayer) => fullPlayer.id === playerId
-  //     );
-  //   });
-  //   return podPlayers;
-  // };
-
-  const recordSheet: () => MatchRecord[] = () => {
+  const generateRecordSheet: () => MatchRecord[] = () => {
     const tempRecordSheet: MatchRecord[] = [];
 
     eventData.evtPlayerList
@@ -45,18 +27,34 @@ export function PairPlayers(eventData: Event, podId: number) {
               (value === playerInPod.id && key === "p1Id") ||
               key === "p2Id"
             ) {
+              const convertWinData = (
+                playerNum: 1 | 2,
+                data: MatchData["winner"]
+              ) => {
+                if (data === "draw") {
+                  return "d";
+                } else if (
+                  (playerNum === 1 && data === "p1") ||
+                  (playerNum === 2 && data === "p2")
+                ) {
+                  return "w";
+                } else {
+                  return "l";
+                }
+              };
+
               const tempEntry1: MatchRecord = {
                 matchId: match.matchId,
                 playerId: match.p1Id,
                 playerRecord: match.p1Score,
-                matchWinner: match.winner,
+                matchResult: convertWinData(1, match.winner),
               };
 
               const tempEntry2: MatchRecord = {
                 matchId: match.matchId,
                 playerId: match.p2Id,
                 playerRecord: match.p2Score,
-                matchWinner: match.winner,
+                matchResult: convertWinData(2, match.winner),
               };
 
               if (
@@ -158,13 +156,15 @@ export function PairPlayers(eventData: Event, podId: number) {
     });
   };
 
-  const pairOnRecord = () => {};
+  const pairOnRecord = () => {
+    const recordSheet = generateRecordSheet();
+    console.log(recordSheet);
+  };
 
   if (round === 1) {
     pairCrossPod();
   } else {
     pairOnRecord();
-    recordSheet();
   }
 
   return newMatches;

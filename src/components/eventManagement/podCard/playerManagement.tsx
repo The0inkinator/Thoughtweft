@@ -3,6 +3,8 @@ import {
   MatchData,
   MatchRecord,
   Player,
+  PlayerRecord,
+  PlayerStanding,
   PlayerUpdateParam,
 } from "~/typing/eventTypes";
 
@@ -147,7 +149,6 @@ export function PairPlayers(eventData: Event, podId: number) {
               byeMatch: true,
               winner: "p1",
             };
-
             newMatches.push(newMatch);
           }
         }
@@ -157,7 +158,8 @@ export function PairPlayers(eventData: Event, podId: number) {
 
   const pairOnRecord = () => {
     const recordSheet = generateRecordSheet();
-    const playerRecordArray = podPlayers.map((player) => {
+
+    const playerRecordArray: PlayerRecord[] = podPlayers.map((player) => {
       const playerWins = recordSheet.filter(
         (entry) => entry.playerId === player.id && entry.matchResult === "w"
       ).length;
@@ -167,7 +169,7 @@ export function PairPlayers(eventData: Event, podId: number) {
       const playerDraws = recordSheet.filter(
         (entry) => entry.playerId === player.id && entry.matchResult === "d"
       ).length;
-      const playerRecordEntry = {
+      const playerRecordEntry: PlayerRecord = {
         pId: player.id,
         pWins: playerWins,
         pLosses: playerLosses,
@@ -176,10 +178,10 @@ export function PairPlayers(eventData: Event, podId: number) {
       return playerRecordEntry;
     });
 
-    let playersToPair = playerRecordArray
+    let playersToPair: PlayerStanding[] = playerRecordArray
       .map((entry) => {
         const points = entry.pWins * 3 + entry.pDraws;
-        return { player: entry.pId, points: points };
+        return { playerId: entry.pId, points: points };
       })
       .sort((a, b) => b.points - a.points);
 
@@ -214,7 +216,21 @@ export function PairPlayers(eventData: Event, podId: number) {
       }
     };
 
-    const createMatch = () => {};
+    const createMatch = () => {
+      const playersForMatch = remainingTopPlayers();
+
+      const pickTwoPlayers = () => {
+        let pickedPlayers: PlayerStanding[] = [];
+
+        for (let i = 0; i < 2; i++) {
+          const availablePlayers = playersForMatch.filter(
+            (player) => !pickedPlayers.includes(player)
+          );
+          let randomIndex = Math.floor(Math.random() * playersForMatch.length);
+          pickedPlayers.push();
+        }
+      };
+    };
 
     createMatch();
 

@@ -340,6 +340,18 @@ export function EventContextProvider(props: any) {
                 const scopedParam = updateParam.hovered;
 
                 newEvt.evtPods[podIndex].podHovered = scopedParam;
+              } else if ("byePlayer" in updateParam) {
+                const scopedParam = updateParam.byePlayer;
+
+                if (!newEvt.evtPods[podIndex].byePlayerIds) {
+                  newEvt.evtPods[podIndex].byePlayerIds = [scopedParam];
+                } else if (
+                  newEvt.evtPods[podIndex].byePlayerIds!.filter(
+                    (id) => id === scopedParam
+                  ).length === 0
+                ) {
+                  newEvt.evtPods[podIndex].byePlayerIds!.push(scopedParam);
+                }
               }
             }
             return newEvt;

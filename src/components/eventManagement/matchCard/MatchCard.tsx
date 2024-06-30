@@ -15,7 +15,8 @@ export default function MatchCard({
   matchInfo,
   matchCardState,
 }: MatchCardInputs) {
-  const [eventState, { updateMatch, addPlayer, addSeat }] = useEventContext();
+  const [eventState, { updateMatch, addPlayer, addSeat, updatePod }] =
+    useEventContext();
   const [optionDisplayVisable, setOptionDisplayVisable] =
     createSignal<boolean>(false);
 
@@ -48,6 +49,10 @@ export default function MatchCard({
   };
 
   onMount(() => {
+    if (thisMatchState()?.byeMatch) {
+      updatePod(podId, { byePlayer: thisMatchState()!.p1Id });
+    }
+
     const player1Seat = eventState()
       .evtPods.find((pod) => pod.podId === podId)
       ?.podSeats.find((seat) => seat.seatNumber === matchInfo.p1Seat);

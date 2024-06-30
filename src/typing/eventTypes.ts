@@ -25,7 +25,8 @@ export type PodUpdateParam =
   | { status: PodStatusModes }
   | { round: number }
   | { newMatch: MatchData }
-  | { hovered: boolean };
+  | { hovered: boolean }
+  | { byePlayer: number };
 
 export type MatchUpdateParam =
   | { winner: MatchData["winner"] }

@@ -39,6 +39,25 @@ export type Player = {
   elMounted?: boolean;
 };
 
+export type PlayerRecord = {
+  pId: number;
+  pWins: number;
+  pLosses: number;
+  pDraws: number;
+};
+
+export type PlayerStanding = {
+  playerId: number;
+  points: number;
+};
+
+export type PlayerPairing = {
+  pId: number;
+  points: number;
+  hasBye: boolean;
+  hasPlayed: number[];
+};
+
 export interface SeatAddress {
   podId: number;
   seat: number;
@@ -94,7 +113,7 @@ export type MatchRecord = {
   matchId: number;
   playerId: number;
   playerRecord: number;
-  matchWinner: MatchData["winner"];
+  matchResult: "w" | "l" | "d";
 };
 
 export type EventSettings = {

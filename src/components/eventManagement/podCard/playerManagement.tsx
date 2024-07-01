@@ -3,6 +3,7 @@ import {
   MatchData,
   MatchRecord,
   Player,
+  PlayerPairing,
   PlayerRecord,
   PlayerStanding,
   PlayerUpdateParam,
@@ -185,6 +186,27 @@ export function PairPlayers(eventData: Event, podId: number) {
       })
       .sort((a, b) => b.points - a.points);
 
+    let testPlayersToPair: PlayerPairing[] = playerRecordArray.map((entry) => {
+      const points = entry.pWins * 3 + entry.pDraws;
+      const byeBoolean = pod.byePlayerIds
+        ? pod.byePlayerIds!.includes(entry.pId)
+        : false;
+      const hasPlayedArray: number[] = pod.podMatches
+        .filter((match) => match.p1Id === entry.pId || match.p2Id === entry.pId)
+        .map((result) => {
+          return [result.p1Id, result.p2Id].filter((id) => id !== entry.pId)[0];
+        });
+
+      return {
+        pId: entry.pId,
+        points: points,
+        hasBye: byeBoolean,
+        hasPlayed: hasPlayedArray,
+      };
+    });
+
+    console.log(testPlayersToPair);
+
     const remainingTopPlayers = () => {
       const topPlayerList = playersToPair.filter(
         (entry) =>
@@ -216,20 +238,59 @@ export function PairPlayers(eventData: Event, podId: number) {
       }
     };
 
+    const topPlayers = () => {
+      const tempTopPlayers = playersToPair.filter(
+        (entry) =>
+          entry.points >=
+          Math.max(
+            ...playersToPair.map((entry) => {
+              return entry.points;
+            })
+          )
+      );
+      return tempTopPlayers;
+    };
+
+    const byePlayers = () => {
+      const tempByePlayers = playersToPair.filter((player) =>
+        pod.byePlayerIds?.includes(player.playerId)
+      );
+
+      return tempByePlayers;
+    };
+
+    const sameRecordPlayers = (targetRecord: number) => {};
+
+    const playedPreviously: (players: PlayerStanding[]) => boolean = (
+      players: PlayerStanding[]
+    ) => {
+      if (
+        pod.podMatches.find((match) =>
+          players.every((player) =>
+            [match.p1Id, match.p2Id].includes(player.playerId)
+          )
+        )
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
     const createMatch = () => {
-      const playersForMatch = remainingTopPlayers();
-
-      const pickTwoPlayers = () => {
-        let pickedPlayers: PlayerStanding[] = [];
-
-        for (let i = 0; i < 2; i++) {
-          const availablePlayers = playersForMatch.filter(
-            (player) => !pickedPlayers.includes(player)
-          );
-          let randomIndex = Math.floor(Math.random() * playersForMatch.length);
-          pickedPlayers.push();
-        }
-      };
+      // const playersForMatch = remainingTopPlayers();
+      // const pickTwoPlayers = () => {
+      //   let pickedPlayers: PlayerStanding[] = [];
+      //   for (let i = 0; i < 2; i++) {
+      //     const availablePlayers = playersForMatch.filter(
+      //       (player) => !pickedPlayers.includes(player)
+      //     );
+      //     let randomIndex = Math.floor(Math.random() * playersForMatch.length);
+      //     pickedPlayers.push();
+      //   }
+      // };
+      console.log(playersToPair.slice(0, 2));
+      console.log(playedPreviously(playersToPair.slice(0, 2)));
     };
 
     createMatch();

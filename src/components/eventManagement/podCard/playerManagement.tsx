@@ -270,7 +270,7 @@ export function PairPlayers(eventData: Event, podId: number) {
       const makePairingFrom: (globalInputArray: BuildingRound[]) => Deposit = (
         globalInputArray: BuildingRound[]
       ) => {
-        const depositArray: Deposit = [];
+        const depositSet: Set<string> = new Set();
 
         const makePairingLoop = (inputArray: BuildingRound[]) => {
           if (
@@ -278,28 +278,20 @@ export function PairPlayers(eventData: Event, podId: number) {
             inputArray.length
           ) {
             const finalArray: PtlRound = inputArray as PtlRound;
-            let duplicateRound = false;
-            depositArray.map((round) => {
-              let duplicateMatches = 0;
-              round.map((match) => {
-                finalArray.map((inputMatch) => {
-                  if (
-                    [match.p1, match.p2].filter(
-                      (player) =>
-                        inputMatch.p1 === player || inputMatch.p2 === player
-                    ).length === 2
-                  ) {
-                    duplicateMatches = duplicateMatches + 1;
-                  }
-                });
-              });
-              if (duplicateMatches >= finalArray.length) {
-                duplicateRound = true;
-                console.log("eliminated duplicate round");
-              }
-            });
-            if (!duplicateRound) {
-              depositArray.push(inputArray as PtlRound);
+            const orderedFinalArray = finalArray
+              .map((match) => {
+                if (match.p1 > match.p2) {
+                  return match;
+                } else {
+                  return { p1: match.p2, p2: match.p1 };
+                }
+              })
+              .sort((a, b) => b.p1 - a.p1);
+
+            const serializedFinalArray = JSON.stringify(orderedFinalArray);
+
+            if (!depositSet.has(serializedFinalArray)) {
+              depositSet.add(serializedFinalArray);
             }
           } else {
             const inputNumList = inputArray.filter(
@@ -363,10 +355,17 @@ export function PairPlayers(eventData: Event, podId: number) {
           makePairingLoop(adjustedInputArray);
         }
 
+        const depositArray: Deposit = Array.from(depositSet).map((round) =>
+          JSON.parse(round)
+        ) as Deposit;
+
         return depositArray;
       };
 
-      console.log("all possible matches", makePairingFrom([1, 2, 3]));
+      console.log(
+        "all possible matches",
+        makePairingFrom([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+      );
     };
 
     createAllPtlRounds();

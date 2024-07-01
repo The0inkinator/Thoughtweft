@@ -3,11 +3,21 @@ import {
   MatchData,
   MatchRecord,
   Player,
-  PlayerPairing,
   PlayerRecord,
-  PlayerStanding,
   PlayerUpdateParam,
 } from "~/typing/eventTypes";
+
+type PlayerPairing = {
+  pId: number;
+  points: number;
+  hasBye: boolean;
+  hasPlayed: number[];
+};
+
+type BuildingRound = number | PtlMatch;
+type PtlMatch = { p1: number; p2: number };
+type PtlRound = PtlMatch[];
+type Deposit = PtlRound[];
 
 export function PairPlayers(eventData: Event, podId: number) {
   //Static Values
@@ -179,33 +189,34 @@ export function PairPlayers(eventData: Event, podId: number) {
       return playerRecordEntry;
     });
 
-    let playersToPair: PlayerStanding[] = playerRecordArray
+    let playersToPair: PlayerPairing[] = playerRecordArray
       .map((entry) => {
         const points = entry.pWins * 3 + entry.pDraws;
-        return { playerId: entry.pId, points: points };
+        const byeBoolean = pod.byePlayerIds
+          ? pod.byePlayerIds!.includes(entry.pId)
+          : false;
+        const hasPlayedArray: number[] = pod.podMatches
+          .filter(
+            (match) => match.p1Id === entry.pId || match.p2Id === entry.pId
+          )
+          .map((result) => {
+            return [result.p1Id, result.p2Id].filter(
+              (id) => id !== entry.pId
+            )[0];
+          });
+
+        return {
+          pId: entry.pId,
+          points: points,
+          hasBye: byeBoolean,
+          hasPlayed: hasPlayedArray,
+        };
       })
-      .sort((a, b) => b.points - a.points);
-
-    let testPlayersToPair: PlayerPairing[] = playerRecordArray.map((entry) => {
-      const points = entry.pWins * 3 + entry.pDraws;
-      const byeBoolean = pod.byePlayerIds
-        ? pod.byePlayerIds!.includes(entry.pId)
-        : false;
-      const hasPlayedArray: number[] = pod.podMatches
-        .filter((match) => match.p1Id === entry.pId || match.p2Id === entry.pId)
-        .map((result) => {
-          return [result.p1Id, result.p2Id].filter((id) => id !== entry.pId)[0];
-        });
-
-      return {
-        pId: entry.pId,
-        points: points,
-        hasBye: byeBoolean,
-        hasPlayed: hasPlayedArray,
-      };
-    });
-
-    console.log(testPlayersToPair);
+      .sort((a, b) => {
+        if (a.hasBye && !b.hasBye) return -1; // `a` comes before `b` if `a` has a bye and `b` does not
+        if (!a.hasBye && b.hasBye) return 1; // `b` comes before `a` if `b` has a bye and `a` does not
+        return b.points - a.points; // Otherwise, sort by points in descending order
+      });
 
     const remainingTopPlayers = () => {
       const topPlayerList = playersToPair.filter(
@@ -251,46 +262,117 @@ export function PairPlayers(eventData: Event, podId: number) {
       return tempTopPlayers;
     };
 
-    const byePlayers = () => {
-      const tempByePlayers = playersToPair.filter((player) =>
-        pod.byePlayerIds?.includes(player.playerId)
-      );
+    const createAllPtlRounds = () => {
+      const pIdList = playersToPair.map((player) => {
+        return player.pId;
+      });
 
-      return tempByePlayers;
+      const makePairingFrom: (globalInputArray: BuildingRound[]) => Deposit = (
+        globalInputArray: BuildingRound[]
+      ) => {
+        const depositArray: Deposit = [];
+
+        const makePairingLoop = (inputArray: BuildingRound[]) => {
+          if (
+            inputArray.filter((entry) => typeof entry !== "number").length ===
+            inputArray.length
+          ) {
+            const finalArray: PtlRound = inputArray as PtlRound;
+            let duplicateRound = false;
+            depositArray.map((round) => {
+              let duplicateMatches = 0;
+              round.map((match) => {
+                finalArray.map((inputMatch) => {
+                  if (
+                    [match.p1, match.p2].filter(
+                      (player) =>
+                        inputMatch.p1 === player || inputMatch.p2 === player
+                    ).length === 2
+                  ) {
+                    duplicateMatches = duplicateMatches + 1;
+                  }
+                });
+              });
+              if (duplicateMatches >= finalArray.length) {
+                duplicateRound = true;
+                console.log("eliminated duplicate round");
+              }
+            });
+            if (!duplicateRound) {
+              depositArray.push(inputArray as PtlRound);
+            }
+          } else {
+            const inputNumList = inputArray.filter(
+              (entry) => typeof entry === "number"
+            );
+
+            if (inputNumList.length > 1) {
+              for (let i = 1; i < inputNumList.length; i++) {
+                const tempNumList = [
+                  ...inputArray.filter((entry) => typeof entry === "number"),
+                ];
+                const tempMatchList = [
+                  ...inputArray.filter((entry) => typeof entry !== "number"),
+                ];
+
+                const player1 = tempNumList[0];
+                const player2 = (() => {
+                  if (tempNumList[i]) {
+                    return tempNumList[i];
+                  } else {
+                    return -1;
+                  }
+                })();
+                tempNumList.splice(0, 1);
+                if (tempNumList[i]) {
+                  tempNumList.splice(i - 1, 1);
+                } else {
+                  tempNumList.splice(-1);
+                }
+
+                tempMatchList.push({
+                  p1: player1,
+                  p2: player2,
+                } as PtlMatch);
+                tempNumList.map((number) => {
+                  tempMatchList.push(number);
+                });
+
+                makePairingLoop(tempMatchList);
+              }
+            } else if (inputNumList.length === 1) {
+              const tempMatchList = [
+                ...inputArray.filter((entry) => typeof entry !== "number"),
+              ];
+
+              tempMatchList.push({
+                p1: inputNumList[0],
+                p2: -1,
+              } as PtlMatch);
+
+              makePairingLoop(tempMatchList);
+            }
+          }
+        };
+
+        for (let i = 0; i < globalInputArray.length; i++) {
+          const adjustedInputArray = globalInputArray
+            .slice(i)
+            .concat(globalInputArray.slice(0, i));
+
+          makePairingLoop(adjustedInputArray);
+        }
+
+        return depositArray;
+      };
+
+      console.log("all possible matches", makePairingFrom([1, 2, 3]));
     };
 
-    const sameRecordPlayers = (targetRecord: number) => {};
-
-    const playedPreviously: (players: PlayerStanding[]) => boolean = (
-      players: PlayerStanding[]
-    ) => {
-      if (
-        pod.podMatches.find((match) =>
-          players.every((player) =>
-            [match.p1Id, match.p2Id].includes(player.playerId)
-          )
-        )
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    };
+    createAllPtlRounds();
 
     const createMatch = () => {
-      // const playersForMatch = remainingTopPlayers();
-      // const pickTwoPlayers = () => {
-      //   let pickedPlayers: PlayerStanding[] = [];
-      //   for (let i = 0; i < 2; i++) {
-      //     const availablePlayers = playersForMatch.filter(
-      //       (player) => !pickedPlayers.includes(player)
-      //     );
-      //     let randomIndex = Math.floor(Math.random() * playersForMatch.length);
-      //     pickedPlayers.push();
-      //   }
-      // };
-      console.log(playersToPair.slice(0, 2));
-      console.log(playedPreviously(playersToPair.slice(0, 2)));
+      // console.log(playersToPair);
     };
 
     createMatch();

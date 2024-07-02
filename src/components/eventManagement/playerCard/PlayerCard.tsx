@@ -84,15 +84,13 @@ export default function PlayerCard({
 
   createEffect(() => {
     if (thisPlayerPodState()) {
-      if (
-        thisPlayerState().seat <= thisPlayerPodState()!.podSize / 2 &&
-        !leftSeatPlayer()
-      ) {
+      const halfTable = thisPlayerPodState()!.podSize / 2;
+      const thisSeat = thisPlayerState().seat;
+      if (thisSeat > halfTable && !leftSeatPlayer()) {
         setLeftSeatPlayer(true);
-      } else if (
-        thisPlayerState().seat > thisPlayerPodState()!.podSize / 2 &&
-        leftSeatPlayer()
-      ) {
+      } else if (thisSeat <= halfTable && leftSeatPlayer()) {
+        setLeftSeatPlayer(false);
+      } else if (thisSeat === 0 && leftSeatPlayer()) {
         setLeftSeatPlayer(false);
       }
     }
@@ -213,7 +211,7 @@ export default function PlayerCard({
   return (
     <div
       class={styles.playerCardCont}
-      style={{ "flex-direction": leftSeatPlayer() ? "row" : "row-reverse" }}
+      style={{ "flex-direction": leftSeatPlayer() ? "row-reverse" : "row" }}
       ref={thisPlayerCard}
     >
       <Switch fallback={<></>}>
@@ -237,17 +235,19 @@ export default function PlayerCard({
               }
             }}
           ></div>
-          <div class={styles.playerName}>{playerName}</div>
-          <div class={styles.dot}></div>
+          <div class={styles.playerName}>
+            {playerName}
+            {thisPlayerState().seat}
+          </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
           <Portal>
-            <div
-              class={styles.playerName}
-              ref={thisPlayerVis}
-              onclick={() => {}}
-            >
-              {playerName}
+            <div class={styles.playerCardCont} ref={thisPlayerVis}>
+              <div class={styles.playerIcon}></div>
+              <div class={styles.playerName}>
+                {thisPlayerState().seat}
+                {playerName}
+              </div>
             </div>
           </Portal>
         </Match>

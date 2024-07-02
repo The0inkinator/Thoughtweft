@@ -10,6 +10,7 @@ import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
 import { playerIdFromAddress } from "~/context/EventDataFunctions";
 import { FullSeat } from "~/typing/eventTypes";
+import seat from ".";
 
 interface SeatInputs {
   podId: number;

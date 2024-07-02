@@ -398,6 +398,8 @@ export function PairPlayers(eventData: Event, podId: number) {
       return bestRounds;
     })();
 
+    console.log("best rounds:", bestRounds);
+
     const chosenRound =
       allRounds[
         bestRounds[Math.floor(Math.random() * bestRounds.length)].index
@@ -407,7 +409,7 @@ export function PairPlayers(eventData: Event, podId: number) {
       matchPodId: podId,
       matchRound: round!,
       matchId: allPodMatches?.length
-        ? allPodMatches.length
+        ? allPodMatches.length + newMatches.length + 1
         : 0 + newMatches.length + 1,
       p1Score: 0,
       p2Score: 0,

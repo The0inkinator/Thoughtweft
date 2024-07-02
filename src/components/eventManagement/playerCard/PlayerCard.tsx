@@ -32,6 +32,7 @@ export default function PlayerCard({
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
   const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
+  const [leftSeatPlayer, setLeftSeatPlayer] = createSignal<boolean>(false);
   //refs
 
   let thisPlayerCard!: HTMLDivElement;
@@ -80,6 +81,22 @@ export default function PlayerCard({
       return eventState().playerHopper;
     }
   };
+
+  createEffect(() => {
+    if (thisPlayerPodState()) {
+      if (
+        thisPlayerState().seat <= thisPlayerPodState()!.podSize / 2 &&
+        !leftSeatPlayer()
+      ) {
+        setLeftSeatPlayer(true);
+      } else if (
+        thisPlayerState().seat > thisPlayerPodState()!.podSize / 2 &&
+        leftSeatPlayer()
+      ) {
+        setLeftSeatPlayer(false);
+      }
+    }
+  });
 
   createEffect(() => {
     const singleHoveredSeat = seats().find((seat) => seat.hovered);
@@ -198,6 +215,7 @@ export default function PlayerCard({
   return (
     <div
       class={styles.playerCardCont}
+      style={{ "flex-direction": leftSeatPlayer() ? "row" : "row-reverse" }}
       ref={thisPlayerCard}
       onMouseDown={(event) => {
         if (
@@ -218,9 +236,8 @@ export default function PlayerCard({
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
-          <div class={styles.playerName} onclick={() => {}}>
-            {playerName}
-          </div>
+          <div class={styles.playerIcon}></div>
+          <div class={styles.playerName}>{playerName}</div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
           <Portal>
@@ -230,7 +247,6 @@ export default function PlayerCard({
               onclick={() => {}}
             >
               {playerName}
-              {/* {hoveredSeat()?.podId} {hoveredSeat()?.seatNumber} */}
             </div>
           </Portal>
         </Match>

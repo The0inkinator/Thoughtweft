@@ -83,27 +83,28 @@ export default function MatchCard({
       .evtPlayerList.find((player) => player.id === pId)
       ?.podRecords.find((record) => record.podId === podId);
 
-    return `${player?.name}: ${recordData?.w} - ${recordData?.l} - ${recordData?.d}`;
+    return `${recordData?.w} - ${recordData?.l} - ${recordData?.d}`;
   };
 
   return (
     <>
-      <div>MatchId: {thisMatchState()?.matchId}</div>
       <Switch fallback={<></>}>
         <Match when={matchCardState === "pairing"}>
-          <div class={styles.matchSeatCont}>
-            <Seat seatNumber={matchInfo.p1Seat} podId={podId}></Seat>
-            VS
-            <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
-          </div>
-          <div>
-            P1: {getPodRecord(matchInfo.p1Id)} P2:{" "}
-            {getPodRecord(matchInfo.p2Id)}
+          <div class={styles.matchCNT}>
+            <div class={styles.matchPlayerCNT}>
+              <Seat seatNumber={matchInfo.p1Seat} podId={podId}></Seat>
+              <div>{getPodRecord(matchInfo.p1Id)}</div>
+            </div>
+            <div class={styles.vs}>VS</div>
+            <div class={styles.matchPlayerCNT}>
+              <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
+              <div>{getPodRecord(matchInfo.p2Id)}</div>
+            </div>
           </div>
         </Match>
 
         <Match when={matchCardState === "playing"}>
-          <div class={styles.matchCont}>
+          <div class={styles.matchCNT}>
             <div
               class={styles.matchSeatCont}
               style={{
@@ -155,6 +156,15 @@ export default function MatchCard({
                   </button>
                   <button
                     type="submit"
+                    value="p1-1-0"
+                    onClick={() => {
+                      report(1, 0);
+                    }}
+                  >
+                    1-0
+                  </button>
+                  <button
+                    type="submit"
                     value="1-1"
                     onClick={() => {
                       report(1, 1, true);
@@ -164,12 +174,30 @@ export default function MatchCard({
                   </button>
                   <button
                     type="submit"
+                    value="0-0"
+                    onClick={() => {
+                      report(0, 0, true);
+                    }}
+                  >
+                    0-0
+                  </button>
+                  <button
+                    type="submit"
+                    value="p2-1-0"
+                    onClick={() => {
+                      report(0, 1);
+                    }}
+                  >
+                    1-0
+                  </button>
+                  <button
+                    type="submit"
                     value="p2-2-1"
                     onClick={() => {
                       report(1, 2);
                     }}
                   >
-                    1-2
+                    2-1
                   </button>
                   <button
                     type="submit"
@@ -178,7 +206,7 @@ export default function MatchCard({
                       report(0, 2);
                     }}
                   >
-                    0-2
+                    2-0
                   </button>
                 </div>
               </Match>

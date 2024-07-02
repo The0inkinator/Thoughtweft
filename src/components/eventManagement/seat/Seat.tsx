@@ -290,7 +290,7 @@ export default function Seat({
         }
       }}
     >
-      {seatNumber}
+      {/* {seatNumber} */}
       <ByeSeatDisplay />
     </div>
   );

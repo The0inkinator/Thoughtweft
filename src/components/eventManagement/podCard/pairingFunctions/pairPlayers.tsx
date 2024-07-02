@@ -473,9 +473,8 @@ export default function PairPlayers(
       })
       .map((match) => {
         const tempP1Seat = proxySeatNumber;
+        const tempP2Seat = proxySeatNumber + halfTable;
         proxySeatNumber = tempP1Seat + 1;
-        const tempP2Seat = proxySeatNumber;
-        proxySeatNumber = tempP2Seat + 1;
 
         const newMatch: MatchData = {
           ...stockMatchData(),

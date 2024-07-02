@@ -33,72 +33,15 @@ export default function PairPlayers(
     (player) => player.podId === podId
   );
 
-  const generateRecordSheet: () => MatchRecord[] = () => {
-    const tempRecordSheet: MatchRecord[] = [];
+  //PairPlayers() takes a snapshot of the event state and a podid
+  //With these inputs it will determin the round and then either pair players on record or cross pod
+  //The final step of either method returns an array of matches of type MatchData
+  //Other parts of the software will add these to the data and update them appropriately
 
-    podPlayers.map((playerInPod) => {
-      pod.podMatches.forEach((match) => {
-        for (const [key, value] of Object.entries(match)) {
-          if ((value === playerInPod.id && key === "p1Id") || key === "p2Id") {
-            const convertWinData = (
-              playerNum: 1 | 2,
-              data: MatchData["winner"]
-            ) => {
-              if (data === "draw") {
-                return "d";
-              } else if (
-                (playerNum === 1 && data === "p1") ||
-                (playerNum === 2 && data === "p2")
-              ) {
-                return "w";
-              } else {
-                return "l";
-              }
-            };
-
-            const tempEntry1: MatchRecord = {
-              matchId: match.matchId,
-              playerId: match.p1Id,
-              playerRecord: match.p1Score,
-              matchResult: convertWinData(1, match.winner),
-            };
-
-            const tempEntry2: MatchRecord = {
-              matchId: match.matchId,
-              playerId: match.p2Id,
-              playerRecord: match.p2Score,
-              matchResult: convertWinData(2, match.winner),
-            };
-
-            if (
-              match.p1Id === playerInPod.id &&
-              !tempRecordSheet.some(
-                (entry) =>
-                  entry.matchId === tempEntry1.matchId &&
-                  entry.playerId === tempEntry1.playerId
-              )
-            ) {
-              tempRecordSheet.push(tempEntry1);
-            }
-
-            if (
-              match.p2Id === playerInPod.id &&
-              !tempRecordSheet.some(
-                (entry) =>
-                  entry.matchId === tempEntry2.matchId &&
-                  entry.playerId === tempEntry2.playerId
-              )
-            ) {
-              tempRecordSheet.push(tempEntry2);
-            }
-          }
-        }
-      });
-    });
-
-    return tempRecordSheet;
-  };
-
+  //Cross pod pairing
+  //Pairs each player against someone half a table away
+  //Player without an opponent recieves a bye
+  //IMPORTANT: Byes are stored in the data as a player id of: -1
   const pairCrossPod = () => {
     pod.podSeats.map((seat) => {
       if (seat.seatNumber <= halfTable) {
@@ -168,9 +111,88 @@ export default function PairPlayers(
     });
   };
 
+  //Simplifies match and player data to a single readable array
+  //Information is used for pairing on record
+  const generateRecordSheet: () => MatchRecord[] = () => {
+    const tempRecordSheet: MatchRecord[] = [];
+
+    podPlayers.map((playerInPod) => {
+      pod.podMatches.forEach((match) => {
+        for (const [key, value] of Object.entries(match)) {
+          if ((value === playerInPod.id && key === "p1Id") || key === "p2Id") {
+            const convertWinData = (
+              playerNum: 1 | 2,
+              data: MatchData["winner"]
+            ) => {
+              if (data === "draw") {
+                return "d";
+              } else if (
+                (playerNum === 1 && data === "p1") ||
+                (playerNum === 2 && data === "p2")
+              ) {
+                return "w";
+              } else {
+                return "l";
+              }
+            };
+
+            const tempEntry1: MatchRecord = {
+              matchId: match.matchId,
+              playerId: match.p1Id,
+              gamesWon: match.p1Score,
+              matchResult: convertWinData(1, match.winner),
+            };
+
+            const tempEntry2: MatchRecord = {
+              matchId: match.matchId,
+              playerId: match.p2Id,
+              gamesWon: match.p2Score,
+              matchResult: convertWinData(2, match.winner),
+            };
+
+            if (
+              match.p1Id === playerInPod.id &&
+              !tempRecordSheet.some(
+                (entry) =>
+                  entry.matchId === tempEntry1.matchId &&
+                  entry.playerId === tempEntry1.playerId
+              )
+            ) {
+              tempRecordSheet.push(tempEntry1);
+            }
+
+            if (
+              match.p2Id === playerInPod.id &&
+              !tempRecordSheet.some(
+                (entry) =>
+                  entry.matchId === tempEntry2.matchId &&
+                  entry.playerId === tempEntry2.playerId
+              )
+            ) {
+              tempRecordSheet.push(tempEntry2);
+            }
+          }
+        }
+      });
+    });
+
+    return tempRecordSheet;
+  };
+
+  //pairOnRecord() will always generate a new round worth of matches.
+  //the algorithm attempts to generate an optimal round by creating a list
+  //of every potential configuration of round then ranking them following a few criteria.
+  // Rounds are ranked on the following criteria
+  //  - All rounds where a player with a bye recieves another bye are placed at the bottom
+  //  - Rounds where players play an opponent they have already played are ranked next
+  //  - The above rounds are only used if no better rounds exist
+  //  - All remaing rounds are assigned a round quality score where the round scores better
+  //    the more desirable matches exsist I.E. players with identical or close records are being paired
+  //  - A random option of round is then chosen from the pool of rounds with the highest equal round quality
   const pairOnRecord = () => {
     const recordSheet = generateRecordSheet();
 
+    //Converts record sheet to an array with a single entry for each player
     const playerRecordArray: PlayerRecord[] = podPlayers.map((player) => {
       const playerWins = recordSheet.filter(
         (entry) => entry.playerId === player.id && entry.matchResult === "w"
@@ -190,35 +212,30 @@ export default function PairPlayers(
       return playerRecordEntry;
     });
 
-    let playersToPair: PlayerPairing[] = playerRecordArray
-      .map((entry) => {
-        const points = entry.pWins * 3 + entry.pDraws;
-        const byeBoolean = pod.byePlayerIds
-          ? pod.byePlayerIds!.includes(entry.pId)
-          : false;
-        const hasPlayedArray: number[] = pod.podMatches
-          .filter(
-            (match) => match.p1Id === entry.pId || match.p2Id === entry.pId
-          )
-          .map((result) => {
-            return [result.p1Id, result.p2Id].filter(
-              (id) => id !== entry.pId
-            )[0];
-          });
+    //creates an array of relavent player info to be referenced
+    let playersToPair: PlayerPairing[] = playerRecordArray.map((entry) => {
+      const points = entry.pWins * 3 + entry.pDraws;
+      const byeBoolean = pod.byePlayerIds
+        ? pod.byePlayerIds!.includes(entry.pId)
+        : false;
+      const hasPlayedArray: number[] = pod.podMatches
+        .filter((match) => match.p1Id === entry.pId || match.p2Id === entry.pId)
+        .map((result) => {
+          return [result.p1Id, result.p2Id].filter((id) => id !== entry.pId)[0];
+        });
 
-        return {
-          pId: entry.pId,
-          points: points,
-          hasBye: byeBoolean,
-          hasPlayed: hasPlayedArray,
-        };
-      })
-      .sort((a, b) => {
-        if (a.hasBye && !b.hasBye) return -1; // `a` comes before `b` if `a` has a bye and `b` does not
-        if (!a.hasBye && b.hasBye) return 1; // `b` comes before `a` if `b` has a bye and `a` does not
-        return b.points - a.points; // Otherwise, sort by points in descending order
-      });
+      return {
+        pId: entry.pId,
+        points: points,
+        hasBye: byeBoolean,
+        hasPlayed: hasPlayedArray,
+      };
+    });
 
+    //Takes in a list of all player ids to pair then
+    // generates a list of all potential rounds ignoring player seating
+    // i.e. {seat1: p3, seat2: p4} and {seat1: p4, seat2: p3} are considered identical
+    // exports the list of rounds as an array of matches as apairs of player ids
     const createAllRounds: (globalInputArray: BuildingRound[]) => Deposit = (
       globalInputArray: BuildingRound[]
     ) => {
@@ -310,18 +327,22 @@ export default function PairPlayers(
       return depositArray;
     };
 
+    //Create an array of player ids to pair
     const pIdList = playersToPair.map((player) => {
       return player.pId;
     });
+
+    //Generate all potential rounds with the player Id
     const allRounds = createAllRounds(pIdList);
 
+    //Function to get all player info from ids
     const playerDataFromId: (id: number) => PlayerPairing | undefined = (
       id: number
     ) => {
       return playersToPair.find((player) => player.pId === id);
     };
 
-    //Round info
+    //An array of all potential scores in the round to assist with ranking rounds
     const allScores: number[] = [];
     playersToPair.map((player) => {
       if (!allScores.includes(player.points)) {
@@ -330,6 +351,8 @@ export default function PairPlayers(
     });
     allScores.sort((a, b) => b - a);
 
+    //Takes all rounds and sorts them with the most desireable rounds at the begining
+    //of the array
     const sortedRounds = allRounds
       .map((ptlRound, roundIndex) => {
         let byeToByePlayer = false;
@@ -388,6 +411,7 @@ export default function PairPlayers(
         return b.roundQuality - a.roundQuality;
       });
 
+    //Creates an array of all rounds with the highest equal quality score
     const bestRounds = (() => {
       const bestRounds = [];
       const tempSortedRounds = [...sortedRounds];
@@ -414,11 +438,14 @@ export default function PairPlayers(
       return bestRounds;
     })();
 
+    //Chooses one of the "best rounds"
     const chosenRound =
       allRounds[
         bestRounds[Math.floor(Math.random() * bestRounds.length)].index
       ];
 
+    //Stock data that is equivilent of reach match in the form
+    //of a callback function so that the matchId value will update for each match
     const stockMatchData = () => {
       return {
         matchPodId: podId,
@@ -433,6 +460,9 @@ export default function PairPlayers(
 
     let proxySeatNumber = 1;
 
+    //Sorts matches in order of highest points to lowest
+    // Once sorted generates the match objects and pushes them
+    //to the final array
     chosenRound
       .sort((a, b) => {
         return (

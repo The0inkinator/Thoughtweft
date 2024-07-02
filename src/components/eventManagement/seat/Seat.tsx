@@ -289,9 +289,6 @@ export default function Seat({
           updateSeat(podId, seatNumber, { hovered: true });
         }
       }}
-    >
-      {/* {seatNumber} */}
-      <ByeSeatDisplay />
-    </div>
+    ></div>
   );
 }

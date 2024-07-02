@@ -7,3 +7,9 @@
   margin-block: 0.5rem;
   color: aliceblue;
 }
+
+/* .seat > * {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+} */

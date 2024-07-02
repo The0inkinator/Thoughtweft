@@ -125,7 +125,6 @@ export default function PlayerCard({
     if (playerCardMode() !== "dragging") {
       setPlayerCardMode("dragging");
       updatePlayer(playerID, { drag: true });
-      // event.preventDefault();
       thisPlayerCard.style.position = "absolute";
       thisPlayerCard.style.pointerEvents = "none";
       thisPlayerVis.style.position = "absolute";
@@ -162,7 +161,6 @@ export default function PlayerCard({
 
   const dragging = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() === "dragging") {
-      // event.preventDefault();
       if (event instanceof MouseEvent) {
         const x = event.clientX - xOffset + window.scrollX;
         const y = event.clientY - yOffset + window.scrollY;
@@ -217,27 +215,30 @@ export default function PlayerCard({
       class={styles.playerCardCont}
       style={{ "flex-direction": leftSeatPlayer() ? "row" : "row-reverse" }}
       ref={thisPlayerCard}
-      onMouseDown={(event) => {
-        if (
-          !thisPlayerPodState() ||
-          thisPlayerPodState()!.podStatus === "seating"
-        ) {
-          dragInit(event);
-        }
-      }}
-      onTouchStart={(event) => {
-        if (
-          !thisPlayerPodState() ||
-          thisPlayerPodState()!.podStatus === "seating"
-        ) {
-          dragInit(event);
-        }
-      }}
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
-          <div class={styles.playerIcon}></div>
+          <div
+            class={styles.playerIcon}
+            onMouseDown={(event) => {
+              if (
+                !thisPlayerPodState() ||
+                thisPlayerPodState()!.podStatus === "seating"
+              ) {
+                dragInit(event);
+              }
+            }}
+            onTouchStart={(event) => {
+              if (
+                !thisPlayerPodState() ||
+                thisPlayerPodState()!.podStatus === "seating"
+              ) {
+                dragInit(event);
+              }
+            }}
+          ></div>
           <div class={styles.playerName}>{playerName}</div>
+          <div class={styles.dot}></div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
           <Portal>

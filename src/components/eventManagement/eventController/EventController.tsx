@@ -4,22 +4,60 @@ import { useEventContext } from "~/context/EventContext";
 import PlayerHopper from "../playerHopper";
 import PodCard from "../podCard";
 import PodPlusButton from "../podPlusButton";
-import { Event } from "~/typing/eventTypes";
 
 export default function EventController() {
   //Context State
-  const [eventState, { updateSeat, updatePlayer, makeEvent }] =
-    useEventContext();
+  const [eventState, { updateEvent, makeEvent }] = useEventContext();
   //Local State
   const [storedEvent, setStoredEvent] = createSignal<string>(
     JSON.stringify(eventState())
   );
+  const [color, setColor] = createSignal<boolean>(false);
+
+  onMount(() => {
+    updateEvent({ evtLoading: false });
+
+    const retrievedEvent = getCookie("event");
+    if (retrievedEvent === null) {
+      console.log("no event found");
+    } else if (typeof retrievedEvent === "string") {
+      makeEvent(JSON.parse(retrievedEvent));
+    }
+  });
+
+  const setCookie = (name: string, value: string, days?: number) => {
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  };
+
+  const getCookie: (name: string) => string | null = (name: string) => {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === " ") c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  };
+
+  const deleteCookie = (name: string) => {
+    document.cookie = name + "=; Max-Age=-99999999";
+  };
 
   return (
     <>
       <button
+        style={{ "background-color": color() ? "green" : "none" }}
         onClick={() => {
           const staticEvent = JSON.stringify(eventState());
+          setCookie("event", staticEvent);
+          setColor(true);
           setStoredEvent(staticEvent);
         }}
       >
@@ -27,10 +65,22 @@ export default function EventController() {
       </button>
       <button
         onClick={() => {
-          makeEvent(JSON.parse(storedEvent()));
+          const retrievedEvent = getCookie("event");
+          if (retrievedEvent === null) {
+            console.log("no event found");
+          } else if (typeof retrievedEvent === "string") {
+            makeEvent(JSON.parse(retrievedEvent));
+          }
         }}
       >
         Use Stored Event
+      </button>
+      <button
+        onClick={() => {
+          deleteCookie("event");
+        }}
+      >
+        Delete Stored Event
       </button>
       <div class={styles.eventController}>
         <div class={styles.podCNT}>

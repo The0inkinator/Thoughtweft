@@ -7,6 +7,7 @@ import {
   ErrorBoundary,
   Switch,
   Match,
+  onCleanup,
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
@@ -15,6 +16,7 @@ import { MatchData, PodSizes, PodStatusModes } from "~/typing/eventTypes";
 import PairPlayers from "./pairingFunctions/pairPlayers";
 import styles from "./podCard.module.css";
 import MatchCard from "../matchCard";
+import CreateStandings from "./pairingFunctions/createStandings";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -30,6 +32,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const [shuffleMode, setShuffleMode] = createSignal<"default" | "confirm">(
     "default"
   );
+  //Refs
+  let thisPod!: HTMLDivElement;
 
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
@@ -469,14 +473,116 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     );
   };
 
-  const FinishedPodCard = () => {
-    return <></>;
+  interface StandingsEntryInputs {
+    inputWidth: string | number;
+    input: string | number;
+    name: boolean;
+  }
+
+  const StandingsEntry = ({
+    inputWidth,
+    input,
+    name,
+  }: StandingsEntryInputs) => {
+    return (
+      <div
+        class={name ? styles.standingEntryName : styles.standingEntry}
+        style={{
+          width:
+            typeof inputWidth === "number" ? `${inputWidth}rem` : inputWidth,
+        }}
+      >
+        {input}
+      </div>
+    );
   };
+
+  const FinishedPodCard = () => {
+    return (
+      <>
+        <div class={styles.standingsCNT}>
+          <div class={styles.standing}>
+            <StandingsEntry name={false} inputWidth={3} input={"Rank"} />
+            <StandingsEntry name={false} inputWidth={"40%"} input={"Player"} />
+            <StandingsEntry name={false} inputWidth={4} input={"Points"} />
+            <StandingsEntry name={false} inputWidth={8} input={"Record"} />
+            <StandingsEntry name={false} inputWidth={4} input={"OMW"} />
+            <StandingsEntry name={false} inputWidth={4} input={"GW"} />
+            <StandingsEntry name={false} inputWidth={4} input={"OGW"} />
+          </div>
+          <For each={CreateStandings(eventState(), podId)}>
+            {(standing) => (
+              <div class={styles.standing}>
+                <StandingsEntry
+                  name={false}
+                  inputWidth={3}
+                  input={standing.rank}
+                />
+                <StandingsEntry
+                  name={true}
+                  inputWidth={"40%"}
+                  input={standing.name}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={4}
+                  input={standing.points}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={8}
+                  input={`${standing.record.w} - ${standing.record.d} - ${standing.record.l}`}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={4}
+                  input={`${standing.omw}%`}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={4}
+                  input={`${standing.gw}%`}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={4}
+                  input={`${standing.ogw}%`}
+                />
+              </div>
+            )}
+          </For>
+        </div>
+      </>
+    );
+  };
+
+  const handleTouchMove = (event: TouchEvent) => {
+    const boundingBox = thisPod.getBoundingClientRect();
+    if (
+      event.touches[0].clientX >= boundingBox.left &&
+      event.touches[0].clientX <= boundingBox.right &&
+      event.touches[0].clientY >= boundingBox.top &&
+      event.touches[0].clientY <= boundingBox.bottom
+    ) {
+      updatePod(podId, { hovered: true });
+    } else {
+      updatePod(podId, { hovered: false });
+    }
+  };
+
+  onMount(() => {
+    document.addEventListener("touchmove", handleTouchMove);
+
+    onCleanup(() => {
+      document.removeEventListener("touchmove", handleTouchMove);
+    });
+  });
 
   return (
     <DisplayFrame>
       <ErrorBoundary fallback={<>oops!</>}>
         <div
+          ref={thisPod}
           // style={{
           //   "background-color": thisPodState()?.podHovered ? "red" : "green",
           // }}

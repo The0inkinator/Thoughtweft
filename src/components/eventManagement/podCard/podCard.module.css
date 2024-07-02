@@ -58,3 +58,27 @@
   background-color: grey;
   cursor: pointer;
 }
+
+.standingsCNT {
+  display: flex;
+  flex-direction: column;
+}
+
+.standing {
+  background-color: rgb(25, 25, 39);
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.5rem;
+  padding-block: 0.25rem;
+}
+
+.standingEntry {
+  color: white;
+  text-align: center;
+  /* outline: solid red; */
+}
+
+.standingEntryName {
+  overflow: hidden;
+  color: white;
+}

@@ -201,44 +201,75 @@ export default function Seat({
   };
 
   //Handles mouse movement to trigger shuffle function
-  const handleMouseMove = (event: MouseEvent) => {
+  const handleMouseMove = (event: MouseEvent | TouchEvent) => {
     const boundingBox = thisSeat.getBoundingClientRect();
-    if (
-      event.clientX >= boundingBox.left &&
-      event.clientX <= boundingBox.right &&
-      event.clientY >= boundingBox.top &&
-      event.clientY <= boundingBox.bottom &&
-      !mouseOver()
-    ) {
-      setMouseOver(true);
-      if (draggedPlayer() && draggedPlayer()?.dragging === true) {
-        updateSeat(podId, seatNumber, { hovered: true });
-        setTimeout(() => {
-          if (draggedPlayer()) {
-            shufflePlayersFrom(seatNumber);
-          }
-        }, 400);
+    if (event instanceof MouseEvent) {
+      if (
+        event.clientX >= boundingBox.left &&
+        event.clientX <= boundingBox.right &&
+        event.clientY >= boundingBox.top &&
+        event.clientY <= boundingBox.bottom &&
+        !mouseOver()
+      ) {
+        setMouseOver(true);
+        if (draggedPlayer() && draggedPlayer()?.dragging === true) {
+          updateSeat(podId, seatNumber, { hovered: true });
+          setTimeout(() => {
+            if (draggedPlayer()) {
+              shufflePlayersFrom(seatNumber);
+            }
+          }, 400);
+        }
+      } else if (
+        (mouseOver() && event.clientX <= boundingBox.left) ||
+        event.clientX >= boundingBox.right ||
+        event.clientY <= boundingBox.top ||
+        event.clientY >= boundingBox.bottom
+      ) {
+        setMouseOver(false);
+        updateSeat(podId, seatNumber, { hovered: false });
       }
-    } else if (
-      (mouseOver() && event.clientX <= boundingBox.left) ||
-      event.clientX >= boundingBox.right ||
-      event.clientY <= boundingBox.top ||
-      event.clientY >= boundingBox.bottom
-    ) {
-      setMouseOver(false);
-      updateSeat(podId, seatNumber, { hovered: false });
+    } else if (event instanceof TouchEvent) {
+      if (
+        event.touches[0].clientX >= boundingBox.left &&
+        event.touches[0].clientX <= boundingBox.right &&
+        event.touches[0].clientY >= boundingBox.top &&
+        event.touches[0].clientY <= boundingBox.bottom &&
+        !mouseOver()
+      ) {
+        setMouseOver(true);
+        if (draggedPlayer() && draggedPlayer()?.dragging === true) {
+          updateSeat(podId, seatNumber, { hovered: true });
+          setTimeout(() => {
+            if (draggedPlayer()) {
+              shufflePlayersFrom(seatNumber);
+            }
+          }, 400);
+        }
+      } else if (
+        (mouseOver() && event.touches[0].clientX <= boundingBox.left) ||
+        event.touches[0].clientX >= boundingBox.right ||
+        event.touches[0].clientY <= boundingBox.top ||
+        event.touches[0].clientY >= boundingBox.bottom
+      ) {
+        setMouseOver(false);
+        updateSeat(podId, seatNumber, { hovered: false });
+      }
     }
   };
 
   onMount(() => {
     document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("touchmove", handleMouseMove);
     updateSeat(podId, seatNumber, { ref: thisSeat });
     if (byeSeat) {
       setIsByeSeat(true);
     }
   });
+
   onCleanup(() => {
     document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("touchmove", handleMouseMove);
   });
 
   const ByeSeatDisplay = () => {
@@ -253,21 +284,11 @@ export default function Seat({
     <div
       class={styles.seat}
       ref={thisSeat}
-      // style={{
-      //   "background-color": thisSeatState().filled ? "green" : "black",
-      //   outline: mouseOver() ? "solid red" : "none",
-      // }}
       onMouseOver={() => {
         if (!thisSeatState().hovered) {
           updateSeat(podId, seatNumber, { hovered: true });
         }
       }}
-      // onMouseEnter={() => {
-      //   updateSeat(podId, seatNumber, { hovered: true });
-      // }}
-      // onMouseLeave={() => {
-      //   updateSeat(podId, seatNumber, { hovered: false });
-      // }}
     >
       {seatNumber}
       <ByeSeatDisplay />

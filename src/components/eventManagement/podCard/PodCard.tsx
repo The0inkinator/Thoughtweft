@@ -11,8 +11,8 @@ import {
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import Seat from "../seat";
-import { PodSizes, PodStatusModes } from "~/typing/eventTypes";
-import { PairPlayers } from "./playerManagement";
+import { MatchData, PodSizes, PodStatusModes } from "~/typing/eventTypes";
+import PairPlayers from "./pairingFunctions/pairPlayers";
 import styles from "./podCard.module.css";
 import MatchCard from "../matchCard";
 interface PodCardInputs {
@@ -319,7 +319,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           style={{ color: "red" }}
           onClick={() => {
             updatePod(podId, { round: 1 });
-            PairPlayers(eventState(), podId).map((match) => {
+            PairPlayers(eventState(), podId).map((match: MatchData) => {
               updatePod(podId, { newMatch: match });
             });
             eventState()
@@ -433,7 +433,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 updatePod(podId, { round: newRound });
 
                 //Pair matches for next round
-                PairPlayers(eventState(), podId).map((match) => {
+                PairPlayers(eventState(), podId).map((match: MatchData) => {
                   updatePod(podId, { newMatch: match });
                 });
 

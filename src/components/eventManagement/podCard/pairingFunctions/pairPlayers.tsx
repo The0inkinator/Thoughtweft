@@ -19,7 +19,10 @@ type PtlMatch = { p1: number; p2: number };
 type PtlRound = PtlMatch[];
 type Deposit = PtlRound[];
 
-export function PairPlayers(eventData: Event, podId: number) {
+export default function PairPlayers(
+  eventData: Event,
+  podId: number
+): MatchData[] {
   //Static Values
   const pod = eventData.evtPods.find((pod) => pod.podId === podId)!;
   const round = pod.currentRound;
@@ -418,19 +421,19 @@ export function PairPlayers(eventData: Event, podId: number) {
         bestRounds[Math.floor(Math.random() * bestRounds.length)].index
       ];
 
-    const stockMatchData = {
-      matchPodId: podId,
-      matchRound: round!,
-      matchId: allPodMatches?.length
-        ? allPodMatches.length + newMatches.length + 1
-        : 0 + newMatches.length + 1,
-      p1Score: 0,
-      p2Score: 0,
+    const stockMatchData = () => {
+      return {
+        matchPodId: podId,
+        matchRound: round!,
+        matchId: allPodMatches?.length
+          ? allPodMatches.length + newMatches.length + 1
+          : 0 + newMatches.length + 1,
+        p1Score: 0,
+        p2Score: 0,
+      };
     };
 
     let proxySeatNumber = 1;
-
-    // const playerFromId = (id: number) => {return playersToPair.find(player => player.pId === id)!}
 
     chosenRound
       .sort((a, b) => {
@@ -447,7 +450,7 @@ export function PairPlayers(eventData: Event, podId: number) {
         proxySeatNumber = tempP2Seat + 1;
 
         const newMatch: MatchData = {
-          ...stockMatchData,
+          ...stockMatchData(),
           p1Seat: tempP1Seat,
           p1Id: match.p1,
           p2Seat: tempP2Seat,

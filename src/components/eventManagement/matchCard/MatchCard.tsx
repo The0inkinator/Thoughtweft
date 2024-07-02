@@ -15,8 +15,10 @@ export default function MatchCard({
   matchInfo,
   matchCardState,
 }: MatchCardInputs) {
-  const [eventState, { updateMatch, addPlayer, addSeat, updatePod }] =
-    useEventContext();
+  const [
+    eventState,
+    { updateMatch, addPlayer, addSeat, updatePod, updatePlayer },
+  ] = useEventContext();
   const [optionDisplayVisable, setOptionDisplayVisable] =
     createSignal<boolean>(false);
 
@@ -59,12 +61,18 @@ export default function MatchCard({
     if (!player1Seat) {
       addSeat(podId, matchInfo.p1Seat);
     }
+    updatePlayer(matchInfo.p1Id, {
+      address: { podId: podId, seat: matchInfo.p1Seat },
+    });
     const player2Seat = eventState()
       .evtPods.find((pod) => pod.podId === podId)
       ?.podSeats.find((seat) => seat.seatNumber === matchInfo.p2Seat);
     if (!player2Seat) {
       addSeat(podId, matchInfo.p2Seat);
     }
+    updatePlayer(matchInfo.p2Id, {
+      address: { podId: podId, seat: matchInfo.p2Seat },
+    });
   });
 
   const getPodRecord = (pId: number) => {
@@ -80,6 +88,7 @@ export default function MatchCard({
 
   return (
     <>
+      <div>MatchId: {thisMatchState()?.matchId}</div>
       <Switch fallback={<></>}>
         <Match when={matchCardState === "pairing"}>
           <div class={styles.matchSeatCont}>
@@ -108,6 +117,10 @@ export default function MatchCard({
                 Match Drawn
               </Show>
               <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
+            </div>
+            <div>
+              P1: {getPodRecord(matchInfo.p1Id)} P2:{" "}
+              {getPodRecord(matchInfo.p2Id)}
             </div>
             <Switch>
               <Match when={!optionDisplayVisable()}>

@@ -90,12 +90,15 @@ export default function PlayerCard({
 
   createEffect(() => {
     if (thisPlayerCard.parentElement !== targetSeatRef()) {
-      targetSeatRef()?.appendChild(thisPlayerCard);
-      if (
-        targetSeatRef() === eventState().playerHopper &&
-        thisPlayerState().elMounted
-      ) {
-        updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+      if (eventState().playerHopper) {
+        targetSeatRef()!.appendChild(thisPlayerCard);
+
+        if (
+          targetSeatRef() === eventState().playerHopper &&
+          thisPlayerState().elMounted
+        ) {
+          updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+        }
       }
     }
   });

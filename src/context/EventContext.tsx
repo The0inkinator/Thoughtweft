@@ -13,6 +13,7 @@ import {
   SeatAddress,
   MatchUpdateParam,
   MatchData,
+  EventUpdateParam,
 } from "~/typing/eventTypes";
 
 //Typing
@@ -30,6 +31,7 @@ type EventState = [
       inputRoundTime: number
     ) => void;
     removePod: (inputPodId: number) => void;
+    updateEvent: (updateParam: EventUpdateParam) => void;
     updatePodSize: (inputPodId: number, newPodSize: number) => void;
     updatePod: (inputPodId: number, updateParam: PodUpdateParam) => void;
     updateMatch: (
@@ -135,7 +137,8 @@ const SampleEvent: Event = {
   ],
   evtSettings: { playerCap: 0 },
   evtStage: "seating",
-  evtLoading: false,
+  evtLoading: true,
+
   nextPodId: 2,
 };
 
@@ -287,6 +290,19 @@ export function EventContextProvider(props: any) {
                 newEvt.evtPods[index].podNumber = index + 1;
               }
             });
+
+            return newEvt;
+          });
+        },
+
+        //UPDATE EVENT
+        updateEvent(updateParam) {
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+
+            if ("evtLoaded" in updateParam) {
+              newEvt.evtLoading = updateParam.evtLoaded;
+            }
 
             return newEvt;
           });

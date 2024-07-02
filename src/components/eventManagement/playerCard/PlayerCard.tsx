@@ -90,7 +90,7 @@ export default function PlayerCard({
 
   createEffect(() => {
     if (thisPlayerCard.parentElement !== targetSeatRef()) {
-      if (eventState().playerHopper) {
+      if (!eventState().evtLoading) {
         targetSeatRef()!.appendChild(thisPlayerCard);
 
         if (

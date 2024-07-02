@@ -7,18 +7,24 @@ import PodPlusButton from "../podPlusButton";
 
 export default function EventController() {
   //Context State
-  const [eventState, { updateSeat, updatePlayer, makeEvent }] =
-    useEventContext();
+  const [eventState, { updateEvent, makeEvent }] = useEventContext();
   //Local State
   const [storedEvent, setStoredEvent] = createSignal<string>(
     JSON.stringify(eventState())
   );
+  const [color, setColor] = createSignal<boolean>(false);
+
+  onMount(() => {
+    updateEvent({ evtLoading: false });
+  });
 
   return (
     <>
       <button
+        style={{ "background-color": color() ? "green" : "none" }}
         onClick={() => {
           const staticEvent = JSON.stringify(eventState());
+          setColor(true);
           setStoredEvent(staticEvent);
         }}
       >
@@ -26,7 +32,8 @@ export default function EventController() {
       </button>
       <button
         onClick={() => {
-          makeEvent(JSON.parse(storedEvent()));
+          console.log(JSON.parse(storedEvent()));
+          // makeEvent(JSON.parse(storedEvent()));
         }}
       >
         Use Stored Event

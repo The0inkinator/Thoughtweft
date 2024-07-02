@@ -138,7 +138,6 @@ const SampleEvent: Event = {
   evtSettings: { playerCap: 0 },
   evtStage: "seating",
   evtLoading: true,
-
   nextPodId: 2,
 };
 
@@ -300,8 +299,8 @@ export function EventContextProvider(props: any) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
 
-            if ("evtLoaded" in updateParam) {
-              newEvt.evtLoading = updateParam.evtLoaded;
+            if ("evtLoading" in updateParam) {
+              newEvt.evtLoading = updateParam.evtLoading;
             }
 
             return newEvt;

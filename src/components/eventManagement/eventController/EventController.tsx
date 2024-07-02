@@ -4,7 +4,6 @@ import { useEventContext } from "~/context/EventContext";
 import PlayerHopper from "../playerHopper";
 import PodCard from "../podCard";
 import PodPlusButton from "../podPlusButton";
-import { Event } from "~/typing/eventTypes";
 
 export default function EventController() {
   //Context State

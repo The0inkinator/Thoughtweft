@@ -108,7 +108,7 @@ export default function PlayerCard({
     if (playerCardMode() !== "dragging") {
       setPlayerCardMode("dragging");
       updatePlayer(playerID, { drag: true });
-      event.preventDefault();
+      // event.preventDefault();
       thisPlayerCard.style.position = "absolute";
       thisPlayerCard.style.pointerEvents = "none";
       thisPlayerVis.style.position = "absolute";
@@ -145,7 +145,7 @@ export default function PlayerCard({
 
   const dragging = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() === "dragging") {
-      event.preventDefault();
+      // event.preventDefault();
       if (event instanceof MouseEvent) {
         const x = event.clientX - xOffset + window.scrollX;
         const y = event.clientY - yOffset + window.scrollY;

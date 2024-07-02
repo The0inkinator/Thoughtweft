@@ -104,11 +104,11 @@ export default function PlayerCard({
     }
   });
 
-  const dragInit = (event: MouseEvent) => {
+  const dragInit = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() !== "dragging") {
       setPlayerCardMode("dragging");
       updatePlayer(playerID, { drag: true });
-      event.preventDefault;
+      event.preventDefault();
       thisPlayerCard.style.position = "absolute";
       thisPlayerCard.style.pointerEvents = "none";
       thisPlayerVis.style.position = "absolute";
@@ -119,22 +119,44 @@ export default function PlayerCard({
       thisPlayerVis.style.top = `${
         thisPlayerCard.getBoundingClientRect().top
       }px`;
-      xOffset = event.clientX - thisPlayerVis.offsetLeft;
-      yOffset = event.clientY - thisPlayerVis.offsetTop;
+      if (event instanceof MouseEvent) {
+        xOffset = event.clientX - thisPlayerVis.offsetLeft + window.scrollX;
+
+        yOffset = event.clientY - thisPlayerVis.offsetTop + window.scrollY;
+      } else if (event instanceof TouchEvent) {
+        xOffset =
+          event.touches[0].clientX - thisPlayerVis.offsetLeft + window.scrollX;
+        yOffset =
+          event.touches[0].clientY - thisPlayerVis.offsetTop + window.scrollY;
+      }
 
       updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
-      document.addEventListener("mousemove", dragging);
-      document.addEventListener("mouseup", dragEnd);
+
+      if (event instanceof MouseEvent) {
+        document.addEventListener("mousemove", dragging, { passive: false });
+        document.addEventListener("mouseup", dragEnd, { passive: false });
+      } else if (event instanceof TouchEvent) {
+        console.log("touch event triggered");
+        document.addEventListener("touchmove", dragging, { passive: false });
+        document.addEventListener("touchend", dragEnd, { passive: false });
+      }
     }
   };
 
-  const dragging = (event: MouseEvent) => {
+  const dragging = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() === "dragging") {
-      event.preventDefault;
-      const x = event.clientX - xOffset;
-      const y = event.clientY - yOffset;
-      thisPlayerVis.style.left = `${x}px`;
-      thisPlayerVis.style.top = `${y}px`;
+      event.preventDefault();
+      if (event instanceof MouseEvent) {
+        const x = event.clientX - xOffset + window.scrollX;
+        const y = event.clientY - yOffset + window.scrollY;
+        thisPlayerVis.style.left = `${x + window.scrollX}px`;
+        thisPlayerVis.style.top = `${y + window.scrollY}px`;
+      } else if (event instanceof TouchEvent) {
+        const x = event.touches[0].clientX - xOffset + window.scrollX;
+        const y = event.touches[0].clientY - yOffset + window.scrollY;
+        thisPlayerVis.style.left = `${x + window.scrollX}px`;
+        thisPlayerVis.style.top = `${y + window.scrollY}px`;
+      }
     }
   };
 
@@ -165,6 +187,8 @@ export default function PlayerCard({
 
     document.removeEventListener("mousemove", dragging);
     document.removeEventListener("mouseup", dragEnd);
+    document.removeEventListener("touchmove", dragging);
+    document.removeEventListener("touchend", dragEnd);
   };
 
   onMount(() => {
@@ -176,6 +200,14 @@ export default function PlayerCard({
       class={styles.playerCardCont}
       ref={thisPlayerCard}
       onMouseDown={(event) => {
+        if (
+          !thisPlayerPodState() ||
+          thisPlayerPodState()!.podStatus === "seating"
+        ) {
+          dragInit(event);
+        }
+      }}
+      onTouchStart={(event) => {
         if (
           !thisPlayerPodState() ||
           thisPlayerPodState()!.podStatus === "seating"

@@ -76,6 +76,13 @@ export default function MatchCard({
             VS
             <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
           </div>
+          <div style={{ "background-color": "blue" }}>
+            {
+              eventState().evtPlayerList.find(
+                (player) => player.id === matchInfo.p1Id
+              )?.name
+            }
+          </div>
         </Match>
 
         <Match when={matchCardState === "playing"}>

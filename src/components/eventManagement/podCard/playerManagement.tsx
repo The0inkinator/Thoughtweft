@@ -314,13 +314,12 @@ export function PairPlayers(eventData: Event, podId: number) {
     });
     const allRounds = createAllRounds(pIdList);
 
-    console.log("all rounds:", allRounds);
-
     const playerDataFromId: (id: number) => PlayerPairing | undefined = (
       id: number
     ) => {
       return playersToPair.find((player) => player.pId === id);
     };
+
     //Round info
     const allScores: number[] = [];
     playersToPair.map((player) => {
@@ -379,8 +378,6 @@ export function PairPlayers(eventData: Event, podId: number) {
         };
 
         return roundEval;
-
-        // console.log("round evaluaion:", roundEval);
       })
       .sort((a, b) => {
         if (a.byePlayer && !b.byePlayer) return 1;

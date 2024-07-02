@@ -36,7 +36,15 @@ export type Player = {
   podId: number;
   seat: number;
   dragging: boolean;
+  podRecords: PodRecord[];
   elMounted?: boolean;
+};
+
+export type PodRecord = {
+  podId: number;
+  w: number;
+  l: number;
+  d: number;
 };
 
 export type PlayerRecord = {
@@ -44,18 +52,6 @@ export type PlayerRecord = {
   pWins: number;
   pLosses: number;
   pDraws: number;
-};
-
-export type PlayerStanding = {
-  playerId: number;
-  points: number;
-};
-
-export type PlayerPairing = {
-  pId: number;
-  points: number;
-  hasBye: boolean;
-  hasPlayed: number[];
 };
 
 export interface SeatAddress {

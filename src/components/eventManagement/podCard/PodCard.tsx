@@ -470,22 +470,81 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     );
   };
 
+  interface StandingsEntryInputs {
+    inputWidth: string | number;
+    input: string | number;
+    name: boolean;
+  }
+
+  const StandingsEntry = ({
+    inputWidth,
+    input,
+    name,
+  }: StandingsEntryInputs) => {
+    return (
+      <div
+        class={name ? styles.standingEntryName : styles.standingEntry}
+        style={{
+          width:
+            typeof inputWidth === "number" ? `${inputWidth}rem` : inputWidth,
+        }}
+      >
+        {input}
+      </div>
+    );
+  };
+
   const FinishedPodCard = () => {
     return (
       <>
         <div class={styles.standingsCNT}>
+          <div class={styles.standing}>
+            <StandingsEntry name={false} inputWidth={3} input={"Rank"} />
+            <StandingsEntry name={false} inputWidth={"40%"} input={"Player"} />
+            <StandingsEntry name={false} inputWidth={4} input={"Points"} />
+            <StandingsEntry name={false} inputWidth={8} input={"Record"} />
+            <StandingsEntry name={false} inputWidth={4} input={"OMW"} />
+            <StandingsEntry name={false} inputWidth={4} input={"GW"} />
+            <StandingsEntry name={false} inputWidth={4} input={"OGW"} />
+          </div>
           <For each={CreateStandings(eventState(), podId)}>
             {(standing) => (
               <div class={styles.standing}>
-                <div class={styles.standingEntry}>{standing.rank}</div>
-                <div class={styles.standingEntry}>{standing.name}</div>
-                <div class={styles.standingEntry}>{standing.points}</div>
-                <div
-                  class={styles.standingEntry}
-                >{`${standing.record.w} - ${standing.record.d} - ${standing.record.l}`}</div>
-                <div class={styles.standingEntry}>{standing.omw}%</div>
-                <div class={styles.standingEntry}>{standing.gw}%</div>
-                <div class={styles.standingEntry}>{standing.ogw}%</div>
+                <StandingsEntry
+                  name={false}
+                  inputWidth={3}
+                  input={standing.rank}
+                />
+                <StandingsEntry
+                  name={true}
+                  inputWidth={"40%"}
+                  input={standing.name}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={4}
+                  input={standing.points}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={8}
+                  input={`${standing.record.w} - ${standing.record.d} - ${standing.record.l}`}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={4}
+                  input={`${standing.omw}%`}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={4}
+                  input={`${standing.gw}%`}
+                />
+                <StandingsEntry
+                  name={false}
+                  inputWidth={4}
+                  input={`${standing.ogw}%`}
+                />
               </div>
             )}
           </For>

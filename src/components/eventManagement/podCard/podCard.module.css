@@ -74,5 +74,11 @@
 
 .standingEntry {
   color: white;
-  margin-inline: 1rem;
+  text-align: center;
+  /* outline: solid red; */
+}
+
+.standingEntryName {
+  overflow: hidden;
+  color: white;
 }

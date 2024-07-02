@@ -59,7 +59,9 @@ export type PodRecord = {
 export type PlayerRecord = {
   pId: number;
   pWins: number;
+  pGameWins?: number;
   pLosses: number;
+  pGameLosses?: number;
   pDraws: number;
 };
 
@@ -118,6 +120,7 @@ export type MatchRecord = {
   matchId: number;
   playerId: number;
   gamesWon: number;
+  gamesPlayed?: number;
   matchResult: "w" | "l" | "d";
 };
 

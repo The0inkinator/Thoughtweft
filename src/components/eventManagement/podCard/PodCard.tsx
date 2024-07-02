@@ -485,7 +485,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 >{`${standing.record.w} - ${standing.record.d} - ${standing.record.l}`}</div>
                 <div class={styles.standingEntry}>{standing.omw}%</div>
                 <div class={styles.standingEntry}>{standing.gw}%</div>
-                <div class={styles.standingEntry}>{standing.omw}%</div>
+                <div class={styles.standingEntry}>{standing.ogw}%</div>
               </div>
             )}
           </For>

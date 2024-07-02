@@ -186,7 +186,6 @@ export default function PlayerCard({
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
           <div class={styles.playerName} onclick={() => {}}>
-            {playerID}
             {playerName}
           </div>
         </Match>

@@ -430,22 +430,32 @@ export function PairPlayers(eventData: Event, podId: number) {
 
     let proxySeatNumber = 1;
 
-    chosenRound.map((match) => {
-      const tempP1Seat = proxySeatNumber;
-      proxySeatNumber = tempP1Seat + 1;
-      const tempP2Seat = proxySeatNumber;
-      proxySeatNumber = tempP2Seat + 1;
+    // const playerFromId = (id: number) => {return playersToPair.find(player => player.pId === id)!}
 
-      const newMatch: MatchData = {
-        ...stockMatchData,
-        p1Seat: tempP1Seat,
-        p1Id: match.p1,
-        p2Seat: tempP2Seat,
-        p2Id: match.p2,
-      };
+    chosenRound
+      .sort((a, b) => {
+        return (
+          playerDataFromId(b.p1)!.points +
+          playerDataFromId(b.p2)!.points -
+          (playerDataFromId(a.p1)!.points + playerDataFromId(a.p2)!.points)
+        );
+      })
+      .map((match) => {
+        const tempP1Seat = proxySeatNumber;
+        proxySeatNumber = tempP1Seat + 1;
+        const tempP2Seat = proxySeatNumber;
+        proxySeatNumber = tempP2Seat + 1;
 
-      newMatches.push(newMatch);
-    });
+        const newMatch: MatchData = {
+          ...stockMatchData,
+          p1Seat: tempP1Seat,
+          p1Id: match.p1,
+          p2Seat: tempP2Seat,
+          p2Id: match.p2,
+        };
+
+        newMatches.push(newMatch);
+      });
   };
 
   if (round === 1) {

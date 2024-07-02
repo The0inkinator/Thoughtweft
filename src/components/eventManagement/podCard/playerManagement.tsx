@@ -391,14 +391,27 @@ export function PairPlayers(eventData: Event, podId: number) {
       const bestRounds = [];
       const tempSortedRounds = [...sortedRounds];
       let targetRoundQuality = tempSortedRounds[0].roundQuality;
-      while (tempSortedRounds[0].roundQuality === targetRoundQuality) {
-        bestRounds.push(tempSortedRounds[0]);
-        tempSortedRounds.splice(0, 1);
+      let roundDowngraded = false;
+      while (
+        tempSortedRounds[0].roundQuality === targetRoundQuality &&
+        !roundDowngraded
+      ) {
+        if (tempSortedRounds.length === 1) {
+          bestRounds.push(tempSortedRounds[0]);
+          break;
+        } else {
+          if (
+            tempSortedRounds[0].byePlayer !== tempSortedRounds[1].byePlayer ||
+            tempSortedRounds[0].priorOppo !== tempSortedRounds[1].priorOppo
+          ) {
+            roundDowngraded = true;
+          }
+          bestRounds.push(tempSortedRounds[0]);
+          tempSortedRounds.splice(0, 1);
+        }
       }
       return bestRounds;
     })();
-
-    console.log("best rounds:", bestRounds);
 
     const chosenRound =
       allRounds[

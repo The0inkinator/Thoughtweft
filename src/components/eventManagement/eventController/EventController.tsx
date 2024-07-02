@@ -33,7 +33,7 @@ export default function EventController() {
       <button
         onClick={() => {
           console.log(JSON.parse(storedEvent()));
-          // makeEvent(JSON.parse(storedEvent()));
+          makeEvent(JSON.parse(storedEvent()));
         }}
       >
         Use Stored Event

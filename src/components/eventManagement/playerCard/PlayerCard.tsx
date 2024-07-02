@@ -90,15 +90,16 @@ export default function PlayerCard({
 
   createEffect(() => {
     if (thisPlayerCard.parentElement !== targetSeatRef()) {
-      if (!eventState().evtLoading) {
-        targetSeatRef()!.appendChild(thisPlayerCard);
+      if (thisPlayerState().id === 0) {
+        console.log(targetSeatRef());
+      }
+      targetSeatRef()!.appendChild(thisPlayerCard);
 
-        if (
-          targetSeatRef() === eventState().playerHopper &&
-          thisPlayerState().elMounted
-        ) {
-          updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
-        }
+      if (
+        targetSeatRef() === eventState().playerHopper &&
+        thisPlayerState().elMounted
+      ) {
+        updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
       }
     }
   });
@@ -181,9 +182,6 @@ export default function PlayerCard({
         ) {
           dragInit(event);
         }
-      }}
-      onMouseMove={(event) => {
-        dragging(event);
       }}
     >
       <Switch fallback={<></>}>

@@ -218,50 +218,6 @@ export function PairPlayers(eventData: Event, podId: number) {
         return b.points - a.points; // Otherwise, sort by points in descending order
       });
 
-    const remainingTopPlayers = () => {
-      const topPlayerList = playersToPair.filter(
-        (entry) =>
-          entry.points >=
-          Math.max(
-            ...playersToPair.map((entry) => {
-              return entry.points;
-            })
-          )
-      );
-
-      const secondaryPlayerList = playersToPair
-        .filter((entry) => !topPlayerList.includes(entry))
-        .filter(
-          (entry2) =>
-            entry2.points >=
-            Math.max(
-              ...playersToPair
-                .filter((entry) => !topPlayerList.includes(entry))
-                .map((topPlayer) => {
-                  return topPlayer.points;
-                })
-            )
-        );
-      if (topPlayerList.length > 1) {
-        return topPlayerList;
-      } else {
-        return topPlayerList.concat(secondaryPlayerList);
-      }
-    };
-
-    const topPlayers = () => {
-      const tempTopPlayers = playersToPair.filter(
-        (entry) =>
-          entry.points >=
-          Math.max(
-            ...playersToPair.map((entry) => {
-              return entry.points;
-            })
-          )
-      );
-      return tempTopPlayers;
-    };
-
     const createAllRounds: (globalInputArray: BuildingRound[]) => Deposit = (
       globalInputArray: BuildingRound[]
     ) => {
@@ -374,57 +330,110 @@ export function PairPlayers(eventData: Event, podId: number) {
     });
     allScores.sort((a, b) => b - a);
 
-    allRounds.map((ptlRound, roundIndex) => {
-      let byeToByePlayer = false;
-      let pairsPriorOpponent = false;
-      let roundQualityScore = 0;
+    const sortedRounds = allRounds
+      .map((ptlRound, roundIndex) => {
+        let byeToByePlayer = false;
+        let pairsPriorOpponent = false;
+        let roundQualityScore = 0;
 
-      ptlRound.map((match) => {
-        const player1 = playerDataFromId(match.p1);
-        const player2 = playerDataFromId(match.p2);
+        ptlRound.map((match) => {
+          const player1 = playerDataFromId(match.p1);
+          const player2 = playerDataFromId(match.p2);
 
-        if (player1) {
-          if (player1.hasBye && match.p2 === -1) {
-            byeToByePlayer = true;
+          if (player1) {
+            if (player1.hasBye && match.p2 === -1) {
+              byeToByePlayer = true;
+            }
           }
-        }
 
-        if (player1 && player2) {
-          if (player1.hasPlayed.includes(player2.pId)) {
-            pairsPriorOpponent = true;
+          if (player1 && player2) {
+            if (player1.hasPlayed.includes(player2.pId)) {
+              pairsPriorOpponent = true;
+            }
+            if (player1.points === player2.points) {
+              const tempScore = roundQualityScore;
+              roundQualityScore = tempScore + allScores.length;
+            }
+            if (player1.points !== player2.points) {
+              const p1Score = allScores.findIndex(
+                (score) => score === player1.points
+              )!;
+
+              const p2Score = allScores.findIndex(
+                (score) => score === player2.points
+              )!;
+
+              const scoreDistance = Math.abs(p1Score - p2Score);
+              const tempScore = roundQualityScore;
+              roundQualityScore =
+                tempScore + Math.abs(scoreDistance - allScores.length);
+            }
           }
-          if (player1.points === player2.points) {
-            const tempScore = roundQualityScore;
-            roundQualityScore = tempScore + allScores.length;
-          }
-          if (player1.points !== player2.points) {
-            const p1Score = allScores.findIndex(
-              (score) => score === player1.points
-            )!;
-            const p2Score = allScores.findIndex(
-              (score) => score === player1.points
-            )!;
-            const scoreDistance = Math.abs(p1Score - p2Score);
-            const tempScore = roundQualityScore;
-            roundQualityScore =
-              tempScore + Math.abs(scoreDistance - allScores.length);
-          }
-        }
+        });
+
+        const roundEval = {
+          index: roundIndex,
+          byePlayer: byeToByePlayer,
+          priorOppo: pairsPriorOpponent,
+          roundQuality: roundQualityScore,
+        };
+
+        return roundEval;
+
+        // console.log("round evaluaion:", roundEval);
+      })
+      .sort((a, b) => {
+        if (a.byePlayer && !b.byePlayer) return 1;
+        if (b.byePlayer && !a.byePlayer) return -1;
+        if (a.priorOppo && !b.priorOppo) return 1;
+        if (b.priorOppo && !a.priorOppo) return -1;
+        return b.roundQuality - a.roundQuality;
       });
 
-      const roundEval = {
-        index: roundIndex,
-        byePlayer: byeToByePlayer,
-        priorOppo: pairsPriorOpponent,
-        roundQuality: roundQualityScore,
+    const bestRounds = (() => {
+      const bestRounds = [];
+      const tempSortedRounds = [...sortedRounds];
+      let targetRoundQuality = tempSortedRounds[0].roundQuality;
+      while (tempSortedRounds[0].roundQuality === targetRoundQuality) {
+        bestRounds.push(tempSortedRounds[0]);
+        tempSortedRounds.splice(0, 1);
+      }
+      return bestRounds;
+    })();
+
+    const chosenRound =
+      allRounds[
+        bestRounds[Math.floor(Math.random() * bestRounds.length)].index
+      ];
+
+    const stockMatchData = {
+      matchPodId: podId,
+      matchRound: round!,
+      matchId: allPodMatches?.length
+        ? allPodMatches.length
+        : 0 + newMatches.length + 1,
+      p1Score: 0,
+      p2Score: 0,
+    };
+
+    let proxySeatNumber = 1;
+
+    chosenRound.map((match) => {
+      const tempP1Seat = proxySeatNumber;
+      proxySeatNumber = tempP1Seat + 1;
+      const tempP2Seat = proxySeatNumber;
+      proxySeatNumber = tempP2Seat + 1;
+
+      const newMatch: MatchData = {
+        ...stockMatchData,
+        p1Seat: tempP1Seat,
+        p1Id: match.p1,
+        p2Seat: tempP2Seat,
+        p2Id: match.p2,
       };
 
-      console.log("round evaluaion:", roundEval);
+      newMatches.push(newMatch);
     });
-
-    const createMatch = () => {};
-
-    createMatch();
   };
 
   if (round === 1) {

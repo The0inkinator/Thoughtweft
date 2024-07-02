@@ -115,7 +115,7 @@ export type MatchData = {
 export type MatchRecord = {
   matchId: number;
   playerId: number;
-  playerRecord: number;
+  gamesWon: number;
   matchResult: "w" | "l" | "d";
 };
 

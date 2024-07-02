@@ -91,10 +91,6 @@ export default function PlayerCard({
   createEffect(() => {
     const staticTSRef = targetSeatRef();
     if (thisPlayerCard.parentElement !== staticTSRef) {
-      if (thisPlayerState().id === 0) {
-        console.log(staticTSRef);
-      }
-
       if (staticTSRef instanceof HTMLDivElement) {
         staticTSRef.appendChild(thisPlayerCard);
 

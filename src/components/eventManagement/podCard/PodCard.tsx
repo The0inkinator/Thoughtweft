@@ -15,6 +15,7 @@ import { MatchData, PodSizes, PodStatusModes } from "~/typing/eventTypes";
 import PairPlayers from "./pairingFunctions/pairPlayers";
 import styles from "./podCard.module.css";
 import MatchCard from "../matchCard";
+import CreateStandings from "./pairingFunctions/createStandings";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -470,7 +471,27 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   };
 
   const FinishedPodCard = () => {
-    return <></>;
+    return (
+      <>
+        <div class={styles.standingsCNT}>
+          <For each={CreateStandings(eventState(), podId)}>
+            {(standing) => (
+              <div class={styles.standing}>
+                <div class={styles.standingEntry}>{standing.rank}</div>
+                <div class={styles.standingEntry}>{standing.name}</div>
+                <div class={styles.standingEntry}>{standing.points}</div>
+                <div
+                  class={styles.standingEntry}
+                >{`${standing.record.w} - ${standing.record.d} - ${standing.record.l}`}</div>
+                <div class={styles.standingEntry}>{standing.omw}%</div>
+                <div class={styles.standingEntry}>{standing.gw}%</div>
+                <div class={styles.standingEntry}>{standing.omw}%</div>
+              </div>
+            )}
+          </For>
+        </div>
+      </>
+    );
   };
 
   return (

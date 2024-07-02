@@ -267,7 +267,7 @@ export function PairPlayers(eventData: Event, podId: number) {
         return player.pId;
       });
 
-      const makePairingFrom: (globalInputArray: BuildingRound[]) => Deposit = (
+      const createAllMatches: (globalInputArray: BuildingRound[]) => Deposit = (
         globalInputArray: BuildingRound[]
       ) => {
         const depositSet: Set<string> = new Set();
@@ -309,25 +309,21 @@ export function PairPlayers(eventData: Event, podId: number) {
 
                 const player1 = tempNumList[0];
                 const player2 = (() => {
-                  if (tempNumList[i]) {
+                  if (tempNumList[i] !== undefined) {
                     return tempNumList[i];
                   } else {
                     return -1;
                   }
                 })();
-                tempNumList.splice(0, 1);
-                if (tempNumList[i]) {
-                  tempNumList.splice(i - 1, 1);
-                } else {
-                  tempNumList.splice(-1);
-                }
 
                 tempMatchList.push({
                   p1: player1,
                   p2: player2,
                 } as PtlMatch);
                 tempNumList.map((number) => {
-                  tempMatchList.push(number);
+                  if (number !== player1 && number !== player2) {
+                    tempMatchList.push(number);
+                  }
                 });
 
                 makePairingLoop(tempMatchList);
@@ -362,10 +358,7 @@ export function PairPlayers(eventData: Event, podId: number) {
         return depositArray;
       };
 
-      console.log(
-        "all possible matches",
-        makePairingFrom([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-      );
+      console.log("all matches:", createAllMatches(pIdList));
     };
 
     createAllPtlRounds();

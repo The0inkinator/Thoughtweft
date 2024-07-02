@@ -1,9 +1,5 @@
 import { Match } from "solid-js";
 
-export type Record = [number, number, number];
-
-export type MatchRecord = { p1: number; p2: number; draw?: boolean };
-
 export type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export type SeatUpdateParam =
@@ -13,7 +9,15 @@ export type SeatUpdateParam =
 
 export type PlayerUpdateParam =
   | { address: { podId: number; seat: number } }
-  | { drag: boolean };
+  | { drag: boolean }
+  | { fullPodRecord: PodRecord }
+  | {
+      matchRecord: {
+        podId: number;
+        result: { w: number } | { l: number } | { d: number };
+      };
+    }
+  | { elMounted: boolean };
 
 export type PodStatusModes =
   | "seating"
@@ -25,11 +29,13 @@ export type PodStatusModes =
 export type PodUpdateParam =
   | { status: PodStatusModes }
   | { round: number }
-  | { newMatch: MatchData };
+  | { newMatch: MatchData }
+  | { hovered: boolean }
+  | { byePlayer: number };
 
 export type MatchUpdateParam =
-  | { matchCompleted: boolean }
-  | { matchRecord: MatchRecord };
+  | { winner: MatchData["winner"] }
+  | { matchRecord: { p1: number; p2: number } };
 
 export type Player = {
   id: number;
@@ -37,9 +43,22 @@ export type Player = {
   podId: number;
   seat: number;
   dragging: boolean;
-  matchRecord?: Record;
-  eventRecord?: Record;
-  currentOpponentId?: number;
+  podRecords: PodRecord[];
+  elMounted?: boolean;
+};
+
+export type PodRecord = {
+  podId: number;
+  w: number;
+  l: number;
+  d: number;
+};
+
+export type PlayerRecord = {
+  pId: number;
+  pWins: number;
+  pLosses: number;
+  pDraws: number;
 };
 
 export interface SeatAddress {
@@ -53,6 +72,7 @@ export type FullSeat = {
   filled: boolean;
   hovered: boolean;
   seatRef?: HTMLDivElement;
+  byeSeat?: boolean;
 };
 
 export type ProxySeat = {
@@ -74,18 +94,29 @@ export type Pod = {
   podName?: string;
   podCube?: URL;
   byePlayerIds?: number[];
+  podRef?: HTMLDivElement;
+  podHovered?: boolean;
 };
 
 export type MatchData = {
   matchPodId: number;
   matchRound: number;
   matchId: number;
-  matchRecord: MatchRecord;
-  player1Id: number;
-  player1Seat: number;
-  player2Id: number;
-  player2Seat: number;
-  matchCompleted: boolean;
+  p1Id: number;
+  p1Seat: number;
+  p1Score: number;
+  p2Id: number;
+  p2Seat: number;
+  p2Score: number;
+  winner?: "p1" | "p2" | "draw";
+  byeMatch?: boolean;
+};
+
+export type MatchRecord = {
+  matchId: number;
+  playerId: number;
+  gamesWon: number;
+  matchResult: "w" | "l" | "d";
 };
 
 export type EventSettings = {

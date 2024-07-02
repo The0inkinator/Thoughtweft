@@ -22,6 +22,7 @@ type EventState = [
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: (name: string, seatAddress?: SeatAddress) => void;
+    addSeat: (podId: number, seatNumber: number) => void;
     addPod: (
       inputPodSize: PodSizes,
       inputPodRounds: number,
@@ -67,14 +68,70 @@ const SampleEvent: Event = {
   ],
   evtSeats: [],
   evtPlayerList: [
-    { id: 0, name: "Keldan", podId: 1, seat: 1, dragging: false },
-    { id: 1, name: "Colton", podId: 1, seat: 2, dragging: false },
-    { id: 2, name: "Aiden", podId: 1, seat: 3, dragging: false },
-    { id: 3, name: "Harrison", podId: 1, seat: 4, dragging: false },
-    { id: 4, name: "Josh", podId: 1, seat: 5, dragging: false },
-    { id: 5, name: "Daniel", podId: 1, seat: 6, dragging: false },
-    { id: 6, name: "Jesse", podId: 1, seat: 7, dragging: false },
-    { id: 7, name: "Jack", podId: 1, seat: 8, dragging: false },
+    {
+      id: 0,
+      name: "Keldan",
+      podId: 1,
+      seat: 1,
+      dragging: false,
+      podRecords: [],
+    },
+    {
+      id: 1,
+      name: "Colton",
+      podId: 1,
+      seat: 2,
+      dragging: false,
+      podRecords: [],
+    },
+    {
+      id: 2,
+      name: "Aiden",
+      podId: 1,
+      seat: 3,
+      dragging: false,
+      podRecords: [],
+    },
+    {
+      id: 3,
+      name: "Harrison",
+      podId: 1,
+      seat: 4,
+      dragging: false,
+      podRecords: [],
+    },
+    {
+      id: 4,
+      name: "Josh",
+      podId: 1,
+      seat: 5,
+      dragging: false,
+      podRecords: [],
+    },
+    {
+      id: 5,
+      name: "Daniel",
+      podId: 1,
+      seat: 6,
+      dragging: false,
+      podRecords: [],
+    },
+    {
+      id: 6,
+      name: "Jesse",
+      podId: 1,
+      seat: 7,
+      dragging: false,
+      podRecords: [],
+    },
+    {
+      id: 7,
+      name: "Jack",
+      podId: 1,
+      seat: 8,
+      dragging: false,
+      podRecords: [],
+    },
   ],
   evtSettings: { playerCap: 0 },
   evtStage: "seating",
@@ -110,6 +167,7 @@ export function EventContextProvider(props: any) {
               podId: tempPodId,
               seat: tempSeat,
               dragging: false,
+              podRecords: [],
             };
           })();
 
@@ -118,6 +176,39 @@ export function EventContextProvider(props: any) {
             newEvt.evtPlayerList = [...newEvt.evtPlayerList, newPlayer];
             return newEvt;
           });
+        },
+
+        //ADD SEAT
+        addSeat(podId, seatNumber) {
+          const newProxySeat: ProxySeat = {
+            podId: podId,
+            seatNumber: seatNumber,
+          };
+
+          const newFullSeat: FullSeat = {
+            podId: podId,
+            seatNumber: seatNumber,
+            filled: false,
+            hovered: false,
+          };
+
+          const podIndex = event().evtPods.findIndex(
+            (pod) => pod.podId === podId
+          );
+
+          if (podIndex !== -1) {
+            setEvent((prevEvt) => {
+              const newEvt = { ...prevEvt };
+
+              newEvt.evtSeats = [...newEvt.evtSeats, newProxySeat];
+
+              newEvt.evtPods[podIndex].podSeats = [
+                ...newEvt.evtPods[podIndex].podSeats,
+                newFullSeat,
+              ];
+              return newEvt;
+            });
+          }
         },
 
         //ADD POD
@@ -302,6 +393,22 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPods[podIndex].podMatches,
                   scopedParam,
                 ];
+              } else if ("hovered" in updateParam) {
+                const scopedParam = updateParam.hovered;
+
+                newEvt.evtPods[podIndex].podHovered = scopedParam;
+              } else if ("byePlayer" in updateParam) {
+                const scopedParam = updateParam.byePlayer;
+
+                if (!newEvt.evtPods[podIndex].byePlayerIds) {
+                  newEvt.evtPods[podIndex].byePlayerIds = [scopedParam];
+                } else if (
+                  newEvt.evtPods[podIndex].byePlayerIds!.filter(
+                    (id) => id === scopedParam
+                  ).length === 0
+                ) {
+                  newEvt.evtPods[podIndex].byePlayerIds!.push(scopedParam);
+                }
               }
             }
             return newEvt;
@@ -325,19 +432,20 @@ export function EventContextProvider(props: any) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
             if (podIndex !== -1 && matchIndex !== -1) {
-              if ("matchCompleted" in updateParam) {
-                const scopedParam = updateParam.matchCompleted;
+              if ("winner" in updateParam) {
+                const scopedParam = updateParam.winner;
 
                 newEvt.evtPods[podIndex].podMatches[matchIndex] = {
                   ...newEvt.evtPods[podIndex].podMatches[matchIndex],
-                  matchCompleted: scopedParam,
+                  winner: scopedParam,
                 };
               } else if ("matchRecord" in updateParam) {
                 const scopedParam = updateParam.matchRecord;
 
                 newEvt.evtPods[podIndex].podMatches[matchIndex] = {
                   ...newEvt.evtPods[podIndex].podMatches[matchIndex],
-                  matchRecord: scopedParam,
+                  p1Score: scopedParam.p1,
+                  p2Score: scopedParam.p2,
                 };
               }
             }
@@ -393,6 +501,7 @@ export function EventContextProvider(props: any) {
             const newEvt = { ...prevEvt };
 
             if (playerIndex !== -1) {
+              const thisPlayer = newEvt.evtPlayerList[playerIndex];
               if ("address" in updateParam) {
                 newEvt.evtPlayerList[playerIndex] = {
                   ...newEvt.evtPlayerList[playerIndex],
@@ -404,7 +513,75 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPlayerList[playerIndex],
                   dragging: updateParam.drag,
                 };
+              } else if ("elMounted" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  elMounted: updateParam.elMounted,
+                };
+              } else if ("fullPodRecord" in updateParam) {
+                const inputRecord = updateParam.fullPodRecord;
+                const updateRecordIndex = newEvt.evtPlayerList[
+                  playerIndex
+                ].podRecords.findIndex(
+                  (record) => record.podId === inputRecord.podId
+                );
+                if (updateRecordIndex !== -1) {
+                  newEvt.evtPlayerList[playerIndex].podRecords.splice(
+                    updateRecordIndex,
+                    1
+                  );
+                  newEvt.evtPlayerList[playerIndex].podRecords = [
+                    ...newEvt.evtPlayerList[playerIndex].podRecords,
+                    inputRecord,
+                  ];
+                } else {
+                  newEvt.evtPlayerList[playerIndex].podRecords = [
+                    ...newEvt.evtPlayerList[playerIndex].podRecords,
+                    inputRecord,
+                  ];
+                }
+              } else if ("matchRecord" in updateParam) {
+                const podRecordIndex = newEvt.evtPlayerList[
+                  playerIndex
+                ].podRecords.findIndex(
+                  (record) => updateParam.matchRecord.podId === record.podId
+                );
+
+                const newRecord = updateParam.matchRecord.result;
+
+                if (podRecordIndex !== -1) {
+                  const podRecordToUpdate =
+                    thisPlayer.podRecords[podRecordIndex];
+                  if ("w" in newRecord) {
+                    const newWinValue = podRecordToUpdate.w + newRecord.w;
+                    thisPlayer.podRecords[podRecordIndex] = {
+                      ...thisPlayer.podRecords[podRecordIndex],
+                      w: newWinValue,
+                    };
+                  } else if ("l" in newRecord) {
+                    const newLossValue = podRecordToUpdate.l + newRecord.l;
+                    thisPlayer.podRecords[podRecordIndex] = {
+                      ...thisPlayer.podRecords[podRecordIndex],
+                      l: newLossValue,
+                    };
+                  } else if ("d" in newRecord) {
+                    const newDrawValue = podRecordToUpdate.d + newRecord.d;
+                    thisPlayer.podRecords[podRecordIndex] = {
+                      ...thisPlayer.podRecords[podRecordIndex],
+                      d: newDrawValue,
+                    };
+                  }
+                } else {
+                  const newRecordFromInput = {
+                    podId: updateParam.matchRecord.podId,
+                    w: 0,
+                    l: 0,
+                    d: 0,
+                  };
+                  this;
+                }
               }
+
               return newEvt;
             } else {
               return newEvt;

@@ -1,5 +1,5 @@
 import styles from "./matchCard.module.css";
-import PlayerSeat from "../playerSeat/PlayerSeat";
+import Seat from "../seat";
 import { MatchData } from "~/typing/eventTypes";
 import { useEventContext } from "~/context/EventContext";
 import { Match, Show, Switch, createSignal, onMount } from "solid-js";
@@ -15,7 +15,10 @@ export default function MatchCard({
   matchInfo,
   matchCardState,
 }: MatchCardInputs) {
-  const [eventState, { updateMatch, addPlayer }] = useEventContext();
+  const [
+    eventState,
+    { updateMatch, addPlayer, addSeat, updatePod, updatePlayer },
+  ] = useEventContext();
   const [optionDisplayVisable, setOptionDisplayVisable] =
     createSignal<boolean>(false);
 
@@ -27,55 +30,97 @@ export default function MatchCard({
 
   const report = (p1r: number, p2r: number, drawR?: boolean) => {
     updateMatch(podId, thisMatchState()!.matchId, {
-      matchRecord: { p1: p1r, p2: p2r, draw: drawR },
+      matchRecord: { p1: p1r, p2: p2r },
     });
+
+    const winner: MatchData["winner"] = (() => {
+      if (drawR) {
+        return "draw";
+      } else if (p1r > p2r) {
+        return "p1";
+      } else if (p2r > p1r) {
+        return "p2";
+      } else {
+        return "draw";
+      }
+    })();
+
     updateMatch(podId, thisMatchState()!.matchId, {
-      matchCompleted: true,
+      winner: winner,
     });
+  };
+
+  onMount(() => {
+    if (thisMatchState()?.byeMatch) {
+      updatePod(podId, { byePlayer: thisMatchState()!.p1Id });
+    }
+
+    const player1Seat = eventState()
+      .evtPods.find((pod) => pod.podId === podId)
+      ?.podSeats.find((seat) => seat.seatNumber === matchInfo.p1Seat);
+    if (!player1Seat) {
+      addSeat(podId, matchInfo.p1Seat);
+    }
+    updatePlayer(matchInfo.p1Id, {
+      address: { podId: podId, seat: matchInfo.p1Seat },
+    });
+    const player2Seat = eventState()
+      .evtPods.find((pod) => pod.podId === podId)
+      ?.podSeats.find((seat) => seat.seatNumber === matchInfo.p2Seat);
+    if (!player2Seat) {
+      addSeat(podId, matchInfo.p2Seat);
+    }
+    updatePlayer(matchInfo.p2Id, {
+      address: { podId: podId, seat: matchInfo.p2Seat },
+    });
+  });
+
+  const getPodRecord = (pId: number) => {
+    const player = eventState().evtPlayerList.find(
+      (player) => player.id === pId
+    );
+    const recordData = eventState()
+      .evtPlayerList.find((player) => player.id === pId)
+      ?.podRecords.find((record) => record.podId === podId);
+
+    return `${player?.name}: ${recordData?.w} - ${recordData?.l} - ${recordData?.d}`;
   };
 
   return (
     <>
+      <div>MatchId: {thisMatchState()?.matchId}</div>
       <Switch fallback={<></>}>
         <Match when={matchCardState === "pairing"}>
           <div class={styles.matchSeatCont}>
-            <PlayerSeat
-              seatNumber={matchInfo.player1Seat}
-              podId={podId}
-              tableSide="L"
-            ></PlayerSeat>
+            <Seat seatNumber={matchInfo.p1Seat} podId={podId}></Seat>
             VS
-            <PlayerSeat
-              seatNumber={matchInfo.player2Seat}
-              podId={podId}
-              tableSide="R"
-            ></PlayerSeat>
+            <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
+          </div>
+          <div>
+            P1: {getPodRecord(matchInfo.p1Id)} P2:{" "}
+            {getPodRecord(matchInfo.p2Id)}
           </div>
         </Match>
+
         <Match when={matchCardState === "playing"}>
           <div class={styles.matchCont}>
             <div
               class={styles.matchSeatCont}
               style={{
-                "background-color": thisMatchState()?.matchCompleted
-                  ? "green"
-                  : "red",
+                "background-color": thisMatchState()?.winner ? "green" : "red",
               }}
             >
-              <PlayerSeat
-                seatNumber={matchInfo.player1Seat}
-                podId={podId}
-                tableSide="L"
-              ></PlayerSeat>
-              {thisMatchState()?.matchRecord.p1} VS{" "}
-              {thisMatchState()?.matchRecord.p2}
+              <Seat seatNumber={matchInfo.p1Seat} podId={podId}></Seat>
+              {thisMatchState()?.p1Score} VS {thisMatchState()?.p2Score}
               <p></p>
-              <Show when={thisMatchState()?.matchRecord.draw}>Match Drawn</Show>
-              <PlayerSeat
-                seatNumber={matchInfo.player2Seat}
-                podId={podId}
-                tableSide="R"
-              ></PlayerSeat>
+              <Show when={thisMatchState()?.winner === "draw"}>
+                Match Drawn
+              </Show>
+              <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
+            </div>
+            <div>
+              P1: {getPodRecord(matchInfo.p1Id)} P2:{" "}
+              {getPodRecord(matchInfo.p2Id)}
             </div>
             <Switch>
               <Match when={!optionDisplayVisable()}>

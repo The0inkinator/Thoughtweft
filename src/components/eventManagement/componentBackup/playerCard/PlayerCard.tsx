@@ -1,17 +1,23 @@
-import styles from "./playerCard.module.css";
+import "./playerCard.css";
 import { useEventContext } from "~/context/EventContext";
+import { useHovRefContext } from "~/context/HovRefContext";
 import {
   createSignal,
   Switch,
   Match,
-  createEffect,
-  createMemo,
   onMount,
+  createEffect,
+  onCleanup,
+  createMemo,
 } from "solid-js";
-import { seatDataFromDiv } from "~/context/EventDataFunctions";
 import { Portal } from "solid-js/web";
 import { FullSeat } from "~/typing/eventTypes";
-import seat from "../seat";
+import {
+  podIdtoPodNum,
+  podNumtoPodId,
+  seatDataFromDiv,
+} from "~/context/EventDataFunctions";
+
 interface PlayerCardInputs {
   playerID: number;
   playerName: string;
@@ -29,15 +35,15 @@ export default function PlayerCard({
 }: PlayerCardInputs) {
   //Context State
   const [eventState, { updatePlayer, updateSeat }] = useEventContext();
+  const [hovRefState, { updateHovRef }] = useHovRefContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
-  const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
   //refs
 
   let thisPlayerCard!: HTMLDivElement;
   let thisPlayerVis!: HTMLDivElement;
   let xOffset: number, yOffset: number;
-  let pastTargetSeatRef: HTMLDivElement;
+  let pastTargetSeat: HTMLDivElement;
 
   const thisPlayerState = createMemo(() => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
@@ -49,52 +55,69 @@ export default function PlayerCard({
     );
   });
 
-  const seats = () => {
+  const hoveredSeat = () => {
     let allSeats: FullSeat[] = [];
     eventState().evtPods.map((pod) => {
       pod.podSeats.map((seat) => {
         allSeats.push(seat);
       });
     });
-    return allSeats;
-  };
-
-  const podHovered = () => {
-    if (eventState().evtPods.find((pod) => pod.podHovered)) {
-      return true;
+    const tempHoveredSeat = allSeats.find((seat) => seat.hovered === true);
+    if (tempHoveredSeat) {
+      return tempHoveredSeat;
     } else {
-      return false;
+      return {
+        podId: 0,
+        seatNumber: 0,
+        filled: false,
+        hovered: false,
+        seatRef: eventState().playerHopper,
+      };
     }
   };
 
-  const targetSeatRef = () => {
-    const seat = eventState()
+  const targetSeat = () => {
+    const seatRef = eventState()
       .evtPods.find((pod) => pod.podId === thisPlayerState().podId)
-      ?.podSeats.find(
-        (seat) => seat.seatNumber === thisPlayerState().seat
-      )?.seatRef;
+      ?.podSeats.find((seat) => seat.seatNumber === thisPlayerState().seat);
 
-    if (seat) {
-      return seat;
+    if (seatRef) {
+      const tempTargetSeat = seatDataFromDiv(eventState(), seatRef.seatRef!);
+      const playersInSeat = eventState().evtPlayerList.filter(
+        (player) =>
+          podNumtoPodId(eventState(), player.podId) === tempTargetSeat?.podId &&
+          player.seat === tempTargetSeat.seatNumber &&
+          player.id !== playerID
+      ).length;
+      if (tempTargetSeat?.seatRef && playersInSeat === 0) {
+        return tempTargetSeat.seatRef;
+      } else {
+        return pastTargetSeat;
+      }
     } else {
-      return eventState().playerHopper;
+      return eventState().playerHopper!;
     }
   };
 
+  //updates target seats and their filled status
   createEffect(() => {
-    const singleHoveredSeat = seats().find((seat) => seat.hovered);
-    if (singleHoveredSeat !== hoveredSeat() && singleHoveredSeat) {
-      setHoveredSeat(singleHoveredSeat);
-    }
-  });
-
-  createEffect(() => {
-    if (thisPlayerCard.parentElement !== targetSeatRef()) {
-      targetSeatRef()?.appendChild(thisPlayerCard);
+    if (
+      targetSeat() &&
+      targetSeat() !== thisPlayerCard.parentElement &&
+      !thisPlayerState().dragging
+    ) {
       if (
-        targetSeatRef() === eventState().playerHopper &&
-        thisPlayerState().elMounted
+        thisPlayerCard.parentElement instanceof HTMLDivElement &&
+        thisPlayerCard.parentElement !== targetSeat()
       ) {
+        pastTargetSeat = thisPlayerCard.parentElement;
+      }
+      targetSeat().appendChild(thisPlayerCard);
+      const currentSeat = seatDataFromDiv(eventState(), targetSeat());
+      // console.log(thisPlayerState().name, currentSeat);
+      if (currentSeat && currentSeat.filled === false) {
+        updateSeat(currentSeat.podId, currentSeat.seatNumber, { filled: true });
+      } else {
         updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
       }
     }
@@ -118,6 +141,13 @@ export default function PlayerCard({
       xOffset = event.clientX - thisPlayerVis.offsetLeft;
       yOffset = event.clientY - thisPlayerVis.offsetTop;
 
+      const currentSeat = seatDataFromDiv(eventState(), targetSeat());
+
+      if (currentSeat) {
+        updateSeat(currentSeat.podId, currentSeat.seatNumber, {
+          filled: false,
+        });
+      }
       updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
       document.addEventListener("mousemove", dragging);
       document.addEventListener("mouseup", dragEnd);
@@ -143,19 +173,9 @@ export default function PlayerCard({
     thisPlayerVis.style.left = `0px`;
     thisPlayerVis.style.top = `0px`;
 
-    if (podHovered() && hoveredSeat() && !hoveredSeat()?.filled) {
+    if (hoveredSeat().filled === false) {
       updatePlayer(playerID, {
-        address: {
-          podId: hoveredSeat()!.podId,
-          seat: hoveredSeat()!.seatNumber,
-        },
-      });
-    } else if (!podHovered() || thisPlayerState().seat === 0) {
-      updatePlayer(playerID, {
-        address: {
-          podId: 0,
-          seat: 0,
-        },
+        address: { podId: hoveredSeat().podId, seat: hoveredSeat().seatNumber },
       });
     }
 
@@ -163,13 +183,9 @@ export default function PlayerCard({
     document.removeEventListener("mouseup", dragEnd);
   };
 
-  onMount(() => {
-    updatePlayer(playerID, { elMounted: true });
-  });
-
   return (
     <div
-      class={styles.playerCardCont}
+      class="playerCardCont"
       ref={thisPlayerCard}
       onMouseDown={(event) => {
         if (
@@ -185,29 +201,24 @@ export default function PlayerCard({
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
-          <div class={styles.playerName} onclick={() => {}}>
+          <div class="playerName" onclick={() => {}}>
             {playerName}
           </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
           <Portal>
-            <div
-              class={styles.playerName}
-              ref={thisPlayerVis}
-              onclick={() => {}}
-            >
+            <div class="playerName" ref={thisPlayerVis} onclick={() => {}}>
               {playerName}
-              {/* {hoveredSeat()?.podId} {hoveredSeat()?.seatNumber} */}
             </div>
           </Portal>
         </Match>
         <Match when={playerCardMode() === "hoveringSeat"}>
-          <div class={styles.playerName} onclick={() => {}}>
+          <div class="playerName" onclick={() => {}}>
             {playerName}
           </div>
         </Match>
         <Match when={playerCardMode() === "seated"}>
-          <div class={styles.playerName} onclick={() => {}}>
+          <div class="playerName" onclick={() => {}}>
             {playerName}
           </div>
         </Match>

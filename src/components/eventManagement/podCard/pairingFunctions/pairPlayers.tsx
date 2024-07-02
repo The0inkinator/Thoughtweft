@@ -2,9 +2,7 @@ import {
   Event,
   MatchData,
   MatchRecord,
-  Player,
   PlayerRecord,
-  PlayerUpdateParam,
 } from "~/typing/eventTypes";
 
 type PlayerPairing = {

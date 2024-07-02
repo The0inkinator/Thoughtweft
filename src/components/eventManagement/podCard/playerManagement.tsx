@@ -262,119 +262,169 @@ export function PairPlayers(eventData: Event, podId: number) {
       return tempTopPlayers;
     };
 
-    const createAllPtlRounds = () => {
-      const pIdList = playersToPair.map((player) => {
-        return player.pId;
-      });
+    const createAllRounds: (globalInputArray: BuildingRound[]) => Deposit = (
+      globalInputArray: BuildingRound[]
+    ) => {
+      const depositSet: Set<string> = new Set();
 
-      const createAllMatches: (globalInputArray: BuildingRound[]) => Deposit = (
-        globalInputArray: BuildingRound[]
-      ) => {
-        const depositSet: Set<string> = new Set();
-
-        const makePairingLoop = (inputArray: BuildingRound[]) => {
-          if (
-            inputArray.filter((entry) => typeof entry !== "number").length ===
-            inputArray.length
-          ) {
-            const finalArray: PtlRound = inputArray as PtlRound;
-            const orderedFinalArray = finalArray
-              .map((match) => {
-                if (match.p1 > match.p2) {
-                  return match;
-                } else {
-                  return { p1: match.p2, p2: match.p1 };
-                }
-              })
-              .sort((a, b) => b.p1 - a.p1);
-
-            const serializedFinalArray = JSON.stringify(orderedFinalArray);
-
-            if (!depositSet.has(serializedFinalArray)) {
-              depositSet.add(serializedFinalArray);
-            }
-          } else {
-            const inputNumList = inputArray.filter(
-              (entry) => typeof entry === "number"
-            );
-
-            if (inputNumList.length > 1) {
-              for (let i = 1; i < inputNumList.length; i++) {
-                const tempNumList = [
-                  ...inputArray.filter((entry) => typeof entry === "number"),
-                ];
-                const tempMatchList = [
-                  ...inputArray.filter((entry) => typeof entry !== "number"),
-                ];
-
-                const player1 = tempNumList[0];
-                const player2 = (() => {
-                  if (tempNumList[i] !== undefined) {
-                    return tempNumList[i];
-                  } else {
-                    return -1;
-                  }
-                })();
-
-                tempMatchList.push({
-                  p1: player1,
-                  p2: player2,
-                } as PtlMatch);
-                tempNumList.map((number) => {
-                  if (number !== player1 && number !== player2) {
-                    tempMatchList.push(number);
-                  }
-                });
-
-                makePairingLoop(tempMatchList);
+      const makeRoundLoop = (inputArray: BuildingRound[]) => {
+        if (
+          inputArray.filter((entry) => typeof entry !== "number").length ===
+          inputArray.length
+        ) {
+          const finalArray: PtlRound = inputArray as PtlRound;
+          const orderedFinalArray = finalArray
+            .map((match) => {
+              if (match.p1 > match.p2) {
+                return match;
+              } else {
+                return { p1: match.p2, p2: match.p1 };
               }
-            } else if (inputNumList.length === 1) {
+            })
+            .sort((a, b) => b.p1 - a.p1);
+
+          const serializedFinalArray = JSON.stringify(orderedFinalArray);
+
+          if (!depositSet.has(serializedFinalArray)) {
+            depositSet.add(serializedFinalArray);
+          }
+        } else {
+          const inputNumList = inputArray.filter(
+            (entry) => typeof entry === "number"
+          );
+
+          if (inputNumList.length > 1) {
+            for (let i = 1; i < inputNumList.length; i++) {
+              const tempNumList = [
+                ...inputArray.filter((entry) => typeof entry === "number"),
+              ];
               const tempMatchList = [
                 ...inputArray.filter((entry) => typeof entry !== "number"),
               ];
 
+              const player1 = tempNumList[0];
+              const player2 = (() => {
+                if (tempNumList[i] !== undefined) {
+                  return tempNumList[i];
+                } else {
+                  return -1;
+                }
+              })();
+
               tempMatchList.push({
-                p1: inputNumList[0],
-                p2: -1,
+                p1: player1,
+                p2: player2,
               } as PtlMatch);
+              tempNumList.map((number) => {
+                if (number !== player1 && number !== player2) {
+                  tempMatchList.push(number);
+                }
+              });
 
-              makePairingLoop(tempMatchList);
+              makeRoundLoop(tempMatchList);
             }
+          } else if (inputNumList.length === 1) {
+            const tempMatchList = [
+              ...inputArray.filter((entry) => typeof entry !== "number"),
+            ];
+
+            tempMatchList.push({
+              p1: inputNumList[0],
+              p2: -1,
+            } as PtlMatch);
+
+            makeRoundLoop(tempMatchList);
           }
-        };
-
-        for (let i = 0; i < globalInputArray.length; i++) {
-          const adjustedInputArray = globalInputArray
-            .slice(i)
-            .concat(globalInputArray.slice(0, i));
-
-          makePairingLoop(adjustedInputArray);
         }
-
-        const depositArray: Deposit = Array.from(depositSet).map((round) =>
-          JSON.parse(round)
-        ) as Deposit;
-
-        return depositArray;
       };
 
-      console.log("all matches:", createAllMatches(pIdList));
+      for (let i = 0; i < globalInputArray.length; i++) {
+        const adjustedInputArray = globalInputArray
+          .slice(i)
+          .concat(globalInputArray.slice(0, i));
+
+        makeRoundLoop(adjustedInputArray);
+      }
+
+      const depositArray: Deposit = Array.from(depositSet).map((round) =>
+        JSON.parse(round)
+      ) as Deposit;
+
+      return depositArray;
     };
 
-    createAllPtlRounds();
+    const pIdList = playersToPair.map((player) => {
+      return player.pId;
+    });
+    const allRounds = createAllRounds(pIdList);
 
-    const createMatch = () => {
-      // console.log(playersToPair);
+    console.log("all rounds:", allRounds);
+
+    const playerDataFromId: (id: number) => PlayerPairing | undefined = (
+      id: number
+    ) => {
+      return playersToPair.find((player) => player.pId === id);
     };
+    //Round info
+    const allScores: number[] = [];
+    playersToPair.map((player) => {
+      if (!allScores.includes(player.points)) {
+        allScores.push(player.points);
+      }
+    });
+    allScores.sort((a, b) => b - a);
+
+    allRounds.map((ptlRound, roundIndex) => {
+      let byeToByePlayer = false;
+      let pairsPriorOpponent = false;
+      let roundQualityScore = 0;
+
+      ptlRound.map((match) => {
+        const player1 = playerDataFromId(match.p1);
+        const player2 = playerDataFromId(match.p2);
+
+        if (player1) {
+          if (player1.hasBye && match.p2 === -1) {
+            byeToByePlayer = true;
+          }
+        }
+
+        if (player1 && player2) {
+          if (player1.hasPlayed.includes(player2.pId)) {
+            pairsPriorOpponent = true;
+          }
+          if (player1.points === player2.points) {
+            const tempScore = roundQualityScore;
+            roundQualityScore = tempScore + allScores.length;
+          }
+          if (player1.points !== player2.points) {
+            const p1Score = allScores.findIndex(
+              (score) => score === player1.points
+            )!;
+            const p2Score = allScores.findIndex(
+              (score) => score === player1.points
+            )!;
+            const scoreDistance = Math.abs(p1Score - p2Score);
+            const tempScore = roundQualityScore;
+            roundQualityScore =
+              tempScore + Math.abs(scoreDistance - allScores.length);
+          }
+        }
+      });
+
+      const roundEval = {
+        index: roundIndex,
+        byePlayer: byeToByePlayer,
+        priorOppo: pairsPriorOpponent,
+        roundQuality: roundQualityScore,
+      };
+
+      console.log("round evaluaion:", roundEval);
+    });
+
+    const createMatch = () => {};
 
     createMatch();
-
-    // while (playersToPair.length > 0) {
-    //   createMatch();
-    // }
-
-    // console.log(playerRecordArray);
-    // console.log(topPlayers);
   };
 
   if (round === 1) {

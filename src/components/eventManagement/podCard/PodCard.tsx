@@ -7,6 +7,7 @@ import {
   ErrorBoundary,
   Switch,
   Match,
+  onCleanup,
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
@@ -31,6 +32,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const [shuffleMode, setShuffleMode] = createSignal<"default" | "confirm">(
     "default"
   );
+  //Refs
+  let thisPod!: HTMLDivElement;
 
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
@@ -553,10 +556,33 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     );
   };
 
+  const handleTouchMove = (event: TouchEvent) => {
+    const boundingBox = thisPod.getBoundingClientRect();
+    if (
+      event.touches[0].clientX >= boundingBox.left &&
+      event.touches[0].clientX <= boundingBox.right &&
+      event.touches[0].clientY >= boundingBox.top &&
+      event.touches[0].clientY <= boundingBox.bottom
+    ) {
+      updatePod(podId, { hovered: true });
+    } else {
+      updatePod(podId, { hovered: false });
+    }
+  };
+
+  onMount(() => {
+    document.addEventListener("touchmove", handleTouchMove);
+
+    onCleanup(() => {
+      document.removeEventListener("touchmove", handleTouchMove);
+    });
+  });
+
   return (
     <DisplayFrame>
       <ErrorBoundary fallback={<>oops!</>}>
         <div
+          ref={thisPod}
           // style={{
           //   "background-color": thisPodState()?.podHovered ? "red" : "green",
           // }}

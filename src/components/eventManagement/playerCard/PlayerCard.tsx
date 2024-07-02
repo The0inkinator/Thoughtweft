@@ -136,7 +136,6 @@ export default function PlayerCard({
         document.addEventListener("mousemove", dragging, { passive: false });
         document.addEventListener("mouseup", dragEnd, { passive: false });
       } else if (event instanceof TouchEvent) {
-        console.log("touch event triggered");
         document.addEventListener("touchmove", dragging, { passive: false });
         document.addEventListener("touchend", dragEnd, { passive: false });
       }

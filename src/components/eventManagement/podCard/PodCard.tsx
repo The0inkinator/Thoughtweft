@@ -310,6 +310,10 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const DraftingPodCard = () => {
     return (
       <>
+        <div class={styles.podTitle}>
+          Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
+          {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}{" "}
+        </div>
         <button
           type="submit"
           style={{ color: "red" }}
@@ -318,11 +322,19 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             PairPlayers(eventState(), podId).map((match) => {
               updatePod(podId, { newMatch: match });
             });
+            eventState()
+              .evtPlayerList.filter((player) => player.podId === podId)
+              .map((filteredPlayer) => {
+                updatePlayer(filteredPlayer.id, {
+                  fullPodRecord: { podId: podId, w: 0, l: 0, d: 0 },
+                });
+              });
             updatePod(podId, { status: "pairing" });
           }}
         >
           Pair Round 1
         </button>
+
         <div>
           {draftTimerHou()} {draftTimerMin()} {draftTimerSec()}
         </div>
@@ -333,6 +345,10 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const PairingPodCard = () => {
     return (
       <>
+        <div class={styles.podTitle}>
+          Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
+          {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}{" "}
+        </div>
         <div>Pairing Round {thisPodState()?.currentRound}</div>
         <button
           type="submit"
@@ -343,6 +359,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         >
           Begin Round {thisPodState()?.currentRound}
         </button>
+
         {/* Match Cards */}
         <div class={styles.pairingTableCont}>
           <For
@@ -363,9 +380,14 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     );
   };
 
+  //Progressing from this card updates round, creates new Matches, and records players performance.
   const PlayingPodCard = () => {
     return (
       <>
+        <div class={styles.podTitle}>
+          Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
+          {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}{" "}
+        </div>
         <div> Round {thisPodState()?.currentRound}</div>
         <div>timer</div>
         <button
@@ -377,11 +399,49 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             );
             if (remainingMatches?.length === 0) {
               let newRound = thisPodState()!.currentRound! + 1;
-              updatePod(podId, { round: newRound });
-              PairPlayers(eventState(), podId).map((match) => {
-                updatePod(podId, { newMatch: match });
-              });
-              updatePod(podId, { status: "pairing" });
+              if (newRound <= thisPodState()!.podRounds) {
+                //Push records to player's data
+                thisPodState()
+                  ?.podMatches.filter(
+                    (match) => match.matchRound === thisPodState()?.currentRound
+                  )
+                  .map((currentMatch) => {
+                    if (currentMatch.winner === "draw") {
+                      updatePlayer(currentMatch.p1Id, {
+                        matchRecord: { podId: podId, result: { d: 1 } },
+                      });
+                      updatePlayer(currentMatch.p2Id, {
+                        matchRecord: { podId: podId, result: { d: 1 } },
+                      });
+                    } else if (currentMatch.winner === "p1") {
+                      updatePlayer(currentMatch.p1Id, {
+                        matchRecord: { podId: podId, result: { w: 1 } },
+                      });
+                      updatePlayer(currentMatch.p2Id, {
+                        matchRecord: { podId: podId, result: { l: 1 } },
+                      });
+                    } else if (currentMatch.winner === "p2") {
+                      updatePlayer(currentMatch.p1Id, {
+                        matchRecord: { podId: podId, result: { l: 1 } },
+                      });
+                      updatePlayer(currentMatch.p2Id, {
+                        matchRecord: { podId: podId, result: { w: 1 } },
+                      });
+                    }
+                  });
+                // Update to new round
+                updatePod(podId, { round: newRound });
+
+                //Pair matches for next round
+                PairPlayers(eventState(), podId).map((match) => {
+                  updatePod(podId, { newMatch: match });
+                });
+
+                //update pod status
+                updatePod(podId, { status: "pairing" });
+              } else {
+                updatePod(podId, { status: "finished" });
+              }
             } else {
               console.log("Ongoing Matches");
             }

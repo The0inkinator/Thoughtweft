@@ -10,6 +10,13 @@ export type SeatUpdateParam =
 export type PlayerUpdateParam =
   | { address: { podId: number; seat: number } }
   | { drag: boolean }
+  | { fullPodRecord: PodRecord }
+  | {
+      matchRecord: {
+        podId: number;
+        result: { w: number } | { l: number } | { d: number };
+      };
+    }
   | { elMounted: boolean };
 
 export type PodStatusModes =

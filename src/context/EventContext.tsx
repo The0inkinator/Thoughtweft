@@ -501,6 +501,7 @@ export function EventContextProvider(props: any) {
             const newEvt = { ...prevEvt };
 
             if (playerIndex !== -1) {
+              const thisPlayer = newEvt.evtPlayerList[playerIndex];
               if ("address" in updateParam) {
                 newEvt.evtPlayerList[playerIndex] = {
                   ...newEvt.evtPlayerList[playerIndex],
@@ -517,7 +518,70 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPlayerList[playerIndex],
                   elMounted: updateParam.elMounted,
                 };
+              } else if ("fullPodRecord" in updateParam) {
+                const inputRecord = updateParam.fullPodRecord;
+                const updateRecordIndex = newEvt.evtPlayerList[
+                  playerIndex
+                ].podRecords.findIndex(
+                  (record) => record.podId === inputRecord.podId
+                );
+                if (updateRecordIndex !== -1) {
+                  newEvt.evtPlayerList[playerIndex].podRecords.splice(
+                    updateRecordIndex,
+                    1
+                  );
+                  newEvt.evtPlayerList[playerIndex].podRecords = [
+                    ...newEvt.evtPlayerList[playerIndex].podRecords,
+                    inputRecord,
+                  ];
+                } else {
+                  newEvt.evtPlayerList[playerIndex].podRecords = [
+                    ...newEvt.evtPlayerList[playerIndex].podRecords,
+                    inputRecord,
+                  ];
+                }
+              } else if ("matchRecord" in updateParam) {
+                const podRecordIndex = newEvt.evtPlayerList[
+                  playerIndex
+                ].podRecords.findIndex(
+                  (record) => updateParam.matchRecord.podId === record.podId
+                );
+
+                const newRecord = updateParam.matchRecord.result;
+
+                if (podRecordIndex !== -1) {
+                  const podRecordToUpdate =
+                    thisPlayer.podRecords[podRecordIndex];
+                  if ("w" in newRecord) {
+                    const newWinValue = podRecordToUpdate.w + newRecord.w;
+                    thisPlayer.podRecords[podRecordIndex] = {
+                      ...thisPlayer.podRecords[podRecordIndex],
+                      w: newWinValue,
+                    };
+                  } else if ("l" in newRecord) {
+                    const newLossValue = podRecordToUpdate.l + newRecord.l;
+                    thisPlayer.podRecords[podRecordIndex] = {
+                      ...thisPlayer.podRecords[podRecordIndex],
+                      l: newLossValue,
+                    };
+                  } else if ("d" in newRecord) {
+                    const newDrawValue = podRecordToUpdate.d + newRecord.d;
+                    thisPlayer.podRecords[podRecordIndex] = {
+                      ...thisPlayer.podRecords[podRecordIndex],
+                      d: newDrawValue,
+                    };
+                  }
+                } else {
+                  const newRecordFromInput = {
+                    podId: updateParam.matchRecord.podId,
+                    w: 0,
+                    l: 0,
+                    d: 0,
+                  };
+                  this;
+                }
               }
+
               return newEvt;
             } else {
               return newEvt;

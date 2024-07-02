@@ -67,6 +67,17 @@ export default function MatchCard({
     }
   });
 
+  const getPodRecord = (pId: number) => {
+    const player = eventState().evtPlayerList.find(
+      (player) => player.id === pId
+    );
+    const recordData = eventState()
+      .evtPlayerList.find((player) => player.id === pId)
+      ?.podRecords.find((record) => record.podId === podId);
+
+    return `${player?.name}: ${recordData?.w} - ${recordData?.l} - ${recordData?.d}`;
+  };
+
   return (
     <>
       <Switch fallback={<></>}>
@@ -76,12 +87,9 @@ export default function MatchCard({
             VS
             <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
           </div>
-          <div style={{ "background-color": "blue" }}>
-            {
-              eventState().evtPlayerList.find(
-                (player) => player.id === matchInfo.p1Id
-              )?.name
-            }
+          <div>
+            P1: {getPodRecord(matchInfo.p1Id)} P2:{" "}
+            {getPodRecord(matchInfo.p2Id)}
           </div>
         </Match>
 

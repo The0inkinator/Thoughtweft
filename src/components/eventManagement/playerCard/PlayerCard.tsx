@@ -89,17 +89,21 @@ export default function PlayerCard({
   });
 
   createEffect(() => {
-    if (thisPlayerCard.parentElement !== targetSeatRef()) {
+    const staticTSRef = targetSeatRef();
+    if (thisPlayerCard.parentElement !== staticTSRef) {
       if (thisPlayerState().id === 0) {
-        console.log(targetSeatRef());
+        console.log(staticTSRef);
       }
-      targetSeatRef()!.appendChild(thisPlayerCard);
 
-      if (
-        targetSeatRef() === eventState().playerHopper &&
-        thisPlayerState().elMounted
-      ) {
-        updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+      if (staticTSRef instanceof HTMLDivElement) {
+        staticTSRef.appendChild(thisPlayerCard);
+
+        if (
+          staticTSRef === eventState().playerHopper &&
+          thisPlayerState().elMounted
+        ) {
+          updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
+        }
       }
     }
   });

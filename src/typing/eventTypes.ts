@@ -37,7 +37,7 @@ export type MatchUpdateParam =
   | { winner: MatchData["winner"] }
   | { matchRecord: { p1: number; p2: number } };
 
-export type EventUpdateParam = { evtLoaded: boolean };
+export type EventUpdateParam = { evtLoading: boolean };
 
 export type Player = {
   id: number;

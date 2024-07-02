@@ -129,6 +129,7 @@ export default function PlayerCard({
         yOffset =
           event.touches[0].clientY - thisPlayerVis.offsetTop + window.scrollY;
       }
+      dragging(event);
 
       updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
 

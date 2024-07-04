@@ -86,6 +86,20 @@ export default function PlayerCard({
   };
 
   createEffect(() => {
+    if (
+      cardLocX() !== thisPlayerCard.getBoundingClientRect().x &&
+      playerCardMode() !== "dragging"
+    ) {
+      setCardLocX(thisPlayerCard.getBoundingClientRect().x);
+    } else if (
+      thisPlayerVis &&
+      cardLocX() !== thisPlayerVis.getBoundingClientRect().x &&
+      playerCardMode() === "dragging"
+    ) {
+      setCardLocX(thisPlayerVis.getBoundingClientRect().x);
+    }
+  });
+  createEffect(() => {
     if (thisPodState()?.podRef && thisPodState()?.podRef?.parentElement) {
       const podRect = thisPodState()!.podRef!.getBoundingClientRect();
       const podMiddle = podRect.width / 2 + podRect.left;
@@ -128,16 +142,18 @@ export default function PlayerCard({
       setPlayerCardMode("dragging");
       updatePlayer(playerID, { drag: true });
       thisPlayerCard.style.position = "absolute";
-      thisPlayerCard.style.pointerEvents = "none";
-      thisPlayerVis.style.position = "absolute";
+      //----------------------
       thisPlayerVis.style.zIndex = "10";
+      thisPlayerVis.style.position = "absolute";
       thisPlayerVis.style.left = `${
         thisPlayerCard.getBoundingClientRect().left
       }px`;
       thisPlayerVis.style.top = `${
         thisPlayerCard.getBoundingClientRect().top
       }px`;
+
       if (event instanceof MouseEvent) {
+        thisPlayerCard.style.pointerEvents = "none";
         xOffset = event.clientX - thisPlayerVis.offsetLeft + window.scrollX;
 
         yOffset = event.clientY - thisPlayerVis.offsetTop + window.scrollY;
@@ -152,11 +168,11 @@ export default function PlayerCard({
       updatePlayer(playerID, { address: { podId: podId, seat: 0 } });
 
       if (event instanceof MouseEvent) {
-        document.addEventListener("mousemove", dragging, { passive: false });
-        document.addEventListener("mouseup", dragEnd, { passive: false });
+        document.addEventListener("mousemove", dragging);
+        document.addEventListener("mouseup", dragEnd);
       } else if (event instanceof TouchEvent) {
-        document.addEventListener("touchmove", dragging, { passive: false });
-        document.addEventListener("touchend", dragEnd, { passive: false });
+        document.addEventListener("touchmove", dragging);
+        document.addEventListener("touchend", dragEnd);
       }
     }
   };
@@ -169,6 +185,7 @@ export default function PlayerCard({
         thisPlayerVis.style.left = `${x + window.scrollX}px`;
         thisPlayerVis.style.top = `${y + window.scrollY}px`;
       } else if (event instanceof TouchEvent) {
+        console.log("touch move triggered");
         const x = event.touches[0].clientX - xOffset + window.scrollX;
         const y = event.touches[0].clientY - yOffset + window.scrollY;
         thisPlayerVis.style.left = `${x + window.scrollX}px`;
@@ -187,11 +204,12 @@ export default function PlayerCard({
   const dragEnd = () => {
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.pointerEvents = "auto";
-    setPlayerCardMode("noSeat");
-    updatePlayer(playerID, { drag: false });
+    //----------------------
     thisPlayerVis.style.position = "static";
     thisPlayerVis.style.left = `0px`;
     thisPlayerVis.style.top = `0px`;
+    setPlayerCardMode("noSeat");
+    updatePlayer(playerID, { drag: false });
 
     if (
       podHovered().hovered &&
@@ -257,10 +275,20 @@ export default function PlayerCard({
     }, 1);
   });
 
+  createEffect(() => {
+    console.log(playerCardMode());
+  });
+
   return (
     <div
       class={styles.playerCardCNT}
       ref={thisPlayerCard}
+      // style={{
+      //   outline:
+      //     playerCardMode() === "dragging"
+      //       ? "solid thin blue"
+      //       : "solid thin red",
+      // }}
       onMouseDown={(event) => {
         if (!thisPodState() || thisPodState()!.podStatus === "seating") {
           dragInit(event);
@@ -279,7 +307,13 @@ export default function PlayerCard({
               leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
             }`}
           >
-            <div class={styles.playerIcon}></div>
+            <div
+              class={styles.playerIcon}
+              style={{
+                "background-color":
+                  playerCardMode() === "dragging" ? "red" : "grey",
+              }}
+            ></div>
             <div class={styles.playerName}>{playerName}</div>
           </div>
         </Match>
@@ -291,7 +325,13 @@ export default function PlayerCard({
                   leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
                 }`}
               >
-                <div class={styles.playerIcon}></div>
+                <div
+                  class={styles.playerIcon}
+                  style={{
+                    "background-color":
+                      playerCardMode() === "dragging" ? "red" : "grey",
+                  }}
+                ></div>
                 <div class={styles.playerName}>{playerName}</div>
               </div>
             </div>

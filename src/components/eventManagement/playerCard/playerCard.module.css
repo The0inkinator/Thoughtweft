@@ -8,7 +8,6 @@
 }
 
 .playerRVisCNT {
-  /* outline: solid thin green; */
   touch-action: none;
   position: absolute;
   display: flex;
@@ -17,7 +16,6 @@
 }
 
 .playerLVisCNT {
-  /* outline: solid thin green; */
   touch-action: none;
   position: absolute;
   display: flex;

@@ -1,22 +1,23 @@
-.playerCardCont {
+.playerCardCNT {
   position: relative;
-  /* width: var(--PlayerCard); */
-  /* aspect-ratio: 3/1; */
+  width: 1.5rem;
+  aspect-ratio: 1/1;
   display: flex;
-  align-items: center;
-  /* overflow: hidden; */
+  /* align-items: center; */
   touch-action: none;
-  top: 50%;
+  /* top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
+  outline: solid blue;
+  /* width: 0px; */
+  /* height: 0px; */
 }
 
 .playerIcon {
-  height: 1.5rem;
+  width: 1.5rem;
   aspect-ratio: 1/1;
   background-color: rgb(167, 163, 185);
-  margin-inline: 5%;
-  border-radius: 0.75rem;
+  /* border-radius: 0.75rem; */
   outline: solid red;
 }
 

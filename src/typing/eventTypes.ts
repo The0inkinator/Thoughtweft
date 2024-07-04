@@ -17,7 +17,7 @@ export type PlayerUpdateParam =
         result: { w: number } | { l: number } | { d: number };
       };
     }
-  | { elMounted: boolean };
+  | { elMounted: HTMLDivElement };
 
 export type PodStatusModes =
   | "seating"
@@ -46,7 +46,7 @@ export type Player = {
   seat: number;
   dragging: boolean;
   podRecords: PodRecord[];
-  elMounted?: boolean;
+  elMounted?: HTMLDivElement;
 };
 
 export type PodRecord = {

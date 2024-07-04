@@ -205,53 +205,46 @@ export default function PlayerCard({
   };
 
   onMount(() => {
-    updatePlayer(playerID, { elMounted: true });
+    thisPlayerState().elMounted?.remove();
+    updatePlayer(playerID, { elMounted: thisPlayerCard });
   });
 
   return (
     <div
-      class={styles.playerCardCont}
+      class={styles.playerCardCNT}
       style={{ "flex-direction": leftSeatPlayer() ? "row-reverse" : "row" }}
       ref={thisPlayerCard}
+      onMouseDown={(event) => {
+        if (
+          !thisPlayerPodState() ||
+          thisPlayerPodState()!.podStatus === "seating"
+        ) {
+          dragInit(event);
+        }
+      }}
+      onTouchStart={(event) => {
+        if (
+          !thisPlayerPodState() ||
+          thisPlayerPodState()!.podStatus === "seating"
+        ) {
+          dragInit(event);
+        }
+      }}
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
-          <div
-            class={styles.playerIcon}
-            onMouseDown={(event) => {
-              if (
-                !thisPlayerPodState() ||
-                thisPlayerPodState()!.podStatus === "seating"
-              ) {
-                dragInit(event);
-              }
-            }}
-            onTouchStart={(event) => {
-              if (
-                !thisPlayerPodState() ||
-                thisPlayerPodState()!.podStatus === "seating"
-              ) {
-                dragInit(event);
-              }
-            }}
-          ></div>
-          <div class={styles.playerName}>
-            {playerName}
-            {thisPlayerState().seat}
-          </div>
+          <div class={styles.playerIcon}></div>
+          <div class={styles.playerName}>{playerName}</div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
           <Portal>
-            <div class={styles.playerCardCont} ref={thisPlayerVis}>
+            <div class={styles.playerCardCNT} ref={thisPlayerVis}>
               <div class={styles.playerIcon}></div>
-              <div class={styles.playerName}>
-                {thisPlayerState().seat}
-                {playerName}
-              </div>
+              <div class={styles.playerName}>{playerName}</div>
             </div>
           </Portal>
         </Match>
-        <Match when={playerCardMode() === "hoveringSeat"}>
+        {/* <Match when={playerCardMode() === "hoveringSeat"}>
           <div class={styles.playerName} onclick={() => {}}>
             {playerName}
           </div>
@@ -260,7 +253,7 @@ export default function PlayerCard({
           <div class={styles.playerName} onclick={() => {}}>
             {playerName}
           </div>
-        </Match>
+        </Match> */}
       </Switch>
     </div>
   );

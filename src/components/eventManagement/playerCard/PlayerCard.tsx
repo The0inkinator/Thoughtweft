@@ -34,11 +34,11 @@ export default function PlayerCard({
   const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
   const [leftSeatPlayer, setLeftSeatPlayer] = createSignal<boolean>(false);
   //refs
-
   let thisPlayerCard!: HTMLDivElement;
   let thisPlayerVis!: HTMLDivElement;
   let xOffset: number, yOffset: number;
-  let pastTargetSeatRef: HTMLDivElement;
+  //Values
+  let mountedNum: Number;
 
   const thisPlayerState = createMemo(() => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
@@ -205,7 +205,18 @@ export default function PlayerCard({
   };
 
   onMount(() => {
-    thisPlayerState().elMounted?.remove();
+    if (
+      thisPlayerState().elMounted?.parentElement &&
+      thisPlayerState().elMounted !== thisPlayerCard
+    ) {
+      if (
+        thisPlayerCard.parentElement &&
+        thisPlayerCard.parentElement.childElementCount > 0
+      ) {
+        thisPlayerState().elMounted?.remove();
+        updatePlayer(playerID, { elMounted: thisPlayerCard });
+      }
+    }
     updatePlayer(playerID, { elMounted: thisPlayerCard });
   });
 

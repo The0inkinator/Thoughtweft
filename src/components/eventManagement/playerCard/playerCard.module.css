@@ -1,24 +1,34 @@
 .playerCardCNT {
+  touch-action: none;
   position: relative;
-  width: 1.5rem;
+  width: var(--PlayerCard);
   aspect-ratio: 1/1;
   display: flex;
-  /* align-items: center; */
-  touch-action: none;
-  /* top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); */
-  /* outline: solid blue; */
-  /* width: 0px; */
-  /* height: 0px; */
+  /* outline: solid thin blue; */
+}
+
+.playerRVisCNT {
+  /* outline: solid thin green; */
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.playerLVisCNT {
+  /* outline: solid thin green; */
+  position: absolute;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  transform: translateX(calc(-100% + var(--PlayerCard)));
 }
 
 .playerIcon {
-  width: 1.5rem;
+  width: var(--PlayerCard);
   aspect-ratio: 1/1;
+  border-radius: calc(var(--PlayerCard) / 2);
   background-color: rgb(167, 163, 185);
-  /* border-radius: 0.75rem; */
-  outline: solid red;
 }
 
 .playerName {
@@ -27,4 +37,5 @@
   font-weight: bold;
   height: 1rem;
   pointer-events: none;
+  margin-inline: calc(var(--PlayerCard) / 4);
 }

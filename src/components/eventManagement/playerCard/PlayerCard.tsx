@@ -125,6 +125,7 @@ export default function PlayerCard({
       updatePlayer(playerID, { drag: true });
       thisPlayerCard.style.position = "absolute";
       thisPlayerCard.style.pointerEvents = "none";
+      thisPlayerCard.style.touchAction = "none";
       thisPlayerVis.style.position = "absolute";
       thisPlayerVis.style.zIndex = "10";
       thisPlayerVis.style.left = `${
@@ -176,6 +177,7 @@ export default function PlayerCard({
   const dragEnd = () => {
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.pointerEvents = "auto";
+    thisPlayerCard.style.touchAction = "auto";
     setPlayerCardMode("noSeat");
     updatePlayer(playerID, { drag: false });
     thisPlayerVis.style.position = "static";
@@ -205,6 +207,7 @@ export default function PlayerCard({
   };
 
   onMount(() => {
+    //This code prevents duplicat player cards add adds the player card ref to the state
     if (
       thisPlayerState().elMounted?.parentElement &&
       thisPlayerState().elMounted !== thisPlayerCard
@@ -223,7 +226,6 @@ export default function PlayerCard({
   return (
     <div
       class={styles.playerCardCNT}
-      style={{ "flex-direction": leftSeatPlayer() ? "row-reverse" : "row" }}
       ref={thisPlayerCard}
       onMouseDown={(event) => {
         if (
@@ -244,14 +246,26 @@ export default function PlayerCard({
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
-          <div class={styles.playerIcon}></div>
-          <div class={styles.playerName}>{playerName}</div>
+          <div
+            class={`${
+              leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
+            }`}
+          >
+            <div class={styles.playerIcon}></div>
+            <div class={styles.playerName}>{playerName}</div>
+          </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
           <Portal>
             <div class={styles.playerCardCNT} ref={thisPlayerVis}>
-              <div class={styles.playerIcon}></div>
-              <div class={styles.playerName}>{playerName}</div>
+              <div
+                class={`${
+                  leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
+                }`}
+              >
+                <div class={styles.playerIcon}></div>
+                <div class={styles.playerName}>{playerName}</div>
+              </div>
             </div>
           </Portal>
         </Match>

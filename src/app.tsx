@@ -8,6 +8,7 @@ import { TestProvider } from "./context/TestContext";
 import { EventContextProvider } from "./context/EventContext";
 
 import "./app.css";
+import "./styling/globalFonts.css";
 import { HovRefContextProvider } from "./context/HovRefContext";
 
 export default function App() {

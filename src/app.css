@@ -10,9 +10,14 @@
 /*CUSTOM FONTS*/
 
 @font-face {
-  font-family: "Modern Sans";
-  src: url("../fonts/ModernSans-Light.otf");
+  font-family: "Roboto";
+  src: url("/public/fonts/Roboto-Regular.ttf");
 }
+@font-face {
+  font-family: "RobotoBold";
+  src: url("/public/fonts/Roboto-Bold.ttf");
+}
+
 /*SITEWIDE VALUES*/
 :root {
   /*Colors*/
@@ -20,6 +25,9 @@
 
   /* Fonts & Font Variables */
   --BodyFont: Modern Sans, Arial, sans-serif;
+
+  /*Fonts*/
+  --FontOne: "Times New Roman";
 
   /*Global Sizing*/
   --PlayerSeat: 2rem;

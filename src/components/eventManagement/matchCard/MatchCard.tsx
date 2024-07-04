@@ -93,7 +93,9 @@ export default function MatchCard({
           <div class={styles.matchCNT}>
             <div class={styles.matchPlayerCNT}>
               <Seat seatNumber={matchInfo.p1Seat} podId={podId}></Seat>
-              <div>{getPodRecord(matchInfo.p1Id)}</div>
+              <div class={styles.recordText}>
+                {getPodRecord(matchInfo.p1Id)}
+              </div>
             </div>
             <div class={styles.vs}>VS</div>
             <div class={styles.matchPlayerCNT}>

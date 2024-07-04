@@ -1,18 +1,26 @@
 .matchCNT {
-  outline: solid green;
+  /* outline: solid thin green; */
   display: flex;
   justify-content: center;
 }
 
 .matchPlayerCNT {
-  outline: solid pink;
-  width: fit-content;
+  /* outline: solid thin pink; */
+  width: calc(var(--PlayerSeat) * 2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .vs {
   display: flex;
-  flex-direction: row;
-  background-color: red;
+  flex-direction: column;
+  justify-content: center;
+  font-family: "RobotoBold";
+  color: lightgrey;
+}
+
+.recordText {
 }
 
 .reportOptionCont {

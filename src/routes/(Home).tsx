@@ -3,7 +3,7 @@ import HeaderDefault from "~/components/layout/headerDefault";
 import TestElement from "~/components/Test/TestElement";
 import EventController from "../components/eventManagement/eventController";
 
-import "../routeStyling/home.css";
+import "../styling/home.css";
 
 export default function Home() {
   <Title>Home</Title>;

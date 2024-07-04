@@ -4,7 +4,6 @@
   width: var(--PlayerCard);
   aspect-ratio: 1/1;
   display: flex;
-  /* outline: solid thin blue; */
 }
 
 .playerRVisCNT {
@@ -25,6 +24,7 @@
 }
 
 .playerIcon {
+  touch-action: none;
   width: var(--PlayerCard);
   aspect-ratio: 1/1;
   border-radius: calc(var(--PlayerCard) / 2);

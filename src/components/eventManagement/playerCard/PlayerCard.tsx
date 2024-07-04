@@ -10,7 +10,7 @@ import {
 } from "solid-js";
 import { seatDataFromDiv } from "~/context/EventDataFunctions";
 import { Portal } from "solid-js/web";
-import { FullSeat } from "~/typing/eventTypes";
+import { FullSeat, Pod } from "~/typing/eventTypes";
 import seat from "../seat";
 interface PlayerCardInputs {
   playerID: number;
@@ -60,11 +60,12 @@ export default function PlayerCard({
     return allSeats;
   };
 
-  const podHovered = () => {
-    if (eventState().evtPods.find((pod) => pod.podHovered)) {
-      return true;
+  const podHovered: () => { hovered: boolean; state?: Pod } = () => {
+    const foundPod = eventState().evtPods.find((pod) => pod.podHovered);
+    if (foundPod) {
+      return { hovered: true, state: foundPod };
     } else {
-      return false;
+      return { hovered: false };
     }
   };
 
@@ -179,6 +180,12 @@ export default function PlayerCard({
         thisPlayerVis.style.top = `${y + window.scrollY}px`;
       }
       setCardLocX(thisPlayerCard.getBoundingClientRect().x);
+
+      if (podHovered().hovered) {
+        updatePlayer(playerID, {
+          address: { podId: podHovered().state!.podId, seat: 0 },
+        });
+      }
     }
   };
 
@@ -192,7 +199,12 @@ export default function PlayerCard({
     thisPlayerVis.style.left = `0px`;
     thisPlayerVis.style.top = `0px`;
 
-    if (podHovered() && hoveredSeat() && !hoveredSeat()?.filled) {
+    if (
+      podHovered().hovered &&
+      hoveredSeat() &&
+      !hoveredSeat()?.filled &&
+      hoveredSeat()?.podId === podHovered().state?.podId
+    ) {
       updatePlayer(playerID, {
         address: {
           podId: hoveredSeat()!.podId,
@@ -200,17 +212,17 @@ export default function PlayerCard({
         },
       });
     } else if (
-      podHovered() &&
-      thisPodState()?.podSeats.find((seat) => !seat.filled)
+      podHovered().hovered &&
+      podHovered().state!.podSeats.find((seat) => !seat.filled)
     ) {
       updatePlayer(playerID, {
         address: {
-          podId: thisPodState()!.podId,
-          seat: thisPodState()!.podSeats.find((seat) => !seat.filled)!
+          podId: podHovered().state!.podId,
+          seat: podHovered().state!.podSeats.find((seat) => !seat.filled)!
             .seatNumber,
         },
       });
-    } else if (!podHovered() || thisPlayerState().seat === 0) {
+    } else if (!podHovered().hovered || thisPlayerState().seat === 0) {
       updatePlayer(playerID, {
         address: {
           podId: 0,
@@ -226,7 +238,7 @@ export default function PlayerCard({
   };
 
   onMount(() => {
-    //This code prevents duplicat player cards add adds the player card ref to the state
+    //Prevents duplicate player cards add adds the player card ref to the state
     if (
       thisPlayerState().elMounted?.parentElement &&
       thisPlayerState().elMounted !== thisPlayerCard

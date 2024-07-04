@@ -9,6 +9,7 @@
 
 .playerRVisCNT {
   /* outline: solid thin green; */
+  touch-action: none;
   position: absolute;
   display: flex;
   flex-direction: row;
@@ -17,6 +18,7 @@
 
 .playerLVisCNT {
   /* outline: solid thin green; */
+  touch-action: none;
   position: absolute;
   display: flex;
   flex-direction: row-reverse;

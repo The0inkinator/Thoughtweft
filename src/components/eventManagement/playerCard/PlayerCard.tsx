@@ -39,6 +39,7 @@ export default function PlayerCard({
   let thisPlayerVis!: HTMLDivElement;
   let xOffset: number, yOffset: number;
   //Values
+  let startingPodRef: HTMLDivElement;
 
   const thisPlayerState = createMemo(() => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
@@ -78,7 +79,6 @@ export default function PlayerCard({
     )?.seatRef;
 
     if (seat) {
-      // console.log("target seat found");
       return seat;
     } else {
       return eventState().playerHopper;
@@ -86,7 +86,7 @@ export default function PlayerCard({
   };
 
   createEffect(() => {
-    if (thisPodState()?.podRef) {
+    if (thisPodState()?.podRef && thisPodState()?.podRef?.parentElement) {
       const podRect = thisPodState()!.podRef!.getBoundingClientRect();
       const podMiddle = podRect.width / 2 + podRect.left;
 
@@ -129,7 +129,6 @@ export default function PlayerCard({
       updatePlayer(playerID, { drag: true });
       thisPlayerCard.style.position = "absolute";
       thisPlayerCard.style.pointerEvents = "none";
-      thisPlayerCard.style.touchAction = "none";
       thisPlayerVis.style.position = "absolute";
       thisPlayerVis.style.zIndex = "10";
       thisPlayerVis.style.left = `${
@@ -188,7 +187,6 @@ export default function PlayerCard({
   const dragEnd = () => {
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.pointerEvents = "auto";
-    thisPlayerCard.style.touchAction = "auto";
     setPlayerCardMode("noSeat");
     updatePlayer(playerID, { drag: false });
     thisPlayerVis.style.position = "static";
@@ -248,6 +246,15 @@ export default function PlayerCard({
       }
     }
     updatePlayer(playerID, { elMounted: thisPlayerCard });
+    setCardLocX(thisPlayerCard.getBoundingClientRect().x);
+    setTimeout(() => {
+      if (thisPodState()?.podRef) {
+        const podRects = thisPodState()!.podRef!.getBoundingClientRect();
+        if (cardLocX() < podRects.left + podRects.width / 2) {
+          setLeftSeatPlayer(true);
+        }
+      }
+    }, 1);
   });
 
   return (

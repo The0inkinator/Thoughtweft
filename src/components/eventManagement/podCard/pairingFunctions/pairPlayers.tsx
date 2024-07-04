@@ -289,6 +289,7 @@ export default function PairPlayers(
                 p1: player1,
                 p2: player2,
               } as PtlMatch);
+
               tempNumList.map((number) => {
                 if (number !== player1 && number !== player2) {
                   tempMatchList.push(number);

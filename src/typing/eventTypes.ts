@@ -31,7 +31,8 @@ export type PodUpdateParam =
   | { round: number }
   | { newMatch: MatchData }
   | { hovered: boolean }
-  | { byePlayer: number };
+  | { byePlayer: number }
+  | { ref: HTMLDivElement };
 
 export type MatchUpdateParam =
   | { winner: MatchData["winner"] }

@@ -556,25 +556,41 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     );
   };
 
-  const handleTouchMove = (event: TouchEvent) => {
+  const handleMove = (event: TouchEvent | MouseEvent) => {
     const boundingBox = thisPod.getBoundingClientRect();
-    if (
-      event.touches[0].clientX >= boundingBox.left &&
-      event.touches[0].clientX <= boundingBox.right &&
-      event.touches[0].clientY >= boundingBox.top &&
-      event.touches[0].clientY <= boundingBox.bottom
-    ) {
-      updatePod(podId, { hovered: true });
-    } else {
-      updatePod(podId, { hovered: false });
+    if (event instanceof TouchEvent) {
+      if (
+        event.touches[0].clientX >= boundingBox.left &&
+        event.touches[0].clientX <= boundingBox.right &&
+        event.touches[0].clientY >= boundingBox.top &&
+        event.touches[0].clientY <= boundingBox.bottom
+      ) {
+        updatePod(podId, { hovered: true });
+      } else {
+        updatePod(podId, { hovered: false });
+      }
+    } else if (event instanceof MouseEvent) {
+      if (
+        event.clientX >= boundingBox.left &&
+        event.clientX <= boundingBox.right &&
+        event.clientY >= boundingBox.top &&
+        event.clientY <= boundingBox.bottom
+      ) {
+        updatePod(podId, { hovered: true });
+      } else {
+        updatePod(podId, { hovered: false });
+      }
     }
   };
 
   onMount(() => {
-    document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchmove", handleMove);
+    document.addEventListener("mousemove", handleMove);
+    updatePod(podId, { ref: thisPod });
 
     onCleanup(() => {
-      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchmove", handleMove);
+      document.removeEventListener("mousemove", handleMove);
     });
   });
 
@@ -584,7 +600,9 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         <div
           ref={thisPod}
           // style={{
-          //   "background-color": thisPodState()?.podHovered ? "red" : "green",
+          //   outline: thisPodState()?.podHovered
+          //     ? "solid thin red"
+          //     : "solid thin green",
           // }}
           onMouseEnter={() => {
             updatePod(podId, { hovered: true });

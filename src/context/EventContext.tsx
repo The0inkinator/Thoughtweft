@@ -424,6 +424,10 @@ export function EventContextProvider(props: any) {
                 ) {
                   newEvt.evtPods[podIndex].byePlayerIds!.push(scopedParam);
                 }
+              } else if ("ref" in updateParam) {
+                const scopedParam = updateParam.ref;
+
+                newEvt.evtPods[podIndex].podRef = scopedParam;
               }
             }
             return newEvt;

@@ -272,7 +272,7 @@ export default function PairPlayers(
               const tempNumList = [
                 ...inputArray.filter((entry) => typeof entry === "number"),
               ];
-              const tempMatchList = [
+              const tempMatchList: (PtlMatch | number)[] = [
                 ...inputArray.filter((entry) => typeof entry !== "number"),
               ];
 

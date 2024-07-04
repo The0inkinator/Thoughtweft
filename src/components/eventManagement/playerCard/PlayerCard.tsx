@@ -86,10 +86,6 @@ export default function PlayerCard({
   };
 
   createEffect(() => {
-    console.log(thisPodState());
-  });
-
-  createEffect(() => {
     if (thisPodState()?.podRef) {
       const podRect = thisPodState()!.podRef!.getBoundingClientRect();
       const podMiddle = podRect.width / 2 + podRect.left;
@@ -179,7 +175,7 @@ export default function PlayerCard({
         thisPlayerVis.style.left = `${x + window.scrollX}px`;
         thisPlayerVis.style.top = `${y + window.scrollY}px`;
       }
-      setCardLocX(thisPlayerCard.getBoundingClientRect().x);
+      setCardLocX(thisPlayerVis.getBoundingClientRect().x);
 
       if (podHovered().hovered) {
         updatePlayer(playerID, {

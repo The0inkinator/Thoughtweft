@@ -29,8 +29,10 @@ interface PodCardInputs {
 //MAIN FUNCTION
 export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   //Context State
-  const [eventState, { updatePodSize, removePod, updatePlayer, updatePod }] =
-    useEventContext();
+  const [
+    eventState,
+    { updatePodSize, removePod, updatePlayer, updatePod, removePlayer },
+  ] = useEventContext();
   //Local State
   const [shuffleMode, setShuffleMode] = createSignal<"default" | "confirm">(
     "default"
@@ -64,6 +66,14 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   onMount(() => {
     updatePodSize(podId, thisPodState()!.podSize);
+  });
+  onCleanup(() => {
+    eventState()
+      .evtPlayerList.filter((player) => player.podId === podId)
+      .map((foundPlayer) => {
+        foundPlayer.elMounted?.remove();
+        removePlayer(foundPlayer.id);
+      });
   });
 
   const shufflePod = () => {

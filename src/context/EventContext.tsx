@@ -23,6 +23,7 @@ type EventState = [
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: (name: string, seatAddress?: SeatAddress) => void;
+    removePlayer: (playerId: number) => void;
     addSeat: (podId: number, seatNumber: number) => void;
     addPod: (
       inputPodSize: PodSizes,
@@ -176,6 +177,23 @@ export function EventContextProvider(props: any) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
             newEvt.evtPlayerList = [...newEvt.evtPlayerList, newPlayer];
+            return newEvt;
+          });
+        },
+
+        //REMOVE PLAYER
+        removePlayer(playerId) {
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+
+            const playerIndex = newEvt.evtPlayerList.findIndex(
+              (player) => player.id === playerId
+            );
+
+            if (playerIndex !== -1) {
+              newEvt.evtPlayerList.splice(playerIndex, 1);
+            }
+
             return newEvt;
           });
         },

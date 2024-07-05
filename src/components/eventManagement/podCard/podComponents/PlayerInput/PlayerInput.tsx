@@ -47,6 +47,7 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
       if (playerNameValue() && firstPodSeat(eventState(), podId)) {
         createNewPlayer(playerNameValue(), firstPodSeat(eventState(), podId));
         setPlayerNameValue("");
+        console.log(eventState().evtPlayerList);
       } else {
         console.log("pod full");
       }

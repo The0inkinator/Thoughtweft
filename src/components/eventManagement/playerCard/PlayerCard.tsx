@@ -29,7 +29,8 @@ export default function PlayerCard({
   seatNumber,
 }: PlayerCardInputs) {
   //Context State
-  const [eventState, { updatePlayer, updateSeat }] = useEventContext();
+  const [eventState, { updatePlayer, updateSeat, removePlayer }] =
+    useEventContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
   const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();

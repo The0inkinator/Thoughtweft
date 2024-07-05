@@ -4,6 +4,7 @@ import {
   For,
   onMount,
   createMemo,
+  Show,
   ErrorBoundary,
   Switch,
   Match,
@@ -35,6 +36,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   );
   //Refs
   let thisPod!: HTMLDivElement;
+  let overlayMenu!: HTMLDivElement;
 
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
@@ -96,6 +98,12 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
       }
     });
   };
+
+  createEffect(() => {
+    if (thisPodState()?.popUpOn && thisPodState()?.popUpRef !== overlayMenu) {
+      updatePod(podId, { popUpRef: overlayMenu });
+    }
+  });
 
   const shrinkPod = () => {
     const playersInPod = eventState().evtPlayerList.filter(
@@ -548,11 +556,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
       <ErrorBoundary fallback={<>oops!</>}>
         <div
           ref={thisPod}
-          // style={{
-          //   outline: thisPodState()?.podHovered
-          //     ? "solid thin red"
-          //     : "solid thin green",
-          // }}
           onMouseEnter={() => {
             updatePod(podId, { hovered: true });
           }}
@@ -578,6 +581,9 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             </Match>
           </Switch>
         </div>
+        <Show when={thisPodState()?.popUpOn}>
+          <div class={styles.overlayMenu} ref={overlayMenu}></div>
+        </Show>
       </ErrorBoundary>
     </DisplayFrame>
   );

@@ -32,7 +32,9 @@ export type PodUpdateParam =
   | { newMatch: MatchData }
   | { hovered: boolean }
   | { byePlayer: number }
-  | { ref: HTMLDivElement };
+  | { ref: HTMLDivElement }
+  | { popUpOn: boolean }
+  | { popUpRef: HTMLDivElement };
 
 export type MatchUpdateParam =
   | { winner: MatchData["winner"] }
@@ -101,6 +103,8 @@ export type Pod = {
   byePlayerIds?: number[];
   podRef?: HTMLDivElement;
   podHovered?: boolean;
+  popUpOn?: boolean;
+  popUpRef?: HTMLDivElement;
 };
 
 export type MatchData = {

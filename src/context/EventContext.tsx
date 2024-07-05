@@ -428,6 +428,10 @@ export function EventContextProvider(props: any) {
                 const scopedParam = updateParam.ref;
 
                 newEvt.evtPods[podIndex].podRef = scopedParam;
+              } else if ("popUpOn" in updateParam) {
+                newEvt.evtPods[podIndex].popUpOn = updateParam.popUpOn;
+              } else if ("popUpRef" in updateParam) {
+                newEvt.evtPods[podIndex].popUpRef = updateParam.popUpRef;
               }
             }
             return newEvt;

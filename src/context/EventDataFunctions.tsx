@@ -81,3 +81,16 @@ export function firstOpenSeatAddress(importedEventState: Event) {
     } as SeatAddress;
   }
 }
+
+export function firstPodSeat(eventData: Event, podId: number) {
+  const Pod = eventData.evtPods.find((pod) => pod.podId === podId);
+
+  const firstOpenSeat = Pod?.podSeats.find((seat) => !seat.filled);
+
+  if (firstOpenSeat) {
+    return {
+      podId: podId,
+      seat: firstOpenSeat.seatNumber,
+    } as SeatAddress;
+  }
+}

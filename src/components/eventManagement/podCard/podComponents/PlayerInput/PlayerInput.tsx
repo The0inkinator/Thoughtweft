@@ -12,7 +12,10 @@ import {
 } from "solid-js";
 import { Player, SeatAddress } from "~/typing/eventTypes";
 import PlayerCard from "~/components/eventManagement/playerCard";
-import { firstOpenSeatAddress } from "~/context/EventDataFunctions";
+import {
+  firstOpenSeatAddress,
+  firstPodSeat,
+} from "~/context/EventDataFunctions";
 
 interface PlayerInputInputs {
   podId: number;
@@ -24,9 +27,8 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
     useEventContext();
   //Local State
   const [playerNameValue, setPlayerNameValue] = createSignal<string>("");
-  const [addToPod, setAddToPod] = createSignal<boolean>(true);
   //Refs
-
+  //Values
   const inputOwner = getOwner();
 
   const createPlayerFromData = (playerInfo: Player) => {
@@ -61,17 +63,11 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
 
   const createPlayerFromSubmit = () => {
     runWithOwner(inputOwner, () => {
-      if (playerNameValue()) {
-        if (addToPod()) {
-          createNewPlayer(
-            playerNameValue(),
-            firstOpenSeatAddress(eventState())
-          );
-          setPlayerNameValue("");
-        } else {
-          createNewPlayer(playerNameValue());
-          setPlayerNameValue("");
-        }
+      if (playerNameValue() && firstPodSeat(eventState(), podId)) {
+        createNewPlayer(playerNameValue(), firstPodSeat(eventState(), podId));
+        setPlayerNameValue("");
+      } else {
+        console.log("pod full");
       }
     });
   };
@@ -94,26 +90,12 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
         ></input>
         <button
           type="submit"
-          style={{ width: "1rem", height: "1rem" }}
+          style={{ width: "1.2rem", height: "1.2rem" }}
           class="addPlayerButton"
           onClick={() => {
             createPlayerFromSubmit();
           }}
         ></button>
-        <p></p>
-        <input
-          type="checkbox"
-          id="addToPod"
-          checked={addToPod()}
-          onClick={() => {
-            if (addToPod()) {
-              setAddToPod(false);
-            } else if (!addToPod()) {
-              setAddToPod(true);
-            }
-          }}
-        ></input>
-        <label for="addToPod">Add to Pod?</label>
       </div>
     </div>
   );

@@ -84,7 +84,7 @@ export default function EventController() {
       </button>
       <div class={styles.eventController}>
         <div class={styles.podCNT}>
-          <PlayerHopper />
+          {/* <PlayerHopper /> */}
           <For each={eventState().evtPods}>
             {(pod) => (
               <PodCard

@@ -19,6 +19,7 @@ import styles from "./podCard.module.css";
 import MatchCard from "../matchCard";
 import CreateStandings from "./pairingFunctions/createStandings";
 import PodTimer from "./podComponents/podTimer/PodTimer";
+import PlayerInput from "./podComponents/playerInput/PlayerInput";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -130,6 +131,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const SeatingPodCard = () => {
     return (
       <>
+        <PlayerInput podId={podId} />
         <div class={styles.podTitle}>
           Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
           {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}

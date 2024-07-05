@@ -464,13 +464,19 @@ export default function PairPlayers(
     //Sorts matches in order of highest points to lowest
     // Once sorted generates the match objects and pushes them
     //to the final array
+    console.log(chosenRound);
     chosenRound
       .sort((a, b) => {
-        return (
-          playerDataFromId(b.p1)!.points +
-          playerDataFromId(b.p2)!.points -
-          (playerDataFromId(a.p1)!.points + playerDataFromId(a.p2)!.points)
-        );
+        if (playerDataFromId(b.p2) && playerDataFromId(a.p2)) {
+          console.log(playerDataFromId(a.p1));
+          return (
+            playerDataFromId(b.p1)!.points +
+            playerDataFromId(b.p2)!.points -
+            (playerDataFromId(a.p1)!.points + playerDataFromId(a.p2)!.points)
+          );
+        } else {
+          return 1;
+        }
       })
       .map((match) => {
         const tempP1Seat = proxySeatNumber;

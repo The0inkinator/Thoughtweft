@@ -464,18 +464,22 @@ export default function PairPlayers(
     //Sorts matches in order of highest points to lowest
     // Once sorted generates the match objects and pushes them
     //to the final array
-    console.log(chosenRound);
     chosenRound
       .sort((a, b) => {
         if (playerDataFromId(b.p2) && playerDataFromId(a.p2)) {
-          console.log(playerDataFromId(a.p1));
           return (
             playerDataFromId(b.p1)!.points +
             playerDataFromId(b.p2)!.points -
             (playerDataFromId(a.p1)!.points + playerDataFromId(a.p2)!.points)
           );
         } else {
-          return 1;
+          if (a.p2 === -1 && b.p2 !== -1) {
+            return 1;
+          } else if (a.p2 !== -1 && b.p2 === -1) {
+            return -1;
+          } else {
+            return 1;
+          }
         }
       })
       .map((match) => {
@@ -489,6 +493,8 @@ export default function PairPlayers(
           p1Id: match.p1,
           p2Seat: tempP2Seat,
           p2Id: match.p2,
+          byeMatch: match.p2 === -1 ? true : undefined,
+          winner: match.p2 === -1 ? "p1" : undefined,
         };
 
         newMatches.push(newMatch);

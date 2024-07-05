@@ -137,7 +137,9 @@ export default function MatchCard({
             <div class={styles.matchPlayerCNT}>
               <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
               <div class={styles.recordText}>
-                {getPodRecord(matchInfo.p2Id)}
+                {thisMatchState()?.p2Id === -1
+                  ? ""
+                  : getPodRecord(matchInfo.p2Id)}
               </div>
             </div>
           </div>
@@ -201,7 +203,11 @@ export default function MatchCard({
                   <ReportButton player="p2" wins={2} losses={1}></ReportButton>
                   <ReportButton player="p2" wins={1} losses={0}></ReportButton>
                 </Match>
-                <Match when={!optionDisplayVisable()}>
+                <Match
+                  when={
+                    !optionDisplayVisable() && thisMatchState()?.p2Id !== -1
+                  }
+                >
                   <div class={styles.recordText}>
                     {getPodRecord(matchInfo.p1Id)}
                   </div>

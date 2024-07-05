@@ -21,7 +21,25 @@
 }
 
 .recordText {
+  font-family: var(--SubHeaderFont);
+  color: rgb(16, 16, 22);
 }
 
 .reportOptionCont {
+}
+
+.reportButton {
+  all: unset;
+  width: calc(var(--PlayerSeat) * 1);
+  aspect-ratio: 1/1;
+  border-radius: calc(var(--PlayerSeat));
+  font-size: calc(var(--PlayerSeat) / 3);
+  background-color: var(--BackgroundColor);
+  text-align: center;
+  color: lightgrey;
+  font-family: "Roboto";
+}
+
+.reportButton:hover {
+  background-color: black;
 }

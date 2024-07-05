@@ -86,6 +86,42 @@ export default function MatchCard({
     return `${recordData?.w} - ${recordData?.l} - ${recordData?.d}`;
   };
 
+  interface ReportButtonInputs {
+    player: "p1" | "p2" | "draw";
+    wins: 0 | 1 | 2;
+    losses: 0 | 1 | 2;
+  }
+  const ReportButton = ({ player, wins, losses }: ReportButtonInputs) => {
+    let value1: number = 0;
+    let value2: number = 0;
+    let displayRecord: string = "0-0";
+
+    if (player === "draw") {
+      value1 = wins;
+      value2 = wins;
+      displayRecord = `${value1} - ${value2}`;
+    } else if (player === "p1") {
+      value1 = wins;
+      value2 = losses;
+      displayRecord = `${value1} - ${value2}`;
+    } else if (player === "p2") {
+      value1 = losses;
+      value2 = wins;
+      displayRecord = `${value2} - ${value1}`;
+    }
+    return (
+      <button
+        class={styles.reportButton}
+        type="submit"
+        onClick={() => {
+          report(value1, value2);
+        }}
+      >
+        {displayRecord}
+      </button>
+    );
+  };
+
   return (
     <>
       <Switch fallback={<></>}>
@@ -100,119 +136,78 @@ export default function MatchCard({
             <div class={styles.vs}>VS</div>
             <div class={styles.matchPlayerCNT}>
               <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
-              <div>{getPodRecord(matchInfo.p2Id)}</div>
+              <div class={styles.recordText}>
+                {getPodRecord(matchInfo.p2Id)}
+              </div>
             </div>
           </div>
         </Match>
 
         <Match when={matchCardState === "playing"}>
           <div class={styles.matchCNT}>
-            <div
-              class={styles.matchSeatCont}
-              style={{
-                "background-color": thisMatchState()?.winner ? "green" : "red",
-              }}
-            >
+            <div class={styles.matchPlayerCNT}>
               <Seat seatNumber={matchInfo.p1Seat} podId={podId}></Seat>
-              {thisMatchState()?.p1Score} VS {thisMatchState()?.p2Score}
-              <p></p>
-              <Show when={thisMatchState()?.winner === "draw"}>
-                Match Drawn
-              </Show>
+              <Switch>
+                <Match when={optionDisplayVisable()}>
+                  <ReportButton player="p1" wins={2} losses={0}></ReportButton>
+                  <ReportButton player="p1" wins={2} losses={1}></ReportButton>
+                  <ReportButton player="p1" wins={1} losses={0}></ReportButton>
+                </Match>
+                <Match when={!optionDisplayVisable()}>
+                  <div class={styles.recordText}>
+                    {getPodRecord(matchInfo.p1Id)}
+                  </div>
+                </Match>
+              </Switch>
+            </div>
+            <div class={styles.vs}>
+              <Switch>
+                <Match when={optionDisplayVisable()}>
+                  <ReportButton
+                    player="draw"
+                    wins={1}
+                    losses={0}
+                  ></ReportButton>
+                  <ReportButton
+                    player="draw"
+                    wins={0}
+                    losses={0}
+                  ></ReportButton>
+                </Match>
+                <Match when={!optionDisplayVisable()}>
+                  <button
+                    class={styles.reportButton}
+                    style={{
+                      "background-color": thisMatchState()?.winner
+                        ? "green"
+                        : "",
+                    }}
+                    onClick={() => {
+                      if (matchInfo.p2Id !== -1) {
+                        setOptionDisplayVisable(true);
+                      }
+                    }}
+                  >
+                    Report
+                  </button>
+                </Match>
+              </Switch>
+            </div>
+            <div class={styles.matchPlayerCNT}>
               <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
+              <Switch>
+                <Match when={optionDisplayVisable()}>
+                  <ReportButton player="p2" wins={2} losses={0}></ReportButton>
+                  <ReportButton player="p2" wins={2} losses={1}></ReportButton>
+                  <ReportButton player="p2" wins={1} losses={0}></ReportButton>
+                </Match>
+                <Match when={!optionDisplayVisable()}>
+                  <div class={styles.recordText}>
+                    {getPodRecord(matchInfo.p1Id)}
+                  </div>
+                </Match>
+              </Switch>
             </div>
-            <div>
-              P1: {getPodRecord(matchInfo.p1Id)} P2:{" "}
-              {getPodRecord(matchInfo.p2Id)}
-            </div>
-            <Switch>
-              <Match when={!optionDisplayVisable()}>
-                <button
-                  onClick={() => {
-                    setOptionDisplayVisable(true);
-                  }}
-                >
-                  Report
-                </button>
-              </Match>
-              <Match when={optionDisplayVisable()}>
-                {/* REPORT BUTTONS */}
-                <div style={styles.reportOptionCont}>
-                  <button
-                    type="submit"
-                    value="p1-2-0"
-                    onClick={() => {
-                      report(2, 0);
-                    }}
-                  >
-                    2-0
-                  </button>
-                  <button
-                    type="submit"
-                    value="p1-2-1"
-                    onClick={() => {
-                      report(2, 1);
-                    }}
-                  >
-                    2-1
-                  </button>
-                  <button
-                    type="submit"
-                    value="p1-1-0"
-                    onClick={() => {
-                      report(1, 0);
-                    }}
-                  >
-                    1-0
-                  </button>
-                  <button
-                    type="submit"
-                    value="1-1"
-                    onClick={() => {
-                      report(1, 1, true);
-                    }}
-                  >
-                    1-1
-                  </button>
-                  <button
-                    type="submit"
-                    value="0-0"
-                    onClick={() => {
-                      report(0, 0, true);
-                    }}
-                  >
-                    0-0
-                  </button>
-                  <button
-                    type="submit"
-                    value="p2-1-0"
-                    onClick={() => {
-                      report(0, 1);
-                    }}
-                  >
-                    1-0
-                  </button>
-                  <button
-                    type="submit"
-                    value="p2-2-1"
-                    onClick={() => {
-                      report(1, 2);
-                    }}
-                  >
-                    2-1
-                  </button>
-                  <button
-                    type="submit"
-                    value="p2-2-0"
-                    onClick={() => {
-                      report(0, 2);
-                    }}
-                  >
-                    2-0
-                  </button>
-                </div>
-              </Match>
-            </Switch>
           </div>
         </Match>
       </Switch>

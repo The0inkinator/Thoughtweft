@@ -25,12 +25,12 @@
 
   /* Fonts & Font Variables */
   --BodyFont: Modern Sans, Arial, sans-serif;
-
-  /*Fonts*/
-  --FontOne: "Times New Roman";
+  --HeaderFont: "RobotoBold";
+  --SubHeaderFont: "Roboto";
+  --SmallTextFont: Helvetica;
 
   /*Global Sizing*/
-  --PlayerSeat: 2rem;
+  --PlayerSeat: 2.2rem;
   --PlayerCard: 2rem;
   --PodCard: 20rem;
   --PodCardAR: 2/3;

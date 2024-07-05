@@ -4,10 +4,23 @@ import { useEventContext } from "~/context/EventContext";
 import PlayerHopper from "../playerHopper";
 import PodCard from "../podCard";
 import PodPlusButton from "../podPlusButton";
+import { Player, SeatAddress } from "~/typing/eventTypes";
+import PlayerCard from "../playerCard";
+
+export function createPlayerFromData(playerInfo: Player) {
+  return (
+    <PlayerCard
+      playerID={playerInfo.id}
+      playerName={playerInfo.name}
+      podId={playerInfo.podId}
+      seatNumber={playerInfo.seat}
+    />
+  );
+}
 
 export default function EventController() {
   //Context State
-  const [eventState, { updateEvent, makeEvent }] = useEventContext();
+  const [eventState, { updateEvent, makeEvent, addPlayer }] = useEventContext();
   //Local State
   const [storedEvent, setStoredEvent] = createSignal<string>(
     JSON.stringify(eventState())
@@ -23,6 +36,13 @@ export default function EventController() {
     } else if (typeof retrievedEvent === "string") {
       makeEvent(JSON.parse(retrievedEvent));
     }
+  });
+
+  //Create player cards for players in the event
+  onMount(() => {
+    eventState().evtPlayerList.map((player) => {
+      createPlayerFromData(player);
+    });
   });
 
   const setCookie = (name: string, value: string, days?: number) => {

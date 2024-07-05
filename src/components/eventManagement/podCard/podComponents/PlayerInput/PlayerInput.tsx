@@ -16,6 +16,7 @@ import {
   firstOpenSeatAddress,
   firstPodSeat,
 } from "~/context/EventDataFunctions";
+import { createPlayerFromData } from "~/components/eventManagement/eventController/EventController";
 
 interface PlayerInputInputs {
   podId: number;
@@ -31,17 +32,6 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
   //Values
   const inputOwner = getOwner();
 
-  const createPlayerFromData = (playerInfo: Player) => {
-    return (
-      <PlayerCard
-        playerID={playerInfo.id}
-        playerName={playerInfo.name}
-        podId={playerInfo.podId}
-        seatNumber={playerInfo.seat}
-      />
-    );
-  };
-
   const createNewPlayer = (name: string, seatAddress?: SeatAddress) => {
     addPlayer(name, seatAddress);
     const newPlayer = eventState().evtPlayerList.findLast((player) => true);
@@ -51,15 +41,6 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
       console.log("New Player Not Found");
     }
   };
-
-  //Create player cards for players in the event
-  onMount(() => {
-    eventState().evtPlayerList.map((player) => {
-      if (player.podId === podId) {
-        createPlayerFromData(player);
-      }
-    });
-  });
 
   const createPlayerFromSubmit = () => {
     runWithOwner(inputOwner, () => {

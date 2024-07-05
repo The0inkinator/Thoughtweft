@@ -68,12 +68,14 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     updatePodSize(podId, thisPodState()!.podSize);
   });
   onCleanup(() => {
-    eventState()
-      .evtPlayerList.filter((player) => player.podId === podId)
-      .map((foundPlayer) => {
-        foundPlayer.elMounted?.remove();
-        removePlayer(foundPlayer.id);
-      });
+    if (!thisPodState()) {
+      eventState()
+        .evtPlayerList.filter((player) => player.podId === podId)
+        .map((foundPlayer) => {
+          foundPlayer.elMounted?.remove();
+          removePlayer(foundPlayer.id);
+        });
+    }
   });
 
   const shufflePod = () => {

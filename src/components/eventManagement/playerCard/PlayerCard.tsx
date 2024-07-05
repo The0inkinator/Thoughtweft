@@ -44,15 +44,15 @@ export default function PlayerCard({
   //Values
   let startingPodRef: HTMLDivElement;
 
-  const thisPlayerState = createMemo(() => {
+  const thisPlayerState = () => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
-  });
+  };
 
-  const thisPodState = createMemo(() => {
+  const thisPodState = () => {
     return eventState().evtPods.find(
       (pod) => pod.podId === thisPlayerState().podId
     );
-  });
+  };
 
   const seats = () => {
     let allSeats: FullSeat[] = [];

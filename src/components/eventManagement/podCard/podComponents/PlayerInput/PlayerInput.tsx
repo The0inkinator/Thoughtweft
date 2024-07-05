@@ -50,7 +50,7 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
     }
   };
 
-  //Set hopper element and appends any players already in the event
+  //Create player cards for players in the event
   onMount(() => {
     eventState().evtPlayerList.map((player) => {
       if (player.podId === podId) {

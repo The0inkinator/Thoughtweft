@@ -14,10 +14,10 @@ import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import Seat from "../seat";
 import { MatchData, PodSizes, PodStatusModes } from "~/typing/eventTypes";
-import PairPlayers from "./pairingFunctions/pairPlayers";
+import PairPlayers from "./playerMgmtFunc/pairPlayers";
 import styles from "./podCard.module.css";
 import MatchCard from "../matchCard";
-import CreateStandings from "./pairingFunctions/createStandings";
+import CreateStandings from "./playerMgmtFunc/createStandings";
 import PodTimer from "./podComponents/podTimer/PodTimer";
 import PlayerInput from "./podComponents/playerInput/PlayerInput";
 interface PodCardInputs {

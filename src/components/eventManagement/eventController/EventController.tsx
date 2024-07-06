@@ -1,18 +1,26 @@
 import styles from "./eventController.module.css";
-import { For, createEffect, createSignal, onMount } from "solid-js";
+import {
+  For,
+  createEffect,
+  createSignal,
+  getOwner,
+  onMount,
+  runWithOwner,
+} from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import PlayerHopper from "../playerHopper";
 import PodCard from "../podCard";
 import PodPlusButton from "../podPlusButton";
 import { Player, SeatAddress } from "~/typing/eventTypes";
 import PlayerCard from "../playerCard";
+import eventController from ".";
+import { effect } from "solid-js/web";
 
 export function createPlayerFromData(playerInfo: Player) {
   return (
     <PlayerCard
       playerID={playerInfo.id}
       playerName={playerInfo.name}
-      podId={playerInfo.podId}
       seatNumber={playerInfo.seat}
     />
   );
@@ -22,13 +30,22 @@ export default function EventController() {
   //Context State
   const [eventState, { updateEvent, makeEvent, addPlayer }] = useEventContext();
   //Local State
-  const [storedEvent, setStoredEvent] = createSignal<string>(
-    JSON.stringify(eventState())
-  );
+  const [storedEvent, setStoredEvent] = createSignal<string>();
+
   const [color, setColor] = createSignal<boolean>(false);
+
+  const [ownersNeeded, setOwnersNeeded] = createSignal<number>(
+    eventState().evtPods.length
+  );
+  const [playersNeeded, setPlayersNeeded] = createSignal<number>(
+    eventState().evtPlayerList.length
+  );
+  // Values
+  const evtControllerOwner = getOwner();
 
   onMount(() => {
     updateEvent({ evtLoading: false });
+    updateEvent({ owner: evtControllerOwner });
 
     const retrievedEvent = getCookie("event");
     if (retrievedEvent === null) {
@@ -40,8 +57,34 @@ export default function EventController() {
 
   //Create player cards for players in the event
   onMount(() => {
+    eventState().evtPods.map((pod) => {
+      createEffect(() => {
+        if (ownersNeeded() === 0) return;
+
+        const podState = eventState().evtPods.find(
+          (foundPod) => foundPod.podId === pod.podId
+        );
+        if (podState?.podOwner) {
+          setOwnersNeeded((prevNum) => prevNum - 1);
+        }
+      });
+    });
+
     eventState().evtPlayerList.map((player) => {
-      createPlayerFromData(player);
+      createEffect(() => {
+        if (playersNeeded() === 0) return;
+        if (ownersNeeded() === 0) {
+          const podState = eventState().evtPods.find(
+            (foundPod) => foundPod.podId === player.podId
+          );
+
+          runWithOwner(podState?.podOwner, () => {
+            return <>{createPlayerFromData(player)}</>;
+          });
+
+          setPlayersNeeded((prevNum) => prevNum - 1);
+        }
+      });
     });
   });
 

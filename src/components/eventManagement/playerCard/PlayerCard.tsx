@@ -8,6 +8,7 @@ import {
   createMemo,
   onMount,
   createReaction,
+  onCleanup,
 } from "solid-js";
 import { seatDataFromDiv } from "~/context/EventDataFunctions";
 import { Portal } from "solid-js/web";
@@ -16,7 +17,6 @@ import seat from "../seat";
 interface PlayerCardInputs {
   playerID: number;
   playerName: string;
-  podId: number;
   seatNumber: number;
 }
 
@@ -25,7 +25,6 @@ type CardMode = "noSeat" | "dragging" | "hoveringSeat" | "seated";
 export default function PlayerCard({
   playerID,
   playerName,
-  podId,
   seatNumber,
 }: PlayerCardInputs) {
   //Context State
@@ -48,10 +47,12 @@ export default function PlayerCard({
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
   };
 
+  const podId = () => {
+    return thisPlayerState()?.podId;
+  };
+
   const thisPodState = () => {
-    return eventState().evtPods.find(
-      (pod) => pod.podId === thisPlayerState().podId
-    );
+    return eventState().evtPods.find((pod) => pod.podId === podId());
   };
 
   const seats = () => {
@@ -74,9 +75,7 @@ export default function PlayerCard({
   };
 
   const targetSeatRef = () => {
-    const pod = eventState().evtPods.find(
-      (pod) => pod.podId === thisPlayerState().podId
-    );
+    const pod = eventState().evtPods.find((pod) => pod.podId === podId());
     const seat = pod?.podSeats.find(
       (seat) => seat.seatNumber === thisPlayerState().seat
     )?.seatRef;
@@ -188,7 +187,7 @@ export default function PlayerCard({
       }
       dragging(event);
 
-      updatePlayer(playerID, { address: { podId: podId, seat: 0 } });
+      updatePlayer(playerID, { address: { podId: podId(), seat: 0 } });
 
       if (event instanceof MouseEvent) {
         document.addEventListener("mousemove", dragging);
@@ -297,12 +296,17 @@ export default function PlayerCard({
     }, 1);
   });
 
+  onCleanup(() => {
+    console.log(`Player ${playerID} element removed`);
+  });
+
   return (
     <div
       class={styles.playerCardCNT}
       ref={thisPlayerCard}
       onMouseDown={(event) => {
         if (!thisPodState() || thisPodState()!.podStatus === "seating") {
+          console.log(thisPlayerState());
           dragInit(event);
         }
       }}

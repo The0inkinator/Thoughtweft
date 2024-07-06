@@ -34,13 +34,14 @@ export type PodUpdateParam =
   | { byePlayer: number }
   | { ref: HTMLDivElement }
   | { popUpOn: boolean }
-  | { popUpRef: HTMLDivElement };
+  | { popUpRef: HTMLDivElement }
+  | { podOwner: any };
 
 export type MatchUpdateParam =
   | { winner: MatchData["winner"] }
   | { matchRecord: { p1: number; p2: number } };
 
-export type EventUpdateParam = { evtLoading: boolean };
+export type EventUpdateParam = { evtLoading: boolean } | { owner: any };
 
 export type Player = {
   id: number;
@@ -105,6 +106,7 @@ export type Pod = {
   podHovered?: boolean;
   popUpOn?: boolean;
   popUpRef?: HTMLDivElement;
+  podOwner?: any;
 };
 
 export type MatchData = {
@@ -142,4 +144,5 @@ export type Event = {
   evtStage: "seating" | "staging" | number;
   evtLoading: boolean;
   playerHopper?: HTMLDivElement;
+  evtControllerOwner?: any;
 };

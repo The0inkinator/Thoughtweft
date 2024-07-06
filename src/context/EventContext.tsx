@@ -191,6 +191,10 @@ export function EventContextProvider(props: any) {
             );
 
             if (playerIndex !== -1) {
+              const playerElement = newEvt.evtPlayerList[playerIndex].elMounted;
+              if (playerElement) {
+                playerElement.remove();
+              }
               newEvt.evtPlayerList.splice(playerIndex, 1);
             }
 
@@ -319,6 +323,8 @@ export function EventContextProvider(props: any) {
 
             if ("evtLoading" in updateParam) {
               newEvt.evtLoading = updateParam.evtLoading;
+            } else if ("owner" in updateParam) {
+              newEvt.evtControllerOwner = updateParam.owner;
             }
 
             return newEvt;
@@ -450,6 +456,8 @@ export function EventContextProvider(props: any) {
                 newEvt.evtPods[podIndex].popUpOn = updateParam.popUpOn;
               } else if ("popUpRef" in updateParam) {
                 newEvt.evtPods[podIndex].popUpRef = updateParam.popUpRef;
+              } else if ("podOwner" in updateParam) {
+                newEvt.evtPods[podIndex].podOwner = updateParam.podOwner;
               }
             }
             return newEvt;

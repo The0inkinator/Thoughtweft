@@ -9,6 +9,7 @@ import {
   Switch,
   Match,
   onCleanup,
+  getOwner,
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
@@ -40,6 +41,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   //Refs
   let thisPod!: HTMLDivElement;
   let overlayMenu!: HTMLDivElement;
+  const podOwner = getOwner();
 
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
@@ -66,16 +68,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   onMount(() => {
     updatePodSize(podId, thisPodState()!.podSize);
-  });
-  onCleanup(() => {
-    if (!thisPodState()) {
-      eventState()
-        .evtPlayerList.filter((player) => player.podId === podId)
-        .map((foundPlayer) => {
-          foundPlayer.elMounted?.remove();
-          removePlayer(foundPlayer.id);
-        });
-    }
+    updatePod(podId, { podOwner: podOwner });
   });
 
   const shufflePod = () => {
@@ -194,6 +187,12 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             type="submit"
             style={{ color: "red" }}
             onClick={() => {
+              console.log(eventState());
+              eventState()
+                .evtPlayerList.filter((player) => player.podId === podId)
+                .map((foundPlayer) => {
+                  removePlayer(foundPlayer.id);
+                });
               removePod(podId);
             }}
           >

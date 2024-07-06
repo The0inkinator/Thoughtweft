@@ -32,6 +32,9 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
   //Values
   const inputOwner = getOwner();
 
+  const thisPodState = () =>
+    eventState().evtPods.find((pod) => pod.podId === podId);
+
   const createNewPlayer = (name: string, seatAddress?: SeatAddress) => {
     addPlayer(name, seatAddress);
     const newPlayer = eventState().evtPlayerList.findLast((player) => true);
@@ -43,15 +46,27 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
   };
 
   const createPlayerFromSubmit = () => {
-    runWithOwner(inputOwner, () => {
-      if (playerNameValue() && firstPodSeat(eventState(), podId)) {
-        createNewPlayer(playerNameValue(), firstPodSeat(eventState(), podId));
-        setPlayerNameValue("");
-        console.log(eventState().evtPlayerList);
-      } else {
-        console.log("pod full");
-      }
-    });
+    if (thisPodState()?.podOwner) {
+      runWithOwner(thisPodState()?.podOwner, () => {
+        if (playerNameValue() && firstPodSeat(eventState(), podId)) {
+          createNewPlayer(playerNameValue(), firstPodSeat(eventState(), podId));
+          setPlayerNameValue("");
+          console.log(eventState().evtPlayerList);
+        } else {
+          console.log("pod full");
+        }
+      });
+    } else {
+      runWithOwner(inputOwner, () => {
+        if (playerNameValue() && firstPodSeat(eventState(), podId)) {
+          createNewPlayer(playerNameValue(), firstPodSeat(eventState(), podId));
+          setPlayerNameValue("");
+          console.log(eventState().evtPlayerList);
+        } else {
+          console.log("pod full");
+        }
+      });
+    }
   };
 
   return (

@@ -18,6 +18,8 @@ interface PlayerCardInputs {
   playerID: number;
   playerName: string;
   seatNumber: number;
+  draggingCard?: boolean;
+  initialEvent?: MouseEvent | TouchEvent;
 }
 
 type CardMode = "noSeat" | "dragging" | "hoveringSeat" | "seated";
@@ -26,6 +28,7 @@ export default function PlayerCard({
   playerID,
   playerName,
   seatNumber,
+  draggingCard,
 }: PlayerCardInputs) {
   //Context State
   const [eventState, { updatePlayer, updateSeat, removePlayer }] =
@@ -55,126 +58,29 @@ export default function PlayerCard({
     return eventState().evtPods.find((pod) => pod.podId === podId());
   };
 
-  const seats = () => {
-    let allSeats: FullSeat[] = [];
-    eventState().evtPods.map((pod) => {
-      pod.podSeats.map((seat) => {
-        allSeats.push(seat);
-      });
-    });
-    return allSeats;
-  };
-
-  const podHovered: () => { hovered: boolean; state?: Pod } = () => {
-    const foundPod = eventState().evtPods.find((pod) => pod.podHovered);
-    if (foundPod) {
-      return { hovered: true, state: foundPod };
-    } else {
-      return { hovered: false };
-    }
-  };
-
-  const targetSeatRef = () => {
-    const pod = eventState().evtPods.find((pod) => pod.podId === podId());
-    const seat = pod?.podSeats.find(
-      (seat) => seat.seatNumber === thisPlayerState().seat
-    )?.seatRef;
-
-    if (seat) {
-      return seat;
-    } else {
-      return eventState().playerHopper;
-    }
-  };
-
-  createEffect(() => {
-    if (
-      cardLocX() !== thisPlayerCard.getBoundingClientRect().x &&
-      playerCardMode() !== "dragging"
-    ) {
-      setCardLocX(thisPlayerCard.getBoundingClientRect().x);
-    } else if (
-      thisPlayerDragCard &&
-      cardLocX() !== thisPlayerDragCard.getBoundingClientRect().x &&
-      playerCardMode() === "dragging"
-    ) {
-      setCardLocX(thisPlayerDragCard.getBoundingClientRect().x);
-    }
-  });
-
-  createEffect(() => {
-    if (thisPodState()?.podRef && thisPodState()?.podRef?.parentElement) {
-      const podRect = thisPodState()!.podRef!.getBoundingClientRect();
-      const podMiddle = podRect.width / 2 + podRect.left;
-
-      if (cardLocX() > podMiddle && leftSeatPlayer()) {
-        setLeftSeatPlayer(false);
-      } else if (cardLocX() < podMiddle && !leftSeatPlayer()) {
-        setLeftSeatPlayer(true);
-      }
-    }
-  });
-
-  createEffect(() => {
-    const singleHoveredSeat = seats().find((seat) => seat.hovered);
-    if (singleHoveredSeat !== hoveredSeat() && singleHoveredSeat) {
-      setHoveredSeat(singleHoveredSeat);
-    }
-  });
-
-  createEffect(() => {
-    const staticTSRef = targetSeatRef();
-    if (thisPlayerCard.parentElement !== staticTSRef) {
-      if (staticTSRef instanceof HTMLDivElement) {
-        staticTSRef.appendChild(thisPlayerCard);
-        setCardLocX(thisPlayerCard.getBoundingClientRect().x);
-
-        if (
-          staticTSRef === eventState().playerHopper &&
-          thisPlayerState().elMounted &&
-          playerCardMode() !== "dragging"
-        ) {
-          updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
-        }
-      }
-    }
-  });
-
-  createEffect(() => {
-    if (
-      playerCardMode() === "noSeat" &&
-      thisPlayerVis.parentElement !== thisPlayerCard
-    ) {
-      thisPlayerCard.appendChild(thisPlayerVis);
-    } else if (
-      playerCardMode() === "dragging" &&
-      thisPlayerVis.parentElement !== thisPlayerDragCard
-    ) {
-      thisPlayerDragCard.appendChild(thisPlayerVis);
+  onMount(() => {
+    if (draggingCard && thisPlayerState().lastEvent) {
+      dragInit(thisPlayerState().lastEvent!);
     }
   });
 
   const dragInit = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() !== "dragging") {
       setPlayerCardMode("dragging");
-      updatePlayer(playerID, { drag: true });
+      thisPlayerCard.style.zIndex = "10";
       thisPlayerCard.style.position = "absolute";
-      //----------------------
-      thisPlayerDragCard.style.zIndex = "10";
-      thisPlayerDragCard.style.position = "absolute";
-      thisPlayerDragCard.style.left = `${
+      thisPlayerCard.style.left = `${
         thisPlayerCard.getBoundingClientRect().left
       }px`;
-      thisPlayerDragCard.style.top = `${
+      thisPlayerCard.style.top = `${
         thisPlayerCard.getBoundingClientRect().top
       }px`;
 
       if (event instanceof MouseEvent) {
         thisPlayerCard.style.pointerEvents = "none";
-        xOffset =
-          event.clientX - thisPlayerDragCard.offsetLeft + window.scrollX;
+        xOffset = event.clientX - thisPlayerCard.offsetLeft + window.scrollX;
 
-        yOffset = event.clientY - thisPlayerDragCard.offsetTop + window.scrollY;
+        yOffset = event.clientY - thisPlayerCard.offsetTop + window.scrollY;
       } else if (event instanceof TouchEvent) {
         xOffset =
           event.touches[0].clientX -
@@ -185,8 +91,6 @@ export default function PlayerCard({
           thisPlayerDragCard.offsetTop +
           window.scrollY;
       }
-      dragging(event);
-
       updatePlayer(playerID, { address: { podId: podId(), seat: 0 } });
 
       if (event instanceof MouseEvent) {
@@ -201,68 +105,67 @@ export default function PlayerCard({
 
   const dragging = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() === "dragging") {
-      if (event instanceof MouseEvent) {
-        const x = event.clientX - xOffset + window.scrollX;
-        const y = event.clientY - yOffset + window.scrollY;
-        thisPlayerDragCard.style.left = `${x + window.scrollX}px`;
-        thisPlayerDragCard.style.top = `${y + window.scrollY}px`;
-      } else if (event instanceof TouchEvent) {
-        const x = event.touches[0].clientX - xOffset + window.scrollX;
-        const y = event.touches[0].clientY - yOffset + window.scrollY;
-        thisPlayerDragCard.style.left = `${x + window.scrollX}px`;
-        thisPlayerDragCard.style.top = `${y + window.scrollY}px`;
-      }
-      setCardLocX(thisPlayerDragCard.getBoundingClientRect().x);
+      console.log("dragging");
 
-      if (podHovered().hovered) {
-        updatePlayer(playerID, {
-          address: { podId: podHovered().state!.podId, seat: 0 },
-        });
+      if (event instanceof MouseEvent) {
+        const x = event.clientX + window.scrollX;
+        const y = event.clientY + window.scrollY;
+        thisPlayerCard.style.left = `${x + window.scrollX}px`;
+        thisPlayerCard.style.top = `${y + window.scrollY}px`;
+      } else if (event instanceof TouchEvent) {
+        const x = event.touches[0].clientX + window.scrollX;
+        const y = event.touches[0].clientY + window.scrollY;
+        thisPlayerCard.style.top = `${y + window.scrollY}px`;
       }
+      // setCardLocX(thisPlayerDragCard.getBoundingClientRect().x);
+
+      // if (podHovered().hovered) {
+      //   updatePlayer(playerID, {
+      //     address: { podId: podHovered().state!.podId, seat: 0 },
+      //   });
+      // }
     }
   };
 
   const dragEnd = () => {
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.pointerEvents = "auto";
-    //----------------------
-    thisPlayerDragCard.style.position = "static";
-    thisPlayerDragCard.style.left = `0px`;
-    thisPlayerDragCard.style.top = `0px`;
     setPlayerCardMode("noSeat");
-    updatePlayer(playerID, { drag: false });
+    updatePlayer(playerID, {
+      address: { podId: podId(), seat: thisPlayerState().lastSeat! },
+    });
 
-    if (
-      podHovered().hovered &&
-      hoveredSeat() &&
-      !hoveredSeat()?.filled &&
-      hoveredSeat()?.podId === podHovered().state?.podId
-    ) {
-      updatePlayer(playerID, {
-        address: {
-          podId: hoveredSeat()!.podId,
-          seat: hoveredSeat()!.seatNumber,
-        },
-      });
-    } else if (
-      podHovered().hovered &&
-      podHovered().state!.podSeats.find((seat) => !seat.filled)
-    ) {
-      updatePlayer(playerID, {
-        address: {
-          podId: podHovered().state!.podId,
-          seat: podHovered().state!.podSeats.find((seat) => !seat.filled)!
-            .seatNumber,
-        },
-      });
-    } else if (!podHovered().hovered || thisPlayerState().seat === 0) {
-      updatePlayer(playerID, {
-        address: {
-          podId: 0,
-          seat: 0,
-        },
-      });
-    }
+    // if (
+    //   podHovered().hovered &&
+    //   hoveredSeat() &&
+    //   !hoveredSeat()?.filled &&
+    //   hoveredSeat()?.podId === podHovered().state?.podId
+    // ) {
+    //   updatePlayer(playerID, {
+    //     address: {
+    //       podId: hoveredSeat()!.podId,
+    //       seat: hoveredSeat()!.seatNumber,
+    //     },
+    //   });
+    // } else if (
+    //   podHovered().hovered &&
+    //   podHovered().state!.podSeats.find((seat) => !seat.filled)
+    // ) {
+    //   updatePlayer(playerID, {
+    //     address: {
+    //       podId: podHovered().state!.podId,
+    //       seat: podHovered().state!.podSeats.find((seat) => !seat.filled)!
+    //         .seatNumber,
+    //     },
+    //   });
+    // } else if (!podHovered().hovered || thisPlayerState().seat === 0) {
+    //   updatePlayer(playerID, {
+    //     address: {
+    //       podId: 0,
+    //       seat: 0,
+    //     },
+    //   });
+    // }
 
     document.removeEventListener("mousemove", dragging);
     document.removeEventListener("mouseup", dragEnd);
@@ -270,56 +173,29 @@ export default function PlayerCard({
     document.removeEventListener("touchend", dragEnd);
   };
 
-  onMount(() => {
-    //Prevents duplicate player cards add adds the player card ref to the state
-    if (
-      thisPlayerState().elMounted?.parentElement &&
-      thisPlayerState().elMounted !== thisPlayerCard
-    ) {
-      if (
-        thisPlayerCard.parentElement &&
-        thisPlayerCard.parentElement.childElementCount > 0
-      ) {
-        thisPlayerState().elMounted?.remove();
-        updatePlayer(playerID, { elMounted: thisPlayerCard });
-      }
-    }
-    updatePlayer(playerID, { elMounted: thisPlayerCard });
-    setCardLocX(thisPlayerCard.getBoundingClientRect().x);
-    setTimeout(() => {
-      if (thisPodState()?.podRef) {
-        const podRects = thisPodState()!.podRef!.getBoundingClientRect();
-        if (cardLocX() < podRects.left + podRects.width / 2) {
-          setLeftSeatPlayer(true);
-        }
-      }
-    }, 1);
-  });
-
-  onCleanup(() => {
-    console.log(`Player ${playerID} element removed`);
-  });
-
   return (
     <div
       class={styles.playerCardCNT}
       ref={thisPlayerCard}
       onMouseDown={(event) => {
         if (!thisPodState() || thisPodState()!.podStatus === "seating") {
-          console.log(thisPlayerState());
-          dragInit(event);
+          // console.log(thisPlayerState());
+          // dragInit(event);
+          updatePlayer(playerID, { lastSeat: seatNumber });
+          updatePlayer(playerID, { lastEvent: event });
+          updatePlayer(playerID, { address: { podId: podId(), seat: 0 } });
         }
       }}
       onTouchStart={(event) => {
         if (!thisPodState() || thisPodState()!.podStatus === "seating") {
-          dragInit(event);
+          // dragInit(event);
         }
       }}
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
           <div
-            ref={thisPlayerVis}
+            // ref={thisPlayerVis}
             class={`${
               leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
             }`}
@@ -329,19 +205,16 @@ export default function PlayerCard({
           </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
-          <Portal>
-            <div class={styles.playerCardCNT} ref={thisPlayerDragCard}>
-              {/* <div
-                ref={thisPlayerVis}
-                class={`${
-                  leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
-                }`}
-              >
-                <div class={styles.playerIcon}></div>
-                <div class={styles.playerName}>{playerName}</div>
-              </div> */}
-            </div>
-          </Portal>
+          <div
+            // ref={thisPlayerVis}
+            class={`${
+              leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
+            }`}
+            // style={{ "background-color": "red" }}
+          >
+            <div class={styles.playerIcon}></div>
+            <div class={styles.playerName}>{playerName}</div>
+          </div>
         </Match>
         {/* <Match when={playerCardMode() === "hoveringSeat"}>
           <div class={styles.playerName} onclick={() => {}}>

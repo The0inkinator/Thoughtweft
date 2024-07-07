@@ -21,6 +21,8 @@ import MatchCard from "../matchCard";
 import CreateStandings from "./playerMgmtFunc/createStandings";
 import PodTimer from "./podComponents/podTimer/PodTimer";
 import PlayerInput from "./podComponents/playerInput/PlayerInput";
+import { Portal } from "solid-js/web";
+import PlayerCard from "../playerCard/PlayerCard";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -564,6 +566,11 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     });
   });
 
+  const draggedPlayer = () =>
+    eventState().evtPlayerList.find(
+      (player) => player.podId === podId && player.seat === 0
+    );
+
   return (
     <DisplayFrame>
       <ErrorBoundary fallback={<>oops!</>}>
@@ -597,6 +604,16 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         <Show when={thisPodState()?.popUpOn}>
           <div class={styles.overlayMenu} ref={overlayMenu}></div>
         </Show>
+        <Portal>
+          <Show when={draggedPlayer()}>
+            <PlayerCard
+              playerID={draggedPlayer()!.id}
+              seatNumber={draggedPlayer()!.seat}
+              playerName={draggedPlayer()!.name}
+              draggingCard={true}
+            ></PlayerCard>
+          </Show>
+        </Portal>
       </ErrorBoundary>
     </DisplayFrame>
   );

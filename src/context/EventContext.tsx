@@ -76,7 +76,6 @@ const SampleEvent: Event = {
       name: "Keldan",
       podId: 1,
       seat: 1,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -84,7 +83,6 @@ const SampleEvent: Event = {
       name: "Colton",
       podId: 1,
       seat: 2,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -92,7 +90,6 @@ const SampleEvent: Event = {
       name: "Aiden",
       podId: 1,
       seat: 3,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -100,7 +97,6 @@ const SampleEvent: Event = {
       name: "Harrison",
       podId: 1,
       seat: 4,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -108,7 +104,6 @@ const SampleEvent: Event = {
       name: "Josh",
       podId: 1,
       seat: 5,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -116,7 +111,6 @@ const SampleEvent: Event = {
       name: "Daniel",
       podId: 1,
       seat: 6,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -124,7 +118,6 @@ const SampleEvent: Event = {
       name: "Jesse",
       podId: 1,
       seat: 7,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -132,7 +125,6 @@ const SampleEvent: Event = {
       name: "Jack",
       podId: 1,
       seat: 8,
-      dragging: false,
       podRecords: [],
     },
   ],
@@ -191,10 +183,6 @@ export function EventContextProvider(props: any) {
             );
 
             if (playerIndex !== -1) {
-              const playerElement = newEvt.evtPlayerList[playerIndex].elMounted;
-              if (playerElement) {
-                playerElement.remove();
-              }
               newEvt.evtPlayerList.splice(playerIndex, 1);
             }
 
@@ -557,16 +545,6 @@ export function EventContextProvider(props: any) {
                   podId: updateParam.address.podId,
                   seat: updateParam.address.seat,
                 };
-              } else if ("drag" in updateParam) {
-                newEvt.evtPlayerList[playerIndex] = {
-                  ...newEvt.evtPlayerList[playerIndex],
-                  dragging: updateParam.drag,
-                };
-              } else if ("elMounted" in updateParam) {
-                newEvt.evtPlayerList[playerIndex] = {
-                  ...newEvt.evtPlayerList[playerIndex],
-                  elMounted: updateParam.elMounted,
-                };
               } else if ("fullPodRecord" in updateParam) {
                 const inputRecord = updateParam.fullPodRecord;
                 const updateRecordIndex = newEvt.evtPlayerList[
@@ -620,15 +598,17 @@ export function EventContextProvider(props: any) {
                       d: newDrawValue,
                     };
                   }
-                } else {
-                  const newRecordFromInput = {
-                    podId: updateParam.matchRecord.podId,
-                    w: 0,
-                    l: 0,
-                    d: 0,
-                  };
-                  this;
                 }
+              } else if ("lastEvent" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  lastEvent: updateParam.lastEvent,
+                };
+              } else if ("lastSeat" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  lastSeat: updateParam.lastSeat,
+                };
               }
 
               return newEvt;

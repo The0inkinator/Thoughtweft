@@ -9,7 +9,6 @@ export type SeatUpdateParam =
 
 export type PlayerUpdateParam =
   | { address: { podId: number; seat: number } }
-  | { drag: boolean }
   | { fullPodRecord: PodRecord }
   | {
       matchRecord: {
@@ -17,7 +16,8 @@ export type PlayerUpdateParam =
         result: { w: number } | { l: number } | { d: number };
       };
     }
-  | { elMounted: HTMLDivElement };
+  | { lastEvent: MouseEvent | TouchEvent }
+  | { lastSeat: number };
 
 export type PodStatusModes =
   | "seating"
@@ -48,9 +48,9 @@ export type Player = {
   name: string;
   podId: number;
   seat: number;
-  dragging: boolean;
   podRecords: PodRecord[];
-  elMounted?: HTMLDivElement;
+  lastEvent?: MouseEvent | TouchEvent;
+  lastSeat?: number;
 };
 
 export type PodRecord = {

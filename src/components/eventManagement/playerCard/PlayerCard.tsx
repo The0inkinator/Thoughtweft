@@ -63,6 +63,28 @@ export default function PlayerCard({
     seats().find((seat) => !seat.filled && seat.podId === id);
   const openSeatAnyPod = () => seats().find((seat) => !seat.filled);
 
+  createEffect(() => {
+    let podRect = thisPodState()!.podRef!.getBoundingClientRect();
+    let podMiddle = podRect.left + podRect.width / 2;
+    let playerLeft = thisPlayerCard.getBoundingClientRect().left;
+
+    if (
+      hoveredPod() &&
+      hoveredPod()?.podId !== podId() &&
+      thisPlayerState().seat === 0
+    ) {
+      podRect = hoveredPod()!.podRef!.getBoundingClientRect();
+      podMiddle = podRect.left + podRect.width / 2;
+      playerLeft = thisPlayerCard.getBoundingClientRect().left;
+    }
+
+    if (playerLeft < podMiddle && !leftSeatPlayer()) {
+      setLeftSeatPlayer(true);
+    } else if (playerLeft > podMiddle && leftSeatPlayer()) {
+      setLeftSeatPlayer(false);
+    }
+  });
+
   onMount(() => {
     updatePlayer(playerID, { currentRef: thisPlayerCard });
     if (draggingCard && thisPlayerState().lastEvent) {

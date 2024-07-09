@@ -9,7 +9,6 @@ export type SeatUpdateParam =
 
 export type PlayerUpdateParam =
   | { address: { podId: number; seat: number } }
-  | { drag: boolean }
   | { fullPodRecord: PodRecord }
   | {
       matchRecord: {
@@ -17,7 +16,10 @@ export type PlayerUpdateParam =
         result: { w: number } | { l: number } | { d: number };
       };
     }
-  | { elMounted: boolean };
+  | { lastEvent: MouseEvent | TouchEvent }
+  | { lastSeat: { podId: number; seat: number } }
+  | { lastLoc: { x: number; y: number } }
+  | { currentRef: HTMLDivElement };
 
 export type PodStatusModes =
   | "seating"
@@ -31,22 +33,28 @@ export type PodUpdateParam =
   | { round: number }
   | { newMatch: MatchData }
   | { hovered: boolean }
-  | { byePlayer: number };
+  | { byePlayer: number }
+  | { ref: HTMLDivElement }
+  | { popUpOn: boolean }
+  | { popUpRef: HTMLDivElement }
+  | { podOwner: any };
 
 export type MatchUpdateParam =
   | { winner: MatchData["winner"] }
   | { matchRecord: { p1: number; p2: number } };
 
-export type EventUpdateParam = { evtLoading: boolean };
+export type EventUpdateParam = { evtLoading: boolean } | { owner: any };
 
 export type Player = {
   id: number;
   name: string;
   podId: number;
   seat: number;
-  dragging: boolean;
   podRecords: PodRecord[];
-  elMounted?: boolean;
+  lastEvent?: MouseEvent | TouchEvent;
+  lastSeat?: { podId: number; seat: number };
+  lastLoc?: { x: number; y: number };
+  currentRef?: HTMLDivElement;
 };
 
 export type PodRecord = {
@@ -100,6 +108,9 @@ export type Pod = {
   byePlayerIds?: number[];
   podRef?: HTMLDivElement;
   podHovered?: boolean;
+  popUpOn?: boolean;
+  popUpRef?: HTMLDivElement;
+  podOwner?: any;
 };
 
 export type MatchData = {
@@ -137,4 +148,5 @@ export type Event = {
   evtStage: "seating" | "staging" | number;
   evtLoading: boolean;
   playerHopper?: HTMLDivElement;
+  evtControllerOwner?: any;
 };

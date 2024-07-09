@@ -10,19 +10,29 @@
 /*CUSTOM FONTS*/
 
 @font-face {
-  font-family: "Modern Sans";
-  src: url("../fonts/ModernSans-Light.otf");
+  font-family: "Roboto";
+  src: url("/public/fonts/Roboto-Regular.ttf");
 }
+@font-face {
+  font-family: "RobotoBold";
+  src: url("/public/fonts/Roboto-Bold.ttf");
+}
+
 /*SITEWIDE VALUES*/
 :root {
   /*Colors*/
   --BackgroundColor: rgb(53, 55, 75);
+  --HeaderBGColor: rgb(23, 21, 31);
 
   /* Fonts & Font Variables */
   --BodyFont: Modern Sans, Arial, sans-serif;
+  --HeaderFont: "RobotoBold";
+  --SubHeaderFont: "Roboto";
+  --SmallTextFont: Helvetica;
 
   /*Global Sizing*/
-  --PlayerCard: 4rem;
+  --PlayerSeat: 2rem;
+  --PlayerCard: 2rem;
   --PodCard: 20rem;
   --PodCardAR: 2/3;
   --LargeBorderRadius: 2rem;

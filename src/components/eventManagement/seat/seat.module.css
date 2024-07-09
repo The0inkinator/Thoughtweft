@@ -1,9 +1,9 @@
 .seat {
+  touch-action: none;
   position: relative;
   background-color: rgb(25, 25, 39);
-  width: 2rem;
-  height: 2rem;
-  text-align: center;
+  width: var(--PlayerSeat);
+  height: var(--PlayerSeat);
+  border-radius: calc(var(--PlayerSeat) / 2);
   margin-block: 0.5rem;
-  color: aliceblue;
 }

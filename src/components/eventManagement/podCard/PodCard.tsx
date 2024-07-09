@@ -4,19 +4,25 @@ import {
   For,
   onMount,
   createMemo,
+  Show,
   ErrorBoundary,
   Switch,
   Match,
   onCleanup,
+  getOwner,
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
 import Seat from "../seat";
 import { MatchData, PodSizes, PodStatusModes } from "~/typing/eventTypes";
-import PairPlayers from "./pairingFunctions/pairPlayers";
+import PairPlayers from "./playerMgmtFunc/pairPlayers";
 import styles from "./podCard.module.css";
 import MatchCard from "../matchCard";
-import CreateStandings from "./pairingFunctions/createStandings";
+import CreateStandings from "./playerMgmtFunc/createStandings";
+import PodTimer from "./podComponents/podTimer/PodTimer";
+import PlayerInput from "./podComponents/playerInput/PlayerInput";
+import { Portal } from "solid-js/web";
+import PlayerCard from "../playerCard/PlayerCard";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -26,14 +32,18 @@ interface PodCardInputs {
 //MAIN FUNCTION
 export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   //Context State
-  const [eventState, { updatePodSize, removePod, updatePlayer, updatePod }] =
-    useEventContext();
+  const [
+    eventState,
+    { updatePodSize, removePod, updatePlayer, updatePod, removePlayer },
+  ] = useEventContext();
   //Local State
   const [shuffleMode, setShuffleMode] = createSignal<"default" | "confirm">(
     "default"
   );
   //Refs
   let thisPod!: HTMLDivElement;
+  let overlayMenu!: HTMLDivElement;
+  const podOwner = getOwner();
 
   const thisPodState = () => {
     return eventState().evtPods.find((pod) => pod.podId === podId);
@@ -60,6 +70,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   onMount(() => {
     updatePodSize(podId, thisPodState()!.podSize);
+    updatePod(podId, { podOwner: podOwner });
   });
 
   const shufflePod = () => {
@@ -96,6 +107,12 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     });
   };
 
+  createEffect(() => {
+    if (thisPodState()?.popUpOn && thisPodState()?.popUpRef !== overlayMenu) {
+      updatePod(podId, { popUpRef: overlayMenu });
+    }
+  });
+
   const shrinkPod = () => {
     const playersInPod = eventState().evtPlayerList.filter(
       (player) => player.podId === podId
@@ -121,6 +138,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const SeatingPodCard = () => {
     return (
       <>
+        <PlayerInput podId={podId} />
         <div class={styles.podTitle}>
           Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
           {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}
@@ -171,6 +189,12 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             type="submit"
             style={{ color: "red" }}
             onClick={() => {
+              console.log(eventState());
+              eventState()
+                .evtPlayerList.filter((player) => player.podId === podId)
+                .map((foundPlayer) => {
+                  removePlayer(foundPlayer.id);
+                });
               removePod(podId);
             }}
           >
@@ -262,55 +286,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     );
   };
 
-  //Timer logic
-  const [draftTimerHou, setDraftTimerHou] = createSignal<number>(0);
-  const [draftTimerMin, setDraftTimerMin] = createSignal<number>(0);
-  const [draftTimerSec, setDraftTimerSec] = createSignal<number>(0);
-  let draftTimerStarted = false;
-
-  createEffect(() => {
-    if (
-      draftTimerStarted === false &&
-      thisPodState()?.podStatus === "drafting"
-    ) {
-      draftTimerStarted = true;
-      const totalTime = thisPodState()!.podDraftTime;
-      const totalHours = Math.floor(totalTime / 60);
-      const totalMins = totalTime - totalHours * 60;
-      const totalSecs = 0;
-      let tempSec;
-      let tempMin;
-      let tempHour;
-      setDraftTimerHou(totalHours);
-      setDraftTimerMin(totalMins);
-      setDraftTimerSec(totalSecs);
-
-      const loop = () => {
-        if (draftTimerSec() > 0) {
-          tempSec = draftTimerSec() - 1;
-          setDraftTimerSec(tempSec);
-          setTimeout(loop, 1000);
-        } else if (draftTimerMin() > 0) {
-          tempMin = draftTimerMin() - 1;
-          tempSec = 59;
-          setDraftTimerMin(tempMin);
-          setDraftTimerSec(tempSec);
-          setTimeout(loop, 1000);
-        } else if (draftTimerHou() > 0) {
-          tempHour = draftTimerHou() - 1;
-          tempMin = 59;
-          tempSec = 59;
-          setDraftTimerHou(tempHour);
-          setDraftTimerMin(tempMin);
-          setDraftTimerSec(tempSec);
-          setTimeout(loop, 1000);
-        }
-      };
-
-      setTimeout(loop, 1000);
-    }
-  });
-
   const DraftingPodCard = () => {
     return (
       <>
@@ -338,10 +313,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         >
           Pair Round 1
         </button>
-
-        <div>
-          {draftTimerHou()} {draftTimerMin()} {draftTimerSec()}
-        </div>
+        <PodTimer eventData={eventState()} podId={podId}></PodTimer>
       </>
     );
   };
@@ -556,36 +528,54 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     );
   };
 
-  const handleTouchMove = (event: TouchEvent) => {
+  const handleMove = (event: TouchEvent | MouseEvent) => {
     const boundingBox = thisPod.getBoundingClientRect();
-    if (
-      event.touches[0].clientX >= boundingBox.left &&
-      event.touches[0].clientX <= boundingBox.right &&
-      event.touches[0].clientY >= boundingBox.top &&
-      event.touches[0].clientY <= boundingBox.bottom
-    ) {
-      updatePod(podId, { hovered: true });
-    } else {
-      updatePod(podId, { hovered: false });
+    if (event instanceof TouchEvent) {
+      if (
+        event.touches[0].clientX >= boundingBox.left &&
+        event.touches[0].clientX <= boundingBox.right &&
+        event.touches[0].clientY >= boundingBox.top &&
+        event.touches[0].clientY <= boundingBox.bottom
+      ) {
+        updatePod(podId, { hovered: true });
+      } else {
+        updatePod(podId, { hovered: false });
+      }
+    } else if (event instanceof MouseEvent) {
+      if (
+        event.clientX >= boundingBox.left &&
+        event.clientX <= boundingBox.right &&
+        event.clientY >= boundingBox.top &&
+        event.clientY <= boundingBox.bottom
+      ) {
+        updatePod(podId, { hovered: true });
+      } else {
+        updatePod(podId, { hovered: false });
+      }
     }
   };
 
   onMount(() => {
-    document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchmove", handleMove);
+    document.addEventListener("mousemove", handleMove);
+    updatePod(podId, { ref: thisPod });
 
     onCleanup(() => {
-      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchmove", handleMove);
+      document.removeEventListener("mousemove", handleMove);
     });
   });
+
+  const draggedPlayer = () =>
+    eventState().evtPlayerList.find(
+      (player) => player.podId === podId && player.seat === 0
+    );
 
   return (
     <DisplayFrame>
       <ErrorBoundary fallback={<>oops!</>}>
         <div
           ref={thisPod}
-          // style={{
-          //   "background-color": thisPodState()?.podHovered ? "red" : "green",
-          // }}
           onMouseEnter={() => {
             updatePod(podId, { hovered: true });
           }}
@@ -611,6 +601,19 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             </Match>
           </Switch>
         </div>
+        <Show when={thisPodState()?.popUpOn}>
+          <div class={styles.overlayMenu} ref={overlayMenu}></div>
+        </Show>
+        <Portal>
+          <Show when={draggedPlayer()}>
+            <PlayerCard
+              playerID={draggedPlayer()!.id}
+              seatNumber={draggedPlayer()!.seat}
+              playerName={draggedPlayer()!.name}
+              draggingCard={true}
+            ></PlayerCard>
+          </Show>
+        </Portal>
       </ErrorBoundary>
     </DisplayFrame>
   );

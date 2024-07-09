@@ -31,9 +31,7 @@ export default function PlayerSeat({
   };
   //Returns state of a player if one is being dragged
   const draggedPlayer = () => {
-    return eventState().evtPlayerList.find(
-      (player) => player.dragging === true
-    );
+    return eventState().evtPlayerList.find((player) => player.seat === 0);
   };
   //Updates the seatstate to contain a reference to the correct element
   createEffect(() => {
@@ -228,7 +226,7 @@ export default function PlayerSeat({
       !mouseOver()
     ) {
       setMouseOver(true);
-      if (draggedPlayer() && draggedPlayer()?.dragging === true) {
+      if (draggedPlayer() && draggedPlayer()?.seat === 0) {
         updateSeat(podId, seatNumber, { hovered: true });
         setTimeout(() => {
           if (draggedPlayer()) {

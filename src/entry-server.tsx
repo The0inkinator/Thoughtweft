@@ -9,6 +9,8 @@ export default createHandler(() => (
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="icon" href="/icons/twFavicon.svg" />
+          {/* IMPORTED FONTS */}
+
           {assets}
         </head>
         <body>

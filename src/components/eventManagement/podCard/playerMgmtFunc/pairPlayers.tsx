@@ -272,7 +272,7 @@ export default function PairPlayers(
               const tempNumList = [
                 ...inputArray.filter((entry) => typeof entry === "number"),
               ];
-              const tempMatchList = [
+              const tempMatchList: (PtlMatch | number)[] = [
                 ...inputArray.filter((entry) => typeof entry !== "number"),
               ];
 
@@ -289,6 +289,7 @@ export default function PairPlayers(
                 p1: player1,
                 p2: player2,
               } as PtlMatch);
+
               tempNumList.map((number) => {
                 if (number !== player1 && number !== player2) {
                   tempMatchList.push(number);
@@ -465,17 +466,26 @@ export default function PairPlayers(
     //to the final array
     chosenRound
       .sort((a, b) => {
-        return (
-          playerDataFromId(b.p1)!.points +
-          playerDataFromId(b.p2)!.points -
-          (playerDataFromId(a.p1)!.points + playerDataFromId(a.p2)!.points)
-        );
+        if (playerDataFromId(b.p2) && playerDataFromId(a.p2)) {
+          return (
+            playerDataFromId(b.p1)!.points +
+            playerDataFromId(b.p2)!.points -
+            (playerDataFromId(a.p1)!.points + playerDataFromId(a.p2)!.points)
+          );
+        } else {
+          if (a.p2 === -1 && b.p2 !== -1) {
+            return 1;
+          } else if (a.p2 !== -1 && b.p2 === -1) {
+            return -1;
+          } else {
+            return 1;
+          }
+        }
       })
       .map((match) => {
         const tempP1Seat = proxySeatNumber;
+        const tempP2Seat = proxySeatNumber + halfTable;
         proxySeatNumber = tempP1Seat + 1;
-        const tempP2Seat = proxySeatNumber;
-        proxySeatNumber = tempP2Seat + 1;
 
         const newMatch: MatchData = {
           ...stockMatchData(),
@@ -483,6 +493,8 @@ export default function PairPlayers(
           p1Id: match.p1,
           p2Seat: tempP2Seat,
           p2Id: match.p2,
+          byeMatch: match.p2 === -1 ? true : undefined,
+          winner: match.p2 === -1 ? "p1" : undefined,
         };
 
         newMatches.push(newMatch);

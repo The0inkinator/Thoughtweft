@@ -2,14 +2,17 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  For,
   onCleanup,
   onMount,
+  Show,
 } from "solid-js";
 import styles from "./seat.module.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
 import { playerIdFromAddress } from "~/context/EventDataFunctions";
 import { FullSeat } from "~/typing/eventTypes";
+import seat from ".";
 
 interface SeatInputs {
   podId: number;
@@ -33,11 +36,19 @@ export default function Seat({
   let thisSeat!: HTMLDivElement;
 
   //Returns state for the seat
-  const thisSeatState = () => {
-    return eventState()
+  const thisSeatState = () =>
+    eventState()
       .evtPods.find((pod) => pod.podId === podId)!
       .podSeats.find((seat) => seat.seatNumber === seatNumber)!;
+
+  const thisPodState = () => {
+    return eventState().evtPods.find((pod) => pod.podId === podId);
   };
+
+  const seatedPlayer = () =>
+    eventState().evtPlayerList.find(
+      (player) => player.seat === seatNumber && player.podId === podId
+    );
 
   createEffect(() => {
     if (thisSeatState().filled && thisSeat.childElementCount === 0) {
@@ -50,9 +61,7 @@ export default function Seat({
 
   //Returns state of a player if one is being dragged
   const draggedPlayer = () => {
-    return eventState().evtPlayerList.find(
-      (player) => player.dragging === true
-    );
+    return eventState().evtPlayerList.find((player) => player.seat === 0);
   };
 
   //Shuffles players to make space for a dragged player
@@ -212,7 +221,7 @@ export default function Seat({
         !mouseOver()
       ) {
         setMouseOver(true);
-        if (draggedPlayer() && draggedPlayer()?.dragging === true) {
+        if (draggedPlayer() && draggedPlayer()?.seat === 0) {
           updateSeat(podId, seatNumber, { hovered: true });
           setTimeout(() => {
             if (draggedPlayer()) {
@@ -238,7 +247,7 @@ export default function Seat({
         !mouseOver()
       ) {
         setMouseOver(true);
-        if (draggedPlayer() && draggedPlayer()?.dragging === true) {
+        if (draggedPlayer() && draggedPlayer()?.seat === 0) {
           updateSeat(podId, seatNumber, { hovered: true });
           setTimeout(() => {
             if (draggedPlayer()) {
@@ -289,9 +298,56 @@ export default function Seat({
           updateSeat(podId, seatNumber, { hovered: true });
         }
       }}
+      onMouseDown={(event) => {
+        if (seatedPlayer() && thisPodState()?.podStatus === "seating") {
+          updatePlayer(seatedPlayer()!.id, {
+            lastSeat: { podId: podId, seat: seatNumber },
+          });
+          updatePlayer(seatedPlayer()!.id, { lastEvent: event });
+          updatePlayer(seatedPlayer()!.id, {
+            lastLoc: {
+              x:
+                event.clientX -
+                seatedPlayer()!.currentRef!.getBoundingClientRect().left,
+              y:
+                event.clientY -
+                seatedPlayer()!.currentRef!.getBoundingClientRect().top,
+            },
+          });
+          updatePlayer(seatedPlayer()!.id, {
+            address: { podId: podId, seat: 0 },
+          });
+        }
+      }}
+      ontouchstart={(event) => {
+        if (seatedPlayer() && thisPodState()?.podStatus === "seating") {
+          updatePlayer(seatedPlayer()!.id, {
+            lastSeat: { podId: podId, seat: seatNumber },
+          });
+          updatePlayer(seatedPlayer()!.id, { lastEvent: event });
+          updatePlayer(seatedPlayer()!.id, {
+            lastLoc: {
+              x:
+                event.touches[0].clientX -
+                seatedPlayer()!.currentRef!.getBoundingClientRect().left,
+              y:
+                event.touches[0].clientY -
+                seatedPlayer()!.currentRef!.getBoundingClientRect().top,
+            },
+          });
+          updatePlayer(seatedPlayer()!.id, {
+            address: { podId: podId, seat: 0 },
+          });
+        }
+      }}
     >
-      {seatNumber}
-      <ByeSeatDisplay />
+      <Show when={seatedPlayer()}>
+        <PlayerCard
+          playerID={seatedPlayer()!.id}
+          seatNumber={seatNumber}
+          playerName={seatedPlayer()!.name}
+        ></PlayerCard>
+      </Show>
     </div>
   );
 }

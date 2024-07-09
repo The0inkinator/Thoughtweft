@@ -23,6 +23,7 @@ type EventState = [
   {
     makeEvent: (newEvent: Event) => void;
     addPlayer: (name: string, seatAddress?: SeatAddress) => void;
+    removePlayer: (playerId: number) => void;
     addSeat: (podId: number, seatNumber: number) => void;
     addPod: (
       inputPodSize: PodSizes,
@@ -75,7 +76,6 @@ const SampleEvent: Event = {
       name: "Keldan",
       podId: 1,
       seat: 1,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -83,7 +83,6 @@ const SampleEvent: Event = {
       name: "Colton",
       podId: 1,
       seat: 2,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -91,7 +90,6 @@ const SampleEvent: Event = {
       name: "Aiden",
       podId: 1,
       seat: 3,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -99,7 +97,6 @@ const SampleEvent: Event = {
       name: "Harrison",
       podId: 1,
       seat: 4,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -107,7 +104,6 @@ const SampleEvent: Event = {
       name: "Josh",
       podId: 1,
       seat: 5,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -115,7 +111,6 @@ const SampleEvent: Event = {
       name: "Daniel",
       podId: 1,
       seat: 6,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -123,7 +118,6 @@ const SampleEvent: Event = {
       name: "Jesse",
       podId: 1,
       seat: 7,
-      dragging: false,
       podRecords: [],
     },
     {
@@ -131,7 +125,6 @@ const SampleEvent: Event = {
       name: "Jack",
       podId: 1,
       seat: 8,
-      dragging: false,
       podRecords: [],
     },
   ],
@@ -176,6 +169,23 @@ export function EventContextProvider(props: any) {
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
             newEvt.evtPlayerList = [...newEvt.evtPlayerList, newPlayer];
+            return newEvt;
+          });
+        },
+
+        //REMOVE PLAYER
+        removePlayer(playerId) {
+          setEvent((prevEvt) => {
+            const newEvt = { ...prevEvt };
+
+            const playerIndex = newEvt.evtPlayerList.findIndex(
+              (player) => player.id === playerId
+            );
+
+            if (playerIndex !== -1) {
+              newEvt.evtPlayerList.splice(playerIndex, 1);
+            }
+
             return newEvt;
           });
         },
@@ -301,6 +311,8 @@ export function EventContextProvider(props: any) {
 
             if ("evtLoading" in updateParam) {
               newEvt.evtLoading = updateParam.evtLoading;
+            } else if ("owner" in updateParam) {
+              newEvt.evtControllerOwner = updateParam.owner;
             }
 
             return newEvt;
@@ -424,6 +436,16 @@ export function EventContextProvider(props: any) {
                 ) {
                   newEvt.evtPods[podIndex].byePlayerIds!.push(scopedParam);
                 }
+              } else if ("ref" in updateParam) {
+                const scopedParam = updateParam.ref;
+
+                newEvt.evtPods[podIndex].podRef = scopedParam;
+              } else if ("popUpOn" in updateParam) {
+                newEvt.evtPods[podIndex].popUpOn = updateParam.popUpOn;
+              } else if ("popUpRef" in updateParam) {
+                newEvt.evtPods[podIndex].popUpRef = updateParam.popUpRef;
+              } else if ("podOwner" in updateParam) {
+                newEvt.evtPods[podIndex].podOwner = updateParam.podOwner;
               }
             }
             return newEvt;
@@ -523,16 +545,6 @@ export function EventContextProvider(props: any) {
                   podId: updateParam.address.podId,
                   seat: updateParam.address.seat,
                 };
-              } else if ("drag" in updateParam) {
-                newEvt.evtPlayerList[playerIndex] = {
-                  ...newEvt.evtPlayerList[playerIndex],
-                  dragging: updateParam.drag,
-                };
-              } else if ("elMounted" in updateParam) {
-                newEvt.evtPlayerList[playerIndex] = {
-                  ...newEvt.evtPlayerList[playerIndex],
-                  elMounted: updateParam.elMounted,
-                };
               } else if ("fullPodRecord" in updateParam) {
                 const inputRecord = updateParam.fullPodRecord;
                 const updateRecordIndex = newEvt.evtPlayerList[
@@ -586,15 +598,27 @@ export function EventContextProvider(props: any) {
                       d: newDrawValue,
                     };
                   }
-                } else {
-                  const newRecordFromInput = {
-                    podId: updateParam.matchRecord.podId,
-                    w: 0,
-                    l: 0,
-                    d: 0,
-                  };
-                  this;
                 }
+              } else if ("lastEvent" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  lastEvent: updateParam.lastEvent,
+                };
+              } else if ("lastSeat" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  lastSeat: updateParam.lastSeat,
+                };
+              } else if ("lastLoc" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  lastLoc: updateParam.lastLoc,
+                };
+              } else if ("currentRef" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  currentRef: updateParam.currentRef,
+                };
               }
 
               return newEvt;

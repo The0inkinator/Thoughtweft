@@ -1,22 +1,15 @@
 import styles from "./playerCard.module.css";
 import { useEventContext } from "~/context/EventContext";
-import {
-  createSignal,
-  Switch,
-  Match,
-  createEffect,
-  createMemo,
-  onMount,
-} from "solid-js";
-import { seatDataFromDiv } from "~/context/EventDataFunctions";
-import { Portal } from "solid-js/web";
-import { FullSeat } from "~/typing/eventTypes";
-import seat from "../seat";
+import { createSignal, Switch, Match, onMount, createEffect } from "solid-js";
+import { FullSeat, Pod } from "~/typing/eventTypes";
+import { z } from "vinxi/dist/types/lib/router-modes";
+
 interface PlayerCardInputs {
   playerID: number;
   playerName: string;
-  podId: number;
   seatNumber: number;
+  draggingCard?: boolean;
+  initialEvent?: MouseEvent | TouchEvent;
 }
 
 type CardMode = "noSeat" | "dragging" | "hoveringSeat" | "seated";
@@ -24,30 +17,33 @@ type CardMode = "noSeat" | "dragging" | "hoveringSeat" | "seated";
 export default function PlayerCard({
   playerID,
   playerName,
-  podId,
   seatNumber,
+  draggingCard,
 }: PlayerCardInputs) {
   //Context State
-  const [eventState, { updatePlayer, updateSeat }] = useEventContext();
+  const [eventState, { updatePlayer, updateSeat, removePlayer }] =
+    useEventContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
-  const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
+  // const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
+  const [leftSeatPlayer, setLeftSeatPlayer] = createSignal<boolean>(false);
+  const [cardLocX, setCardLocX] = createSignal<number>(0);
   //refs
-
   let thisPlayerCard!: HTMLDivElement;
-  let thisPlayerVis!: HTMLDivElement;
   let xOffset: number, yOffset: number;
-  let pastTargetSeatRef: HTMLDivElement;
+  //Values
 
-  const thisPlayerState = createMemo(() => {
+  const thisPlayerState = () => {
     return eventState().evtPlayerList.find((player) => player.id === playerID)!;
-  });
+  };
 
-  const thisPlayerPodState = createMemo(() => {
-    return eventState().evtPods.find(
-      (pod) => pod.podId === thisPlayerState().podId
-    );
-  });
+  const podId = () => {
+    return thisPlayerState()?.podId;
+  };
+
+  const thisPodState = () => {
+    return eventState().evtPods.find((pod) => pod.podId === podId());
+  };
 
   const seats = () => {
     let allSeats: FullSeat[] = [];
@@ -59,128 +55,144 @@ export default function PlayerCard({
     return allSeats;
   };
 
-  const podHovered = () => {
-    if (eventState().evtPods.find((pod) => pod.podHovered)) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+  const hoveredPod = () => eventState().evtPods.find((pod) => pod.podHovered);
 
-  const targetSeatRef = () => {
-    const seat = eventState()
-      .evtPods.find((pod) => pod.podId === thisPlayerState().podId)
-      ?.podSeats.find(
-        (seat) => seat.seatNumber === thisPlayerState().seat
-      )?.seatRef;
+  const hoveredSeat = () => seats().find((seat) => seat.hovered);
 
-    if (seat) {
-      return seat;
-    } else {
-      return eventState().playerHopper;
-    }
-  };
+  const openSeatFromPod = (id: number) =>
+    seats().find((seat) => !seat.filled && seat.podId === id);
+  const openSeatAnyPod = () => seats().find((seat) => !seat.filled);
 
   createEffect(() => {
-    const singleHoveredSeat = seats().find((seat) => seat.hovered);
-    if (singleHoveredSeat !== hoveredSeat() && singleHoveredSeat) {
-      setHoveredSeat(singleHoveredSeat);
+    let podRect = thisPodState()!.podRef!.getBoundingClientRect();
+    let podMiddle = podRect.left + podRect.width / 2;
+    let playerLeft = thisPlayerCard.getBoundingClientRect().left;
+
+    if (
+      hoveredPod() &&
+      hoveredPod()?.podId !== podId() &&
+      thisPlayerState().seat === 0
+    ) {
+      podRect = hoveredPod()!.podRef!.getBoundingClientRect();
+      podMiddle = podRect.left + podRect.width / 2;
+      playerLeft = thisPlayerCard.getBoundingClientRect().left;
+    }
+
+    if (playerLeft < podMiddle && !leftSeatPlayer()) {
+      setLeftSeatPlayer(true);
+    } else if (playerLeft > podMiddle && leftSeatPlayer()) {
+      setLeftSeatPlayer(false);
     }
   });
 
-  createEffect(() => {
-    const staticTSRef = targetSeatRef();
-    if (thisPlayerCard.parentElement !== staticTSRef) {
-      if (staticTSRef instanceof HTMLDivElement) {
-        staticTSRef.appendChild(thisPlayerCard);
-
-        if (
-          staticTSRef === eventState().playerHopper &&
-          thisPlayerState().elMounted
-        ) {
-          updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
-        }
-      }
+  onMount(() => {
+    updatePlayer(playerID, { currentRef: thisPlayerCard });
+    if (draggingCard && thisPlayerState().lastEvent) {
+      // document.addEventListener("touchmove", dragging, true);
+      dragInit(thisPlayerState().lastEvent!);
     }
   });
 
   const dragInit = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() !== "dragging") {
       setPlayerCardMode("dragging");
-      updatePlayer(playerID, { drag: true });
-      // event.preventDefault();
-      thisPlayerCard.style.position = "absolute";
-      thisPlayerCard.style.pointerEvents = "none";
-      thisPlayerVis.style.position = "absolute";
-      thisPlayerVis.style.zIndex = "10";
-      thisPlayerVis.style.left = `${
-        thisPlayerCard.getBoundingClientRect().left
-      }px`;
-      thisPlayerVis.style.top = `${
-        thisPlayerCard.getBoundingClientRect().top
-      }px`;
-      if (event instanceof MouseEvent) {
-        xOffset = event.clientX - thisPlayerVis.offsetLeft + window.scrollX;
+      thisPlayerCard.style.zIndex = "10";
 
-        yOffset = event.clientY - thisPlayerVis.offsetTop + window.scrollY;
+      if (event instanceof MouseEvent) {
+        thisPlayerCard.style.pointerEvents = "none";
+        xOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.x : 0;
+        yOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.y : 0;
       } else if (event instanceof TouchEvent) {
-        xOffset =
-          event.touches[0].clientX - thisPlayerVis.offsetLeft + window.scrollX;
-        yOffset =
-          event.touches[0].clientY - thisPlayerVis.offsetTop + window.scrollY;
+        xOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.x : 0;
+        yOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.y : 0;
       }
       dragging(event);
 
-      updatePlayer(playerID, { address: { podId: 0, seat: 0 } });
-
       if (event instanceof MouseEvent) {
-        document.addEventListener("mousemove", dragging, { passive: false });
-        document.addEventListener("mouseup", dragEnd, { passive: false });
+        document.addEventListener("mousemove", dragging);
+        document.addEventListener("mouseup", dragEnd);
       } else if (event instanceof TouchEvent) {
-        document.addEventListener("touchmove", dragging, { passive: false });
-        document.addEventListener("touchend", dragEnd, { passive: false });
+        document.addEventListener("touchmove", dragging);
+        document.addEventListener("touchend", dragEnd);
       }
     }
   };
 
   const dragging = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() === "dragging") {
-      // event.preventDefault();
+      const playerRef = thisPlayerState().currentRef
+        ? thisPlayerState().currentRef!
+        : thisPlayerCard;
       if (event instanceof MouseEvent) {
-        const x = event.clientX - xOffset + window.scrollX;
-        const y = event.clientY - yOffset + window.scrollY;
-        thisPlayerVis.style.left = `${x + window.scrollX}px`;
-        thisPlayerVis.style.top = `${y + window.scrollY}px`;
+        const x = event.clientX - xOffset;
+        const y = event.clientY - yOffset;
+        playerRef.style.left = `${x + window.scrollX}px`;
+        playerRef.style.top = `${y + window.scrollY}px`;
       } else if (event instanceof TouchEvent) {
-        const x = event.touches[0].clientX - xOffset + window.scrollX;
-        const y = event.touches[0].clientY - yOffset + window.scrollY;
-        thisPlayerVis.style.left = `${x + window.scrollX}px`;
-        thisPlayerVis.style.top = `${y + window.scrollY}px`;
+        const x = event.touches[0].clientX - xOffset;
+        const y = event.touches[0].clientY - yOffset;
+        playerRef.style.left = `${x + window.scrollX}px`;
+        playerRef.style.top = `${y + window.scrollY}px`;
       }
+    }
+    if (hoveredSeat() && !hoveredSeat()?.filled) {
+      updatePlayer(playerID, {
+        lastSeat: {
+          podId: hoveredSeat()!.podId,
+          seat: hoveredSeat()!.seatNumber,
+        },
+      });
     }
   };
 
   const dragEnd = () => {
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.pointerEvents = "auto";
-    setPlayerCardMode("noSeat");
-    updatePlayer(playerID, { drag: false });
-    thisPlayerVis.style.position = "static";
-    thisPlayerVis.style.left = `0px`;
-    thisPlayerVis.style.top = `0px`;
 
-    if (podHovered() && hoveredSeat() && !hoveredSeat()?.filled) {
+    if (hoveredSeat() && !hoveredSeat()?.filled) {
       updatePlayer(playerID, {
         address: {
           podId: hoveredSeat()!.podId,
           seat: hoveredSeat()!.seatNumber,
         },
       });
-    } else if (!podHovered() || thisPlayerState().seat === 0) {
+    } else if (
+      hoveredPod() &&
+      hoveredPod()?.podId !== podId() &&
+      openSeatFromPod(hoveredPod()!.podId)
+    ) {
       updatePlayer(playerID, {
         address: {
-          podId: 0,
-          seat: 0,
+          podId: hoveredPod()!.podId,
+          seat: openSeatFromPod(hoveredPod()!.podId)!.seatNumber,
+        },
+      });
+    } else if (
+      thisPlayerState().lastSeat &&
+      eventState()
+        .evtPods.find((pod) => pod.podId === thisPlayerState().lastSeat!.podId)
+        ?.podSeats.find(
+          (seat) => seat.seatNumber === thisPlayerState().lastSeat!.seat
+        )
+    ) {
+      updatePlayer(playerID, {
+        address: {
+          podId: thisPlayerState().lastSeat!.podId,
+          seat: thisPlayerState().lastSeat!.seat,
+        },
+      });
+    } else if (openSeatFromPod(podId())) {
+      updatePlayer(playerID, {
+        address: {
+          podId: podId(),
+          seat: openSeatFromPod(podId())!.seatNumber,
+        },
+      });
+    } else {
+      updatePlayer(playerID, {
+        address: {
+          podId: openSeatAnyPod()!.podId,
+          seat: openSeatAnyPod()!.seatNumber,
         },
       });
     }
@@ -191,57 +203,27 @@ export default function PlayerCard({
     document.removeEventListener("touchend", dragEnd);
   };
 
-  onMount(() => {
-    updatePlayer(playerID, { elMounted: true });
-  });
-
   return (
-    <div
-      class={styles.playerCardCont}
-      ref={thisPlayerCard}
-      onMouseDown={(event) => {
-        if (
-          !thisPlayerPodState() ||
-          thisPlayerPodState()!.podStatus === "seating"
-        ) {
-          dragInit(event);
-        }
-      }}
-      onTouchStart={(event) => {
-        if (
-          !thisPlayerPodState() ||
-          thisPlayerPodState()!.podStatus === "seating"
-        ) {
-          dragInit(event);
-        }
-      }}
-    >
+    <div class={styles.playerCardCNT} ref={thisPlayerCard}>
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
-          <div class={styles.playerName} onclick={() => {}}>
-            {playerName}
+          <div
+            class={`${
+              leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
+            }`}
+          >
+            <div class={styles.playerIcon}></div>
+            <div class={styles.playerName}>{playerName}</div>
           </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
-          <Portal>
-            <div
-              class={styles.playerName}
-              ref={thisPlayerVis}
-              onclick={() => {}}
-            >
-              {playerName}
-              {/* {hoveredSeat()?.podId} {hoveredSeat()?.seatNumber} */}
-            </div>
-          </Portal>
-        </Match>
-        <Match when={playerCardMode() === "hoveringSeat"}>
-          <div class={styles.playerName} onclick={() => {}}>
-            {playerName}
-          </div>
-        </Match>
-        <Match when={playerCardMode() === "seated"}>
-          <div class={styles.playerName} onclick={() => {}}>
-            {playerName}
+          <div
+            class={`${
+              leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
+            }`}
+          >
+            <div class={styles.playerIcon}></div>
+            <div class={styles.playerName}>{playerName}</div>
           </div>
         </Match>
       </Switch>

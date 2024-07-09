@@ -28,7 +28,8 @@ export default function Seat({
   justifyRight,
 }: SeatInputs) {
   //Context State
-  const [eventState, { updateSeat, updatePlayer }] = useEventContext();
+  const [eventState, { updateSeat, updatePlayer, removePlayer }] =
+    useEventContext();
   //Local State
   const [mouseOver, setMouseOver] = createSignal<boolean>(false);
   const [isByeSeat, setIsByeSeat] = createSignal<boolean>(false);

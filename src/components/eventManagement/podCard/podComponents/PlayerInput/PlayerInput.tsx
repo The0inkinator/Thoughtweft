@@ -12,10 +12,7 @@ import {
 } from "solid-js";
 import { Player, SeatAddress } from "~/typing/eventTypes";
 import PlayerCard from "~/components/eventManagement/playerCard";
-import {
-  firstOpenSeatAddress,
-  firstPodSeat,
-} from "~/context/EventDataFunctions";
+import { openSeatFromPod } from "~/context/EventDataFunctions";
 import { createPlayerFromData } from "~/components/eventManagement/eventController/EventController";
 
 interface PlayerInputInputs {
@@ -48,8 +45,11 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
   const createPlayerFromSubmit = () => {
     if (thisPodState()?.podOwner) {
       runWithOwner(thisPodState()?.podOwner, () => {
-        if (playerNameValue() && firstPodSeat(eventState(), podId)) {
-          createNewPlayer(playerNameValue(), firstPodSeat(eventState(), podId));
+        if (playerNameValue() && openSeatFromPod(eventState(), podId)) {
+          createNewPlayer(playerNameValue(), {
+            podId: openSeatFromPod(eventState(), podId)!.podId,
+            seat: openSeatFromPod(eventState(), podId)!.seatNumber,
+          });
           setPlayerNameValue("");
           console.log(eventState().evtPlayerList);
         } else {
@@ -58,8 +58,11 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
       });
     } else {
       runWithOwner(inputOwner, () => {
-        if (playerNameValue() && firstPodSeat(eventState(), podId)) {
-          createNewPlayer(playerNameValue(), firstPodSeat(eventState(), podId));
+        if (playerNameValue() && openSeatFromPod(eventState(), podId)) {
+          createNewPlayer(playerNameValue(), {
+            podId: openSeatFromPod(eventState(), podId)!.podId,
+            seat: openSeatFromPod(eventState(), podId)!.seatNumber,
+          });
           setPlayerNameValue("");
           console.log(eventState().evtPlayerList);
         } else {

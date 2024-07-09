@@ -57,40 +57,21 @@ export function seatDataFromDiv(
   }
 }
 
-export function firstOpenSeatAddress(importedEventState: Event) {
-  const firstOpenPod = importedEventState.evtPods.find((pod) => {
-    let seatFilled = true;
+export function getAllSeats(eventData: Event) {
+  let allSeats: FullSeat[] = [];
+  eventData.evtPods.map((pod) => {
     pod.podSeats.map((seat) => {
-      if (!seat.filled) {
-        seatFilled = false;
-      }
+      allSeats.push(seat);
     });
-    if (!seatFilled) {
-      return true;
-    } else {
-      return false;
-    }
   });
-
-  const firstOpenSeat = firstOpenPod?.podSeats.find((seat) => !seat.filled);
-
-  if (firstOpenPod && firstOpenSeat) {
-    return {
-      podId: firstOpenPod.podId,
-      seat: firstOpenSeat.seatNumber,
-    } as SeatAddress;
-  }
+  return allSeats;
 }
 
-export function firstPodSeat(eventData: Event, podId: number) {
-  const Pod = eventData.evtPods.find((pod) => pod.podId === podId);
-
-  const firstOpenSeat = Pod?.podSeats.find((seat) => !seat.filled);
-
-  if (firstOpenSeat) {
-    return {
-      podId: podId,
-      seat: firstOpenSeat.seatNumber,
-    } as SeatAddress;
-  }
+export function openSeatFromPod(eventData: Event, podId: number) {
+  return getAllSeats(eventData).find(
+    (seat) => !seat.filled && seat.podId === podId
+  );
+}
+export function openSeatAnyPod(eventData: Event) {
+  return getAllSeats(eventData).find((seat) => !seat.filled);
 }

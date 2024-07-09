@@ -3,6 +3,7 @@ import { useEventContext } from "~/context/EventContext";
 import { createSignal, Switch, Match, onMount, createEffect } from "solid-js";
 import { FullSeat, Pod } from "~/typing/eventTypes";
 import { z } from "vinxi/dist/types/lib/router-modes";
+import { getAllSeats, openSeatFromPod } from "~/context/EventDataFunctions";
 
 interface PlayerCardInputs {
   playerID: number;
@@ -27,7 +28,6 @@ export default function PlayerCard({
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
   // const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
   const [leftSeatPlayer, setLeftSeatPlayer] = createSignal<boolean>(false);
-  const [cardLocX, setCardLocX] = createSignal<number>(0);
   //refs
   let thisPlayerCard!: HTMLDivElement;
   let xOffset: number, yOffset: number;
@@ -45,23 +45,10 @@ export default function PlayerCard({
     return eventState().evtPods.find((pod) => pod.podId === podId());
   };
 
-  const seats = () => {
-    let allSeats: FullSeat[] = [];
-    eventState().evtPods.map((pod) => {
-      pod.podSeats.map((seat) => {
-        allSeats.push(seat);
-      });
-    });
-    return allSeats;
-  };
-
   const hoveredPod = () => eventState().evtPods.find((pod) => pod.podHovered);
 
-  const hoveredSeat = () => seats().find((seat) => seat.hovered);
-
-  const openSeatFromPod = (id: number) =>
-    seats().find((seat) => !seat.filled && seat.podId === id);
-  const openSeatAnyPod = () => seats().find((seat) => !seat.filled);
+  const hoveredSeat = () =>
+    getAllSeats(eventState()).find((seat) => seat.hovered);
 
   createEffect(() => {
     let podRect = thisPodState()!.podRef!.getBoundingClientRect();
@@ -88,7 +75,6 @@ export default function PlayerCard({
   onMount(() => {
     updatePlayer(playerID, { currentRef: thisPlayerCard });
     if (draggingCard && thisPlayerState().lastEvent) {
-      // document.addEventListener("touchmove", dragging, true);
       dragInit(thisPlayerState().lastEvent!);
     }
   });
@@ -159,12 +145,12 @@ export default function PlayerCard({
     } else if (
       hoveredPod() &&
       hoveredPod()?.podId !== podId() &&
-      openSeatFromPod(hoveredPod()!.podId)
+      openSeatFromPod(eventState(), hoveredPod()!.podId)
     ) {
       updatePlayer(playerID, {
         address: {
           podId: hoveredPod()!.podId,
-          seat: openSeatFromPod(hoveredPod()!.podId)!.seatNumber,
+          seat: openSeatFromPod(eventState(), hoveredPod()!.podId)!.seatNumber,
         },
       });
     } else if (
@@ -181,18 +167,18 @@ export default function PlayerCard({
           seat: thisPlayerState().lastSeat!.seat,
         },
       });
-    } else if (openSeatFromPod(podId())) {
+    } else if (openSeatFromPod(eventState(), hoveredPod()!.podId)) {
       updatePlayer(playerID, {
         address: {
           podId: podId(),
-          seat: openSeatFromPod(podId())!.seatNumber,
+          seat: openSeatFromPod(eventState(), hoveredPod()!.podId)!.seatNumber,
         },
       });
     } else {
       updatePlayer(playerID, {
         address: {
-          podId: openSeatAnyPod()!.podId,
-          seat: openSeatAnyPod()!.seatNumber,
+          podId: openSeatFromPod(eventState(), hoveredPod()!.podId)!.podId,
+          seat: openSeatFromPod(eventState(), hoveredPod()!.podId)!.seatNumber,
         },
       });
     }

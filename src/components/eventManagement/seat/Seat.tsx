@@ -41,6 +41,10 @@ export default function Seat({
       .evtPods.find((pod) => pod.podId === podId)!
       .podSeats.find((seat) => seat.seatNumber === seatNumber)!;
 
+  const thisPodState = () => {
+    return eventState().evtPods.find((pod) => pod.podId === podId);
+  };
+
   const seatedPlayer = () =>
     eventState().evtPlayerList.find(
       (player) => player.seat === seatNumber && player.podId === podId
@@ -292,6 +296,48 @@ export default function Seat({
       onMouseOver={() => {
         if (!thisSeatState().hovered) {
           updateSeat(podId, seatNumber, { hovered: true });
+        }
+      }}
+      onMouseDown={(event) => {
+        if (seatedPlayer() && thisPodState()?.podStatus === "seating") {
+          updatePlayer(seatedPlayer()!.id, {
+            lastSeat: { podId: podId, seat: seatNumber },
+          });
+          updatePlayer(seatedPlayer()!.id, { lastEvent: event });
+          updatePlayer(seatedPlayer()!.id, {
+            lastLoc: {
+              x:
+                event.clientX -
+                seatedPlayer()!.currentRef!.getBoundingClientRect().left,
+              y:
+                event.clientY -
+                seatedPlayer()!.currentRef!.getBoundingClientRect().top,
+            },
+          });
+          updatePlayer(seatedPlayer()!.id, {
+            address: { podId: podId, seat: 0 },
+          });
+        }
+      }}
+      ontouchstart={(event) => {
+        if (seatedPlayer() && thisPodState()?.podStatus === "seating") {
+          updatePlayer(seatedPlayer()!.id, {
+            lastSeat: { podId: podId, seat: seatNumber },
+          });
+          updatePlayer(seatedPlayer()!.id, { lastEvent: event });
+          updatePlayer(seatedPlayer()!.id, {
+            lastLoc: {
+              x:
+                event.touches[0].clientX -
+                seatedPlayer()!.currentRef!.getBoundingClientRect().left,
+              y:
+                event.touches[0].clientY -
+                seatedPlayer()!.currentRef!.getBoundingClientRect().top,
+            },
+          });
+          updatePlayer(seatedPlayer()!.id, {
+            address: { podId: podId, seat: 0 },
+          });
         }
       }}
     >

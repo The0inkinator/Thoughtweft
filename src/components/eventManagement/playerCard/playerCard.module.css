@@ -1,5 +1,6 @@
 .playerCardCNT {
   touch-action: none;
+  pointer-events: none;
   position: absolute;
   width: var(--PlayerCard);
   aspect-ratio: 1/1;

@@ -1,6 +1,6 @@
 import styles from "./playerCard.module.css";
 import { useEventContext } from "~/context/EventContext";
-import { createSignal, Switch, Match, onMount } from "solid-js";
+import { createSignal, Switch, Match, onMount, createEffect } from "solid-js";
 import { FullSeat, Pod } from "~/typing/eventTypes";
 import { z } from "vinxi/dist/types/lib/router-modes";
 
@@ -45,9 +45,28 @@ export default function PlayerCard({
     return eventState().evtPods.find((pod) => pod.podId === podId());
   };
 
+  const seats = () => {
+    let allSeats: FullSeat[] = [];
+    eventState().evtPods.map((pod) => {
+      pod.podSeats.map((seat) => {
+        allSeats.push(seat);
+      });
+    });
+    return allSeats;
+  };
+
+  const hoveredPod = () => eventState().evtPods.find((pod) => pod.podHovered);
+
+  const hoveredSeat = () => seats().find((seat) => seat.hovered);
+
+  const openSeatFromPod = (id: number) =>
+    seats().find((seat) => !seat.filled && seat.podId === id);
+  const openSeatAnyPod = () => seats().find((seat) => !seat.filled);
+
   onMount(() => {
     updatePlayer(playerID, { currentRef: thisPlayerCard });
     if (draggingCard && thisPlayerState().lastEvent) {
+      // document.addEventListener("touchmove", dragging, true);
       dragInit(thisPlayerState().lastEvent!);
     }
   });
@@ -55,8 +74,7 @@ export default function PlayerCard({
   const dragInit = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() !== "dragging") {
       setPlayerCardMode("dragging");
-      // thisPlayerCard.style.zIndex = "10";
-      // thisPlayerCard.style.position = "absolute";
+      thisPlayerCard.style.zIndex = "10";
 
       if (event instanceof MouseEvent) {
         thisPlayerCard.style.pointerEvents = "none";
@@ -104,24 +122,6 @@ export default function PlayerCard({
       });
     }
   };
-
-  const seats = () => {
-    let allSeats: FullSeat[] = [];
-    eventState().evtPods.map((pod) => {
-      pod.podSeats.map((seat) => {
-        allSeats.push(seat);
-      });
-    });
-    return allSeats;
-  };
-
-  const hoveredPod = () => eventState().evtPods.find((pod) => pod.podHovered);
-
-  const hoveredSeat = () => seats().find((seat) => seat.hovered);
-
-  const openSeatFromPod = (id: number) =>
-    seats().find((seat) => !seat.filled && seat.podId === id);
-  const openSeatAnyPod = () => seats().find((seat) => !seat.filled);
 
   const dragEnd = () => {
     thisPlayerCard.style.position = "static";
@@ -182,51 +182,10 @@ export default function PlayerCard({
   };
 
   return (
-    <div
-      class={styles.playerCardCNT}
-      style={{
-        "background-color": playerCardMode() === "dragging" ? "blue" : "red",
-      }}
-      ref={thisPlayerCard}
-      onMouseDown={(event) => {
-        if (!thisPodState() || thisPodState()!.podStatus === "seating") {
-          updatePlayer(playerID, {
-            lastSeat: { podId: podId(), seat: seatNumber },
-          });
-          updatePlayer(playerID, { lastEvent: event });
-          updatePlayer(playerID, {
-            lastLoc: {
-              x: event.clientX - thisPlayerCard.getBoundingClientRect().left,
-              y: event.clientY - thisPlayerCard.getBoundingClientRect().top,
-            },
-          });
-          updatePlayer(playerID, { address: { podId: podId(), seat: 0 } });
-        }
-      }}
-      onTouchStart={(event) => {
-        if (!thisPodState() || thisPodState()!.podStatus === "seating") {
-          updatePlayer(playerID, {
-            lastSeat: { podId: podId(), seat: seatNumber },
-          });
-          updatePlayer(playerID, { lastEvent: event });
-          updatePlayer(playerID, {
-            lastLoc: {
-              x:
-                event.touches[0].clientX -
-                thisPlayerCard.getBoundingClientRect().left,
-              y:
-                event.touches[0].clientY -
-                thisPlayerCard.getBoundingClientRect().top,
-            },
-          });
-          updatePlayer(playerID, { address: { podId: podId(), seat: 0 } });
-        }
-      }}
-    >
-      {/* <Switch fallback={<></>}>
+    <div class={styles.playerCardCNT} ref={thisPlayerCard}>
+      <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
           <div
-            style={{ "z-index": "-1" }}
             class={`${
               leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
             }`}
@@ -245,7 +204,7 @@ export default function PlayerCard({
             <div class={styles.playerName}>{playerName}</div>
           </div>
         </Match>
-      </Switch> */}
+      </Switch>
     </div>
   );
 }

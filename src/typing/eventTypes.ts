@@ -17,7 +17,8 @@ export type PlayerUpdateParam =
       };
     }
   | { lastEvent: MouseEvent | TouchEvent }
-  | { lastSeat: number };
+  | { lastSeat: { podId: number; seat: number } }
+  | { lastLoc: { x: number; y: number } };
 
 export type PodStatusModes =
   | "seating"
@@ -50,7 +51,8 @@ export type Player = {
   seat: number;
   podRecords: PodRecord[];
   lastEvent?: MouseEvent | TouchEvent;
-  lastSeat?: number;
+  lastSeat?: { podId: number; seat: number };
+  lastLoc?: { x: number; y: number };
 };
 
 export type PodRecord = {

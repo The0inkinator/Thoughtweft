@@ -35,7 +35,7 @@ export default function PlayerCard({
     useEventContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
-  const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
+  // const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
   const [leftSeatPlayer, setLeftSeatPlayer] = createSignal<boolean>(false);
   const [cardLocX, setCardLocX] = createSignal<number>(0);
   //refs
@@ -78,19 +78,13 @@ export default function PlayerCard({
 
       if (event instanceof MouseEvent) {
         thisPlayerCard.style.pointerEvents = "none";
-        xOffset = event.clientX - thisPlayerCard.offsetLeft + window.scrollX;
-
-        yOffset = event.clientY - thisPlayerCard.offsetTop + window.scrollY;
+        xOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.x : 0;
+        yOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.y : 0;
       } else if (event instanceof TouchEvent) {
-        xOffset =
-          event.touches[0].clientX -
-          thisPlayerDragCard.offsetLeft +
-          window.scrollX;
-        yOffset =
-          event.touches[0].clientY -
-          thisPlayerDragCard.offsetTop +
-          window.scrollY;
+        xOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.x : 0;
+        yOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.y : 0;
       }
+      dragging(event);
       updatePlayer(playerID, { address: { podId: podId(), seat: 0 } });
 
       if (event instanceof MouseEvent) {
@@ -105,67 +99,97 @@ export default function PlayerCard({
 
   const dragging = (event: MouseEvent | TouchEvent) => {
     if (playerCardMode() === "dragging") {
-      console.log("dragging");
-
       if (event instanceof MouseEvent) {
-        const x = event.clientX + window.scrollX;
-        const y = event.clientY + window.scrollY;
+        const x = event.clientX + window.scrollX - xOffset;
+        const y = event.clientY + window.scrollY - yOffset;
         thisPlayerCard.style.left = `${x + window.scrollX}px`;
         thisPlayerCard.style.top = `${y + window.scrollY}px`;
       } else if (event instanceof TouchEvent) {
-        const x = event.touches[0].clientX + window.scrollX;
-        const y = event.touches[0].clientY + window.scrollY;
+        const x = event.touches[0].clientX + window.scrollX - xOffset;
+        const y = event.touches[0].clientY + window.scrollY - yOffset;
+        thisPlayerCard.style.left = `${x + window.scrollX}px`;
         thisPlayerCard.style.top = `${y + window.scrollY}px`;
       }
-      // setCardLocX(thisPlayerDragCard.getBoundingClientRect().x);
-
-      // if (podHovered().hovered) {
-      //   updatePlayer(playerID, {
-      //     address: { podId: podHovered().state!.podId, seat: 0 },
-      //   });
-      // }
+    }
+    if (hoveredSeat() && !hoveredSeat()?.filled) {
+      updatePlayer(playerID, {
+        lastSeat: {
+          podId: hoveredSeat()!.podId,
+          seat: hoveredSeat()!.seatNumber,
+        },
+      });
     }
   };
+
+  const seats = () => {
+    let allSeats: FullSeat[] = [];
+    eventState().evtPods.map((pod) => {
+      pod.podSeats.map((seat) => {
+        allSeats.push(seat);
+      });
+    });
+    return allSeats;
+  };
+
+  const hoveredPod = () => eventState().evtPods.find((pod) => pod.podHovered);
+
+  const hoveredSeat = () => seats().find((seat) => seat.hovered);
+
+  const openSeatFromPod = (id: number) =>
+    seats().find((seat) => !seat.filled && seat.podId === id);
+  const openSeatAnyPod = () => seats().find((seat) => !seat.filled);
 
   const dragEnd = () => {
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.pointerEvents = "auto";
-    setPlayerCardMode("noSeat");
-    updatePlayer(playerID, {
-      address: { podId: podId(), seat: thisPlayerState().lastSeat! },
-    });
 
-    // if (
-    //   podHovered().hovered &&
-    //   hoveredSeat() &&
-    //   !hoveredSeat()?.filled &&
-    //   hoveredSeat()?.podId === podHovered().state?.podId
-    // ) {
-    //   updatePlayer(playerID, {
-    //     address: {
-    //       podId: hoveredSeat()!.podId,
-    //       seat: hoveredSeat()!.seatNumber,
-    //     },
-    //   });
-    // } else if (
-    //   podHovered().hovered &&
-    //   podHovered().state!.podSeats.find((seat) => !seat.filled)
-    // ) {
-    //   updatePlayer(playerID, {
-    //     address: {
-    //       podId: podHovered().state!.podId,
-    //       seat: podHovered().state!.podSeats.find((seat) => !seat.filled)!
-    //         .seatNumber,
-    //     },
-    //   });
-    // } else if (!podHovered().hovered || thisPlayerState().seat === 0) {
-    //   updatePlayer(playerID, {
-    //     address: {
-    //       podId: 0,
-    //       seat: 0,
-    //     },
-    //   });
-    // }
+    if (hoveredSeat() && !hoveredSeat()?.filled) {
+      updatePlayer(playerID, {
+        address: {
+          podId: hoveredSeat()!.podId,
+          seat: hoveredSeat()!.seatNumber,
+        },
+      });
+    } else if (
+      hoveredPod() &&
+      hoveredPod()?.podId !== podId() &&
+      openSeatFromPod(hoveredPod()!.podId)
+    ) {
+      updatePlayer(playerID, {
+        address: {
+          podId: hoveredPod()!.podId,
+          seat: openSeatFromPod(hoveredPod()!.podId)!.seatNumber,
+        },
+      });
+    } else if (
+      thisPlayerState().lastSeat &&
+      eventState()
+        .evtPods.find((pod) => pod.podId === thisPlayerState().lastSeat!.podId)
+        ?.podSeats.find(
+          (seat) => seat.seatNumber === thisPlayerState().lastSeat!.seat
+        )
+    ) {
+      updatePlayer(playerID, {
+        address: {
+          podId: thisPlayerState().lastSeat!.podId,
+          seat: thisPlayerState().lastSeat!.seat,
+        },
+      });
+    } else if (openSeatFromPod(podId())) {
+      updatePlayer(playerID, {
+        address: {
+          podId: podId(),
+          seat: openSeatFromPod(podId())!.seatNumber,
+        },
+      });
+    } else {
+      updatePlayer(playerID, {
+        address: {
+          podId: openSeatAnyPod()!.podId,
+          seat: openSeatAnyPod()!.seatNumber,
+        },
+      });
+    }
 
     document.removeEventListener("mousemove", dragging);
     document.removeEventListener("mouseup", dragEnd);
@@ -179,23 +203,42 @@ export default function PlayerCard({
       ref={thisPlayerCard}
       onMouseDown={(event) => {
         if (!thisPodState() || thisPodState()!.podStatus === "seating") {
-          // console.log(thisPlayerState());
-          // dragInit(event);
-          updatePlayer(playerID, { lastSeat: seatNumber });
+          updatePlayer(playerID, {
+            lastSeat: { podId: podId(), seat: seatNumber },
+          });
           updatePlayer(playerID, { lastEvent: event });
+          updatePlayer(playerID, {
+            lastLoc: {
+              x: event.clientX - thisPlayerCard.getBoundingClientRect().left,
+              y: event.clientY - thisPlayerCard.getBoundingClientRect().top,
+            },
+          });
           updatePlayer(playerID, { address: { podId: podId(), seat: 0 } });
         }
       }}
       onTouchStart={(event) => {
         if (!thisPodState() || thisPodState()!.podStatus === "seating") {
-          // dragInit(event);
+          updatePlayer(playerID, {
+            lastSeat: { podId: podId(), seat: seatNumber },
+          });
+          updatePlayer(playerID, { lastEvent: event });
+          updatePlayer(playerID, {
+            lastLoc: {
+              x:
+                event.touches[0].clientX -
+                thisPlayerCard.getBoundingClientRect().left,
+              y:
+                event.touches[0].clientY -
+                thisPlayerCard.getBoundingClientRect().top,
+            },
+          });
+          -updatePlayer(playerID, { address: { podId: podId(), seat: 0 } });
         }
       }}
     >
       <Switch fallback={<></>}>
         <Match when={playerCardMode() === "noSeat"}>
           <div
-            // ref={thisPlayerVis}
             class={`${
               leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
             }`}
@@ -206,11 +249,9 @@ export default function PlayerCard({
         </Match>
         <Match when={playerCardMode() === "dragging"}>
           <div
-            // ref={thisPlayerVis}
             class={`${
               leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
             }`}
-            // style={{ "background-color": "red" }}
           >
             <div class={styles.playerIcon}></div>
             <div class={styles.playerName}>{playerName}</div>

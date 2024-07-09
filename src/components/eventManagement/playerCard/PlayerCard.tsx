@@ -80,31 +80,52 @@ export default function PlayerCard({
   });
 
   const dragInit = (event: MouseEvent | TouchEvent) => {
-    if (playerCardMode() !== "dragging") {
-      setPlayerCardMode("dragging");
-      thisPlayerCard.style.zIndex = "10";
+    // setPlayerCardMode("dragging");
+    thisPlayerCard.style.zIndex = "10";
 
-      if (event instanceof MouseEvent) {
-        thisPlayerCard.style.pointerEvents = "none";
-        xOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.x : 0;
-        yOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.y : 0;
-      } else if (event instanceof TouchEvent) {
-        xOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.x : 0;
-        yOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.y : 0;
-      }
-      dragging(event);
-
-      if (event instanceof MouseEvent) {
-        document.addEventListener("mousemove", dragging);
-        document.addEventListener("mouseup", dragEnd);
-      } else if (event instanceof TouchEvent) {
-        document.addEventListener("touchmove", dragging);
-        document.addEventListener("touchend", dragEnd);
-      }
+    //Set offsets
+    if (event instanceof MouseEvent) {
+      thisPlayerCard.style.pointerEvents = "none";
+      xOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.x : 0;
+      yOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.y : 0;
+    } else if (event instanceof TouchEvent) {
+      xOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.x : 0;
+      yOffset = thisPlayerState().lastLoc ? thisPlayerState().lastLoc!.y : 0;
+    }
+    //Trigger Initial Styling
+    const playerRef = thisPlayerState().currentRef
+      ? thisPlayerState().currentRef!
+      : thisPlayerCard;
+    if (event instanceof MouseEvent) {
+      const x = event.clientX - xOffset;
+      const y = event.clientY - yOffset;
+      playerRef.style.left = `${x + window.scrollX}px`;
+      playerRef.style.top = `${y + window.scrollY}px`;
+    } else if (event instanceof TouchEvent) {
+      const x = event.touches[0].clientX - xOffset;
+      const y = event.touches[0].clientY - yOffset;
+      playerRef.style.left = `${x + window.scrollX}px`;
+      playerRef.style.top = `${y + window.scrollY}px`;
+    }
+    //Add event Listeners
+    if (event instanceof MouseEvent) {
+      document.addEventListener("mousemove", dragging);
+      document.addEventListener("mouseup", dragEnd);
+    } else if (event instanceof TouchEvent) {
+      document.addEventListener("touchmove", dragging);
+      document.addEventListener("touchend", dragEnd);
     }
   };
 
   const dragging = (event: MouseEvent | TouchEvent) => {
+    if (
+      (event.type === "mousemove" || event.type === "touchmove") &&
+      playerCardMode() !== "dragging"
+    ) {
+      setTimeout(() => {
+        setPlayerCardMode("dragging");
+      }, 70);
+    }
     if (playerCardMode() === "dragging") {
       const playerRef = thisPlayerState().currentRef
         ? thisPlayerState().currentRef!
@@ -134,6 +155,10 @@ export default function PlayerCard({
   const dragEnd = () => {
     thisPlayerCard.style.position = "static";
     thisPlayerCard.style.pointerEvents = "auto";
+
+    if (playerCardMode() !== "dragging") {
+      console.log("clicked");
+    }
 
     if (hoveredSeat() && !hoveredSeat()?.filled) {
       updatePlayer(playerID, {

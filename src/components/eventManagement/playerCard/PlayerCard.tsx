@@ -1,6 +1,13 @@
 import styles from "./playerCard.module.css";
 import { useEventContext } from "~/context/EventContext";
-import { createSignal, Switch, Match, onMount, createEffect } from "solid-js";
+import {
+  createSignal,
+  Switch,
+  Match,
+  onMount,
+  createEffect,
+  Show,
+} from "solid-js";
 import { FullSeat, Pod } from "~/typing/eventTypes";
 import { z } from "vinxi/dist/types/lib/router-modes";
 import { getAllSeats, openSeatFromPod } from "~/context/EventDataFunctions";
@@ -157,7 +164,6 @@ export default function PlayerCard({
     thisPlayerCard.style.pointerEvents = "auto";
 
     if (playerCardMode() !== "dragging") {
-      console.log("clicked");
     }
 
     if (hoveredSeat() && !hoveredSeat()?.filled) {
@@ -238,6 +244,9 @@ export default function PlayerCard({
           </div>
         </Match>
       </Switch>
+      <Show when={true}>
+        <div>Menu</div>
+      </Show>
     </div>
   );
 }

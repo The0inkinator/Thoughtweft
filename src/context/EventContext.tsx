@@ -619,6 +619,11 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPlayerList[playerIndex],
                   currentRef: updateParam.currentRef,
                 };
+              } else if ("menuOpen" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  menuOpen: updateParam.menuOpen,
+                };
               }
 
               return newEvt;

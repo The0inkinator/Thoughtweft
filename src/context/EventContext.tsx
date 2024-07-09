@@ -614,6 +614,11 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPlayerList[playerIndex],
                   lastLoc: updateParam.lastLoc,
                 };
+              } else if ("currentRef" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  currentRef: updateParam.currentRef,
+                };
               }
 
               return newEvt;

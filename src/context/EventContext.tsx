@@ -18,7 +18,7 @@ import {
 
 //Typing
 
-type EventState = [
+export type EventState = [
   () => Event,
   {
     makeEvent: (newEvent: Event) => void;

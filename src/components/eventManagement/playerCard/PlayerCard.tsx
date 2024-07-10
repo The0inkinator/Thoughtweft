@@ -165,9 +165,9 @@ export default function PlayerCard({
     thisPlayerCard.style.pointerEvents = "auto";
 
     if (playerCardMode() !== "dragging") {
-      updatePod(podId(), { popUpOn: true });
+      updatePod(podId(), { menuOpen: true });
       updatePlayer(playerID, { menuOpen: true });
-      thisPodState()?.popUpRef?.appendChild(thisPlayerMenu);
+      thisPodState()?.menuRef?.appendChild(thisPlayerMenu);
     }
 
     if (hoveredSeat() && !hoveredSeat()?.filled) {

@@ -108,8 +108,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   };
 
   createEffect(() => {
-    if (thisPodState()?.popUpOn && thisPodState()?.popUpRef !== overlayMenu) {
-      updatePod(podId, { popUpRef: overlayMenu });
+    if (thisPodState()?.menuOpen && thisPodState()?.menuRef !== overlayMenu) {
+      updatePod(podId, { menuRef: overlayMenu });
     }
   });
 
@@ -601,7 +601,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             </Match>
           </Switch>
         </div>
-        <Show when={thisPodState()?.popUpOn}>
+        <Show when={thisPodState()?.menuOpen}>
           <div class={styles.overlayMenu} ref={overlayMenu}></div>
         </Show>
         <Portal>

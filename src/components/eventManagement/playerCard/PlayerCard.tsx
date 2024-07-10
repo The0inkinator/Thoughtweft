@@ -29,7 +29,7 @@ export default function PlayerCard({
   draggingCard,
 }: PlayerCardInputs) {
   //Context State
-  const [eventState, { updatePlayer, updateSeat, removePlayer }] =
+  const [eventState, { updatePlayer, updateSeat, removePlayer, updatePod }] =
     useEventContext();
   //Local State
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
@@ -37,6 +37,7 @@ export default function PlayerCard({
   const [leftSeatPlayer, setLeftSeatPlayer] = createSignal<boolean>(false);
   //refs
   let thisPlayerCard!: HTMLDivElement;
+  let thisPlayerMenu!: HTMLDivElement;
   let xOffset: number, yOffset: number;
   //Values
 
@@ -164,6 +165,9 @@ export default function PlayerCard({
     thisPlayerCard.style.pointerEvents = "auto";
 
     if (playerCardMode() !== "dragging") {
+      updatePod(podId(), { popUpOn: true });
+      updatePlayer(playerID, { menuOpen: true });
+      thisPodState()?.popUpRef?.appendChild(thisPlayerMenu);
     }
 
     if (hoveredSeat() && !hoveredSeat()?.filled) {
@@ -244,8 +248,8 @@ export default function PlayerCard({
           </div>
         </Match>
       </Switch>
-      <Show when={true}>
-        <div>Menu</div>
+      <Show when={thisPlayerState().menuOpen}>
+        <div ref={thisPlayerMenu}>Menu</div>
       </Show>
     </div>
   );

@@ -235,7 +235,7 @@ export default function PlayerCard({
             }`}
           >
             <div class={styles.playerIcon}></div>
-            <div class={styles.playerName}>{playerName}</div>
+            <div class={styles.playerName}>{thisPlayerState().name}</div>
           </div>
         </Match>
         <Match when={playerCardMode() === "dragging"}>
@@ -245,7 +245,7 @@ export default function PlayerCard({
             }`}
           >
             <div class={styles.playerIcon}></div>
-            <div class={styles.playerName}>{playerName}</div>
+            <div class={styles.playerName}>{thisPlayerState().name}</div>
           </div>
         </Match>
       </Switch>

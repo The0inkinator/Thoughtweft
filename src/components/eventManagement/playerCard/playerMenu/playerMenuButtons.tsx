@@ -1,3 +1,4 @@
+import { createSignal } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 
 interface PlayerButtonInputs {
@@ -16,5 +17,28 @@ export function PlayerCloseButton({ playerId, podId }: PlayerButtonInputs) {
         updatePod(podId, { menuOpen: false });
       }}
     ></div>
+  );
+}
+
+export function PlayerRenameButton({ playerId, podId }: PlayerButtonInputs) {
+  const [eventState, { updatePlayer, updatePod }] = useEventContext();
+  const thisPlayerState = () =>
+    eventState().evtPlayerList.find((player) => player.id === playerId);
+  const [nameValue, setNameValue] = createSignal<string>(
+    thisPlayerState()!.name
+  );
+
+  return (
+    <input
+      onInput={(event) => {
+        setNameValue(event.target.value);
+      }}
+      value={nameValue()}
+      onkeydown={(event) => {
+        if (event.key === "Enter") {
+          updatePlayer(playerId, { name: nameValue() });
+        }
+      }}
+    ></input>
   );
 }

@@ -11,6 +11,7 @@ import {
 import { FullSeat, Pod } from "~/typing/eventTypes";
 import { z } from "vinxi/dist/types/lib/router-modes";
 import { getAllSeats, openSeatFromPod } from "~/context/EventDataFunctions";
+import PlayerMenu from "./playerMenu/PlayerMenu";
 
 interface PlayerCardInputs {
   playerID: number;
@@ -248,9 +249,11 @@ export default function PlayerCard({
           </div>
         </Match>
       </Switch>
-      <Show when={thisPlayerState().menuOpen}>
-        <div ref={thisPlayerMenu}>Menu</div>
-      </Show>
+      <PlayerMenu
+        ref={thisPlayerMenu}
+        playerId={playerID}
+        podId={podId()}
+      ></PlayerMenu>
     </div>
   );
 }

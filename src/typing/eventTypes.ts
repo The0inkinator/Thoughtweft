@@ -36,8 +36,8 @@ export type PodUpdateParam =
   | { hovered: boolean }
   | { byePlayer: number }
   | { ref: HTMLDivElement }
-  | { popUpOn: boolean }
-  | { popUpRef: HTMLDivElement }
+  | { menuOpen: boolean }
+  | { menuRef: HTMLDivElement }
   | { podOwner: any };
 
 export type MatchUpdateParam =
@@ -110,8 +110,8 @@ export type Pod = {
   byePlayerIds?: number[];
   podRef?: HTMLDivElement;
   podHovered?: boolean;
-  popUpOn?: boolean;
-  popUpRef?: HTMLDivElement;
+  menuOpen?: boolean;
+  menuRef?: HTMLDivElement;
   podOwner?: any;
 };
 

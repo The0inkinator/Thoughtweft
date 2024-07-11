@@ -38,7 +38,7 @@ export type PodUpdateParam =
   | { byePlayer: number }
   | { ref: HTMLDivElement }
   | { menuOpen: boolean }
-  | { menuRef: HTMLDivElement }
+  | { overlayOpen: boolean }
   | { podOwner: any };
 
 export type MatchUpdateParam =
@@ -112,7 +112,7 @@ export type Pod = {
   podRef?: HTMLDivElement;
   podHovered?: boolean;
   menuOpen?: boolean;
-  menuRef?: HTMLDivElement;
+  overlayOpen?: boolean;
   podOwner?: any;
 };
 

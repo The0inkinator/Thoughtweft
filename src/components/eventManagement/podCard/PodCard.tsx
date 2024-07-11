@@ -108,12 +108,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     });
   };
 
-  createEffect(() => {
-    if (thisPodState()?.menuOpen && thisPodState()?.menuRef !== overlayMenu) {
-      updatePod(podId, { menuRef: overlayMenu });
-    }
-  });
-
   const shrinkPod = () => {
     const playersInPod = eventState().evtPlayerList.filter(
       (player) => player.podId === podId

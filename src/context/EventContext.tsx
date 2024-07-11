@@ -442,8 +442,8 @@ export function EventContextProvider(props: any) {
                 newEvt.evtPods[podIndex].podRef = scopedParam;
               } else if ("menuOpen" in updateParam) {
                 newEvt.evtPods[podIndex].menuOpen = updateParam.menuOpen;
-              } else if ("menuRef" in updateParam) {
-                newEvt.evtPods[podIndex].menuRef = updateParam.menuRef;
+              } else if ("overlayOpen" in updateParam) {
+                newEvt.evtPods[podIndex].overlayOpen = updateParam.overlayOpen;
               } else if ("podOwner" in updateParam) {
                 newEvt.evtPods[podIndex].podOwner = updateParam.podOwner;
               }

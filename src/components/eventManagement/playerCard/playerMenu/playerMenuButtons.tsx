@@ -38,7 +38,7 @@ export function PlayerRenameButton({ playerId, podId }: PlayerButtonInputs) {
         if (event.key === "Enter") {
           updatePlayer(playerId, { name: nameValue() });
           updatePlayer(playerId, { menuOpen: false });
-          updatePod(podId, { menuOpen: false });
+          updatePod(podId, { overlayOpen: false });
         }
       }}
     ></input>

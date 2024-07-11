@@ -168,7 +168,7 @@ export default function PlayerCard({
     thisPlayerCard.style.pointerEvents = "auto";
 
     if (playerCardMode() !== "dragging") {
-      updatePod(podId(), { menuOpen: true });
+      updatePod(podId(), { overlayOpen: true });
       updatePlayer(playerID, { menuOpen: true });
     }
 

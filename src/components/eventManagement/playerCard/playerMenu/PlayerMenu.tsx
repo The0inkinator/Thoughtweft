@@ -1,4 +1,4 @@
-import { createEffect, onCleanup, Show } from "solid-js";
+import { createEffect, onCleanup, onMount, Show } from "solid-js";
 import styles from "./playerMenu.module.css";
 import { useEventContext } from "~/context/EventContext";
 import { PlayerCloseButton, PlayerRenameButton } from "./playerMenuButtons";
@@ -18,7 +18,12 @@ export default function PlayerMenu({ ref, playerId, podId }: PlayerMenuInputs) {
 
   return (
     <div ref={ref} style={{ "pointer-events": "auto" }}>
-      <Show when={thisPlayerState()?.menuOpen}>
+      <Show
+        when={
+          thisPlayerState()?.menuOpen &&
+          ref.parentElement !== thisPlayerState()?.currentRef
+        }
+      >
         <PlayerCloseButton playerId={playerId} podId={podId} />
         <PlayerRenameButton playerId={playerId} podId={podId} />
       </Show>

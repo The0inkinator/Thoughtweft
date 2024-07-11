@@ -167,8 +167,7 @@ export default function PlayerCard({
 
     if (playerCardMode() !== "dragging") {
       updatePod(podId(), { menuOpen: true });
-      // updatePlayer(playerID, { menuOpen: true });
-      // thisPodState()?.menuRef?.appendChild(thisPlayerMenu);
+      updatePlayer(playerID, { menuOpen: true });
     }
 
     if (hoveredSeat() && !hoveredSeat()?.filled) {
@@ -249,11 +248,6 @@ export default function PlayerCard({
           </div>
         </Match>
       </Switch>
-      <PlayerMenu
-        ref={thisPlayerMenu}
-        playerId={playerID}
-        podId={podId()}
-      ></PlayerMenu>
     </div>
   );
 }

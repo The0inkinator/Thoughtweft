@@ -4,12 +4,11 @@ import { useEventContext } from "~/context/EventContext";
 import { PlayerCloseButton, PlayerRenameButton } from "./playerMenuButtons";
 
 interface PlayerMenuInputs {
-  ref: HTMLDivElement;
   playerId: number;
   podId: number;
 }
 
-export default function PlayerMenu({ ref, playerId, podId }: PlayerMenuInputs) {
+export default function PlayerMenu({ playerId, podId }: PlayerMenuInputs) {
   //Context State
   const [eventState, { updatePlayer, updatePod }] = useEventContext();
 
@@ -17,16 +16,8 @@ export default function PlayerMenu({ ref, playerId, podId }: PlayerMenuInputs) {
     eventState().evtPlayerList.find((player) => player.id === playerId);
 
   return (
-    <div ref={ref} style={{ "pointer-events": "auto" }}>
-      <Show
-        when={
-          thisPlayerState()?.menuOpen &&
-          ref.parentElement !== thisPlayerState()?.currentRef
-        }
-      >
-        <PlayerCloseButton playerId={playerId} podId={podId} />
-        <PlayerRenameButton playerId={playerId} podId={podId} />
-      </Show>
+    <div style={{ "pointer-events": "auto" }}>
+      <PlayerRenameButton playerId={playerId} podId={podId} />
     </div>
   );
 }

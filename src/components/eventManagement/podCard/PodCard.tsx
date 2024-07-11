@@ -3,7 +3,7 @@ import {
   createSignal,
   For,
   onMount,
-  createMemo,
+  runWithOwner,
   Show,
   ErrorBoundary,
   Switch,
@@ -24,6 +24,7 @@ import PlayerInput from "./podComponents/playerInput/PlayerInput";
 import { Portal } from "solid-js/web";
 import PlayerCard from "../playerCard/PlayerCard";
 import PodOverlay from "./podComponents/podOverlay/podOverlay";
+import shrinkPod from "./playerMgmtFunc/shrinkPod";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -73,61 +74,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     updatePodSize(podId, thisPodState()!.podSize);
     updatePod(podId, { podOwner: podOwner });
   });
-
-  const shufflePod = () => {
-    const shuffleArray = eventState().evtPlayerList.filter(
-      (player) => player.podId === podId
-    );
-    for (let i = shuffleArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffleArray[i], shuffleArray[j]] = [shuffleArray[j], shuffleArray[i]];
-    }
-
-    shuffleArray.map((shuffledPlayer, index) => {
-      const playerToEdit = eventState().evtPlayerList.find(
-        (player) => shuffledPlayer.id === player.id
-      );
-
-      if (playerToEdit) {
-        updatePlayer(playerToEdit.id, {
-          address: { podId: 0, seat: 0 },
-        });
-      }
-    });
-
-    shuffleArray.map((shuffledPlayer, index) => {
-      const playerToEdit = eventState().evtPlayerList.find(
-        (player) => shuffledPlayer.id === player.id
-      );
-
-      if (playerToEdit) {
-        updatePlayer(playerToEdit.id, {
-          address: { podId: podId, seat: index + 1 },
-        });
-      }
-    });
-  };
-
-  const shrinkPod = () => {
-    const playersInPod = eventState().evtPlayerList.filter(
-      (player) => player.podId === podId
-    );
-    const seatsInPod = eventState().evtPods.find(
-      (pod) => pod.podId === podId
-    )!.podSeats;
-
-    playersInPod.map((player, index) => {
-      const firstOpenSeat = seatsInPod.find((seat) => !seat.filled);
-
-      if (firstOpenSeat && firstOpenSeat.seatNumber < player.seat) {
-        updatePlayer(player.id, {
-          address: { podId: podId, seat: firstOpenSeat.seatNumber },
-        });
-      }
-    });
-
-    updatePodSize(podId, playersInPod.length);
-  };
 
   const SeatingPodCard = () => {
     return (
@@ -188,52 +134,15 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           >
             Menu
           </button>
-          <p></p>
-          {/* SHRINK POD */}
           {/* SHUFFLE PLAYERS */}
-          <Switch fallback={<></>}>
-            <Match when={shuffleMode() === "default"}>
-              <button
-                type="submit"
-                style={{ color: "red" }}
-                onClick={() => {
-                  setShuffleMode("confirm");
-                }}
-              >
-                Shuffle Players
-              </button>
-            </Match>
-            <Match when={shuffleMode() === "confirm"}>
-              <button type="submit" style={{ color: "black" }}>
-                Are you Sure?
-              </button>
-              <button
-                type="submit"
-                style={{ color: "green" }}
-                onClick={() => {
-                  shufflePod();
-                  setShuffleMode("default");
-                }}
-              >
-                ✔
-              </button>
-              <button
-                type="submit"
-                style={{ color: "red" }}
-                onClick={() => {
-                  setShuffleMode("default");
-                }}
-              >
-                X
-              </button>
-            </Match>
-          </Switch>
           {/* ADVANCE TO DRAFTING */}
           <button
             type="submit"
             style={{ color: "red" }}
             onClick={() => {
-              shrinkPod();
+              runWithOwner(thisPodState()!.podOwner!, () => {
+                shrinkPod(podId);
+              });
               updatePod(podId, { status: "drafting" });
             }}
           >

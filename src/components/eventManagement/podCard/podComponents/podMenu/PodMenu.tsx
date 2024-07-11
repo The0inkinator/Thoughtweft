@@ -1,7 +1,11 @@
 import { createEffect, onCleanup, onMount, Show } from "solid-js";
 import styles from "./podMenu.module.css";
 import { useEventContext } from "~/context/EventContext";
-import { RemovePodBtn, ShrinkPod } from "./podMenuButtons";
+import {
+  RemovePodBtn,
+  ShrinkPodBtn,
+  ShufflePlayersBtn,
+} from "./podMenuButtons";
 
 interface PodMenuInputs {
   podId: number;
@@ -17,7 +21,8 @@ export default function PodMenu({ podId }: PodMenuInputs) {
   return (
     <div>
       <RemovePodBtn podId={podId} />
-      <ShrinkPod podId={podId} />
+      <ShrinkPodBtn podId={podId} />
+      <ShufflePlayersBtn podId={podId} />
     </div>
   );
 }

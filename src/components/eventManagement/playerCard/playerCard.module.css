@@ -39,4 +39,7 @@
   height: 1rem;
   pointer-events: none;
   margin-inline: calc(var(--PlayerCard) / 4);
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: calc(var(--PodCard) / 4);
 }

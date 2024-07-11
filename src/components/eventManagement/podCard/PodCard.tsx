@@ -127,7 +127,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     });
 
     updatePodSize(podId, playersInPod.length);
-    setPodSizeBtn(playersInPod.length as PodSizes);
   };
 
   const SeatingPodCard = () => {
@@ -179,33 +178,18 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
               </For>
             </div>
           </button>
-          {/* REMOVE POD */}
+          {/* MENU BUTTON */}
           <button
-            type="submit"
-            style={{ color: "red" }}
             onClick={() => {
-              console.log(eventState());
-              eventState()
-                .evtPlayerList.filter((player) => player.podId === podId)
-                .map((foundPlayer) => {
-                  removePlayer(foundPlayer.id);
-                });
-              removePod(podId);
+              updatePod(podId, { menuOpen: true });
+              updatePod(podId, { overlayOpen: true });
             }}
+            style={{ color: "black" }}
           >
-            Remove Pod
+            Menu
           </button>
           <p></p>
           {/* SHRINK POD */}
-          <button
-            type="submit"
-            style={{ color: "red" }}
-            onClick={() => {
-              shrinkPod();
-            }}
-          >
-            Shrink Pod
-          </button>
           {/* SHUFFLE PLAYERS */}
           <Switch fallback={<></>}>
             <Match when={shuffleMode() === "default"}>

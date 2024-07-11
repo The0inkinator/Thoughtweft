@@ -2,6 +2,7 @@ import { onMount, Show } from "solid-js";
 import styles from "./podOverlay.module.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerMenu from "~/components/eventManagement/playerCard/playerMenu/PlayerMenu";
+import PodMenu from "../podMenu/PodMenu";
 
 interface PodOverlayInputs {
   podId: number;
@@ -18,6 +19,9 @@ export default function PodOverlay({ podId }: PodOverlayInputs) {
       <div class={styles.podOverlay}>
         <Show when={openPlayerMenu()}>
           <PlayerMenu playerId={openPlayerMenu()!.id} podId={podId} />
+        </Show>
+        <Show when={thisPodState()?.menuOpen}>
+          <PodMenu podId={podId} />
         </Show>
         <button
           onClick={() => {

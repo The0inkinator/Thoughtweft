@@ -23,6 +23,7 @@ import PodTimer from "./podComponents/podTimer/PodTimer";
 import PlayerInput from "./podComponents/playerInput/PlayerInput";
 import { Portal } from "solid-js/web";
 import PlayerCard from "../playerCard/PlayerCard";
+import PodOverlay from "./podComponents/podOverlay/podOverlay";
 interface PodCardInputs {
   podSize: PodSizes;
   podNumber: number;
@@ -601,9 +602,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             </Match>
           </Switch>
         </div>
-        <Show when={thisPodState()?.menuOpen}>
-          <div class={styles.overlayMenu} ref={overlayMenu}></div>
-        </Show>
+        <PodOverlay podId={podId} />
+
         <Portal>
           <Show when={draggedPlayer()}>
             <PlayerCard

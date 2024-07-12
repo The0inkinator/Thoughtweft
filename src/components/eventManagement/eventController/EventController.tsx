@@ -15,50 +15,98 @@ import { Player, SafeEvent, SeatAddress } from "~/typing/eventTypes";
 import PlayerCard from "../playerCard";
 import eventController from ".";
 import { effect } from "solid-js/web";
+import { getEvent } from "vinxi/http";
 
 export default function EventController() {
   //Context State
   const [eventState, { updateEvent, makeEvent, addPlayer }] = useEventContext();
   //Local State
-  const [storedEvent, setStoredEvent] = createSignal<string>();
-
-  const [color, setColor] = createSignal<boolean>(false);
+  const [storing, setStoring] = createSignal<boolean>(false);
+  const [ticker, setTicker] = createSignal<boolean>(true);
   // Values
   const evtControllerOwner = getOwner();
 
   onMount(() => {
     updateEvent({ evtLoading: false });
+    if (localStorage.getItem("storing")) {
+      if (localStorage.getItem("storing") === "true") {
+        setStoring(true);
+        if (retrievedEventData()) {
+          makeEvent(retrievedEventData());
+        }
+      }
+    } else {
+      localStorage.setItem("storing", "false");
+    }
+  });
+
+  const convertedEventData = () => {
+    const safeEventData: SafeEvent = {
+      ...eventState(),
+      evtPods: eventState().evtPods.map((pod) => {
+        const { podOwner, ...rest } = pod;
+
+        return rest;
+      }),
+    };
+    return safeEventData;
+  };
+
+  const saveEvent = (input: SafeEvent) => {
+    const serializedEvtData = JSON.stringify(input);
+
+    localStorage.setItem("savedEvent", serializedEvtData);
+  };
+
+  const retrievedEventData = () => {
     const rawEventData = localStorage.getItem("savedEvent");
     if (typeof rawEventData === "string") {
       const parsedEventData = JSON.parse(rawEventData);
-      makeEvent(parsedEventData);
+      return parsedEventData;
+    } else {
+      return convertedEventData();
+    }
+  };
+
+  createEffect(() => {
+    if (storing() && ticker()) {
+      const currentEventData = convertedEventData();
+      const storedEventData = retrievedEventData();
+      if (
+        JSON.stringify(currentEventData) !== JSON.stringify(storedEventData)
+      ) {
+        saveEvent(currentEventData);
+        setTicker(false);
+        setTimeout(() => {
+          setTicker(true);
+        }, 100);
+      }
     }
   });
 
   return (
     <>
       <button
-        style={{ "background-color": color() ? "green" : "none" }}
+        style={{
+          "background-color": storing() ? "green" : "white",
+          height: "3rem",
+        }}
         onClick={() => {
-          const safeEventData: SafeEvent = {
-            ...eventState(),
-            evtPods: eventState().evtPods.map((pod) => {
-              const { podOwner, ...rest } = pod;
+          if (localStorage.getItem("storing") === "true") {
+            localStorage.setItem("storing", "false");
+            setStoring(false);
+          } else if (localStorage.getItem("storing") === "false") {
+            localStorage.setItem("storing", "true");
 
-              return rest;
-            }),
-          };
-          const serializedEvtData = JSON.stringify(safeEventData);
-
-          localStorage.setItem("savedEvent", serializedEvtData);
+            setStoring(true);
+          }
         }}
       >
         Store Event
       </button>
-      <button onClick={() => {}}>Use Stored Event</button>
       <button
         onClick={() => {
-          localStorage.clear();
+          localStorage.removeItem("savedEvent");
         }}
       >
         Delete Stored Event

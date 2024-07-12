@@ -70,8 +70,14 @@ export default function EventController() {
   };
 
   createEffect(() => {
+    console.log("storing", storing());
+  });
+  createEffect(() => {
+    console.log("ticker", ticker());
+  });
+
+  createEffect(() => {
     if (storing() && ticker()) {
-      console.log("test tick");
       const currentEventData = convertedEventData();
       const storedEventData = retrievedEventData();
       if (

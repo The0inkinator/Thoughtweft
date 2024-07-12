@@ -19,6 +19,7 @@ export function RemovePodBtn({ podId }: PodButtonInputs) {
         eventState()
           .evtPlayerList.filter((player) => player.podId === podId)
           .map((foundPlayer) => {
+            console.log(foundPlayer);
             removePlayer(foundPlayer.id);
           });
         removePod(podId);

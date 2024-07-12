@@ -13,7 +13,6 @@ import {
 import { Player, SeatAddress } from "~/typing/eventTypes";
 import PlayerCard from "~/components/eventManagement/playerCard";
 import { openSeatFromPod } from "~/context/EventDataFunctions";
-import { createPlayerFromData } from "~/components/eventManagement/eventController/EventController";
 
 interface PlayerInputInputs {
   podId: number;
@@ -32,21 +31,11 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
   const thisPodState = () =>
     eventState().evtPods.find((pod) => pod.podId === podId);
 
-  const createNewPlayer = (name: string, seatAddress?: SeatAddress) => {
-    addPlayer(name, seatAddress);
-    const newPlayer = eventState().evtPlayerList.findLast((player) => true);
-    if (newPlayer) {
-      createPlayerFromData(newPlayer);
-    } else {
-      console.log("New Player Not Found");
-    }
-  };
-
   const createPlayerFromSubmit = () => {
     if (thisPodState()?.podOwner) {
       runWithOwner(thisPodState()?.podOwner, () => {
         if (playerNameValue() && openSeatFromPod(eventState(), podId)) {
-          createNewPlayer(playerNameValue(), {
+          addPlayer(playerNameValue(), {
             podId: openSeatFromPod(eventState(), podId)!.podId,
             seat: openSeatFromPod(eventState(), podId)!.seatNumber,
           });
@@ -59,7 +48,7 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
     } else {
       runWithOwner(inputOwner, () => {
         if (playerNameValue() && openSeatFromPod(eventState(), podId)) {
-          createNewPlayer(playerNameValue(), {
+          addPlayer(playerNameValue(), {
             podId: openSeatFromPod(eventState(), podId)!.podId,
             seat: openSeatFromPod(eventState(), podId)!.seatNumber,
           });

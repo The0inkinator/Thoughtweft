@@ -16,16 +16,6 @@ import PlayerCard from "../playerCard";
 import eventController from ".";
 import { effect } from "solid-js/web";
 
-export function createPlayerFromData(playerInfo: Player) {
-  return (
-    <PlayerCard
-      playerID={playerInfo.id}
-      playerName={playerInfo.name}
-      seatNumber={playerInfo.seat}
-    />
-  );
-}
-
 export default function EventController() {
   //Context State
   const [eventState, { updateEvent, makeEvent, addPlayer }] = useEventContext();
@@ -45,48 +35,7 @@ export default function EventController() {
 
   onMount(() => {
     updateEvent({ evtLoading: false });
-    // updateEvent({ owner: evtControllerOwner });
-
-    // const retrievedEvent = getCookie("event");
-    // if (retrievedEvent === null) {
-    //   console.log("no event found");
-    // } else if (typeof retrievedEvent === "string") {
-    //   makeEvent(JSON.parse(retrievedEvent));
-    // }
   });
-
-  //Create player cards for players in the event
-  // onMount(() => {
-  //   eventState().evtPods.map((pod) => {
-  //     createEffect(() => {
-  //       if (ownersNeeded() === 0) return;
-
-  //       const podState = eventState().evtPods.find(
-  //         (foundPod) => foundPod.podId === pod.podId
-  //       );
-  //       if (podState?.podOwner) {
-  //         setOwnersNeeded((prevNum) => prevNum - 1);
-  //       }
-  //     });
-  //   });
-
-  //   eventState().evtPlayerList.map((player) => {
-  //     createEffect(() => {
-  //       if (playersNeeded() === 0) return;
-  //       if (ownersNeeded() === 0) {
-  //         const podState = eventState().evtPods.find(
-  //           (foundPod) => foundPod.podId === player.podId
-  //         );
-
-  //         runWithOwner(podState?.podOwner, () => {
-  //           return <>{createPlayerFromData(player)}</>;
-  //         });
-
-  //         setPlayersNeeded((prevNum) => prevNum - 1);
-  //       }
-  //     });
-  //   });
-  // });
 
   const setCookie = (name: string, value: string, days?: number) => {
     let expires = "";

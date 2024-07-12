@@ -40,6 +40,7 @@ export default function PlayerCard({
   let thisPlayerCard!: HTMLDivElement;
   let thisPlayerMenu!: HTMLDivElement;
   let xOffset: number, yOffset: number;
+  let moveTally = 0;
   //Values
 
   const thisPlayerState = () => {
@@ -133,9 +134,11 @@ export default function PlayerCard({
       (event.type === "mousemove" || event.type === "touchmove") &&
       playerCardMode() !== "dragging"
     ) {
-      setTimeout(() => {
+      const storedMoveTally = moveTally;
+      moveTally = storedMoveTally + 1;
+      if (moveTally > 2) {
         setPlayerCardMode("dragging");
-      }, 70);
+      }
     }
     if (playerCardMode() === "dragging") {
       const playerRef = thisPlayerState().currentRef

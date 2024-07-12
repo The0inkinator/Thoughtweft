@@ -70,13 +70,6 @@ export default function EventController() {
   };
 
   createEffect(() => {
-    console.log("storing", storing());
-  });
-  createEffect(() => {
-    console.log("ticker", ticker());
-  });
-
-  createEffect(() => {
     if (storing() && ticker()) {
       const currentEventData = convertedEventData();
       const storedEventData = retrievedEventData();
@@ -112,13 +105,13 @@ export default function EventController() {
       >
         Store Event
       </button>
-      <button
+      {/* <button
         onclick={() => {
           saveEvent(convertedEventData());
         }}
       >
         Test
-      </button>
+      </button> */}
       <button
         onClick={() => {
           localStorage.removeItem("savedEvent");

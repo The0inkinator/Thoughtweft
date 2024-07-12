@@ -55,10 +55,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     return eventState().evtSeats.filter((seat) => seat.podId === podId);
   };
 
-  const [podSizeBtn, setPodSizeBtn] = createSignal<PodSizes>(podSize);
-  const podOptions: PodSizes[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  const [podSizeDrop, setPodSizeDrop] = createSignal<"open" | "close">("close");
-
   const leftSeats = () => {
     return thisPodSeats().filter(
       (seat, index) => index >= thisPodSeats().length / 2
@@ -84,46 +80,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}
           <p></p>
           {/* POD SIZE DROP DOWN */}
-          <button
-            class={styles.podSizeDrop}
-            type="button"
-            onMouseUp={() => {
-              if (podSizeDrop() === "close") {
-                setPodSizeDrop("open");
-              }
-            }}
-            onfocusout={() => {
-              if (podSizeDrop() === "open") {
-                setPodSizeDrop("close");
-              }
-            }}
-          >
-            {podSizeBtn()}
-            <div
-              class={styles.podSizeMenu}
-              style={{
-                display: podSizeDrop() === "open" ? "block" : "none",
-              }}
-            >
-              <For each={podOptions}>
-                {(option: PodSizes) => (
-                  <div
-                    class={styles.podSizeOption}
-                    style={{
-                      display: podSizeDrop() === "open" ? "block" : "none",
-                    }}
-                    onClick={() => {
-                      setPodSizeBtn(option);
-                      setPodSizeDrop("close");
-                      updatePodSize(podId, option);
-                    }}
-                  >
-                    {option}
-                  </div>
-                )}
-              </For>
-            </div>
-          </button>
           {/* MENU BUTTON */}
           <button
             onClick={() => {
@@ -134,7 +90,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           >
             Menu
           </button>
-          {/* SHUFFLE PLAYERS */}
           {/* ADVANCE TO DRAFTING */}
           <button
             type="submit"

@@ -40,8 +40,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
     { updatePodSize, removePod, updatePlayer, updatePod, removePlayer },
   ] = useEventContext();
   //Local State
-  const [shuffleMode, setShuffleMode] = createSignal<"default" | "confirm">(
-    "default"
+  const [standings, setStandings] = createSignal(
+    CreateStandings(eventState(), podId)
   );
   //Refs
   let thisPod!: HTMLDivElement;
@@ -260,6 +260,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 //update pod status
                 updatePod(podId, { status: "pairing" });
               } else {
+                CreateStandings(eventState(), podId);
                 updatePod(podId, { status: "finished" });
               }
             } else {
@@ -316,6 +317,13 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const FinishedPodCard = () => {
     return (
       <>
+        <button
+          onclick={() => {
+            updatePod(podId, { status: "playing" });
+          }}
+        >
+          Back
+        </button>
         <div class={styles.standingsCNT}>
           <div class={styles.standing}>
             <StandingsEntry name={false} inputWidth={3} input={"Rank"} />
@@ -326,7 +334,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             <StandingsEntry name={false} inputWidth={4} input={"GW"} />
             <StandingsEntry name={false} inputWidth={4} input={"OGW"} />
           </div>
-          <For each={CreateStandings(eventState(), podId)}>
+          <For each={standings()}>
             {(standing) => (
               <div class={styles.standing}>
                 <StandingsEntry
@@ -347,7 +355,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 <StandingsEntry
                   name={false}
                   inputWidth={8}
-                  input={`${standing.record.w} - ${standing.record.d} - ${standing.record.l}`}
+                  input={`${standing.record.w} - ${standing.record.l} - ${standing.record.d}`}
                 />
                 <StandingsEntry
                   name={false}

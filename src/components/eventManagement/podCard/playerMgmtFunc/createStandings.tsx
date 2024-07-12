@@ -96,8 +96,6 @@ export default function CreateStandings(eventData: Event, podId: number) {
 
   const recordSheet = generateRecordSheet();
 
-  //   console.log(recordSheet);
-
   const playerRecordArray: PlayerRecord[] = podPlayers.map((player) => {
     let pGameWins: number = 0;
     let pGameLosses: number = 0;
@@ -143,8 +141,6 @@ export default function CreateStandings(eventData: Event, podId: number) {
     return playerRecordEntry;
   });
 
-  //   console.log(playerRecordArray);
-
   podPlayers.map((player) => {
     const fullPRecord = playerRecordArray.find(
       (record) => record.pId === player.id
@@ -157,22 +153,30 @@ export default function CreateStandings(eventData: Event, podId: number) {
     };
     const omwCalc: () => number = () => {
       let totalWinPer = 0;
-      let opponentCount = playerRecordArray.filter(
-        (record) => record.pId !== player.id
-      ).length;
+      const matchesPlayed = recordSheet.filter(
+        (record) => record.playerId === player.id
+      );
+      const opponentIds = recordSheet
+        .filter(
+          (record) =>
+            matchesPlayed.some((match) => match.matchId === record.matchId) &&
+            record.playerId !== player.id
+        )
+        .map((filteredRecord) => {
+          return filteredRecord.playerId;
+        });
+      const opponentCount = opponentIds.length;
+
       playerRecordArray
-        .filter((record) => record.pId !== player.id)
+        .filter((record) => opponentIds.some((id) => id === record.pId))
         .map((foundRecord) => {
           const tempWinPer = totalWinPer;
-          const result = parseInt(
-            (
-              (foundRecord.pWins / (foundRecord.pLosses + foundRecord.pWins)) *
-              100
-            ).toFixed(0)
-          );
+          const result =
+            foundRecord.pWins / (foundRecord.pLosses + foundRecord.pWins);
           totalWinPer = tempWinPer + result;
         });
-      return parseInt((totalWinPer / opponentCount).toFixed(0));
+
+      return parseFloat(((totalWinPer / opponentCount) * 100).toFixed(0));
     };
 
     const gwCalc: number = parseInt(
@@ -184,23 +188,31 @@ export default function CreateStandings(eventData: Event, podId: number) {
     );
     const ogwCalc: () => number = () => {
       let totalWinPer = 0;
-      let opponentCount = playerRecordArray.filter(
-        (record) => record.pId !== player.id
-      ).length;
+      const matchesPlayed = recordSheet.filter(
+        (record) => record.playerId === player.id
+      );
+      const opponentIds = recordSheet
+        .filter(
+          (record) =>
+            matchesPlayed.some((match) => match.matchId === record.matchId) &&
+            record.playerId !== player.id
+        )
+        .map((filteredRecord) => {
+          return filteredRecord.playerId;
+        });
+      const opponentCount = opponentIds.length;
+
       playerRecordArray
-        .filter((record) => record.pId !== player.id)
+        .filter((record) => opponentIds.some((id) => id === record.pId))
         .map((foundRecord) => {
           const tempWinPer = totalWinPer;
-          const result = parseInt(
-            (
-              (foundRecord.pGameWins! /
-                (foundRecord.pGameLosses! + foundRecord.pGameWins!)) *
-              100
-            ).toFixed(0)
-          );
+          const result =
+            foundRecord.pGameWins! /
+            (foundRecord.pGameLosses! + foundRecord.pGameWins!);
           totalWinPer = tempWinPer + result;
         });
-      return parseInt((totalWinPer / opponentCount).toFixed(0));
+
+      return parseFloat(((totalWinPer / opponentCount) * 100).toFixed(0));
     };
 
     //Get point totals
@@ -237,7 +249,22 @@ export default function CreateStandings(eventData: Event, podId: number) {
     tempStandings.push(standingEntry);
   });
 
-  const finalStandings = tempStandings.sort((a, b) => b.points - a.points);
+  const finalStandings = tempStandings
+    .sort((a, b) => {
+      if (b.points - a.points !== 0) {
+        return b.points - a.points;
+      } else if (b.omw - a.omw !== 0) {
+        return b.omw - a.omw;
+      } else if (b.gw - a.gw !== 0) {
+        return b.gw - a.gw;
+      } else {
+        return b.ogw - a.ogw;
+      }
+    })
+    .map((standing, index) => {
+      const finalStanding = { ...standing, rank: index + 1 };
+      return finalStanding;
+    });
 
   return finalStandings;
 }

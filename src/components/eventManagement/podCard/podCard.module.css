@@ -32,33 +32,6 @@
   flex-direction: column;
 }
 
-.podSizeDrop {
-  all: unset;
-  background-color: white;
-  color: black;
-  position: relative;
-  width: 1.5rem;
-  height: 1.5rem;
-  z-index: 2;
-}
-.podSizeMenu {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  width: 100%;
-}
-
-.podSizeOption {
-  background-color: white;
-  height: 100%;
-  width: 100%;
-}
-
-.podSizeOption:hover {
-  background-color: grey;
-  cursor: pointer;
-}
-
 .standingsCNT {
   display: flex;
   flex-direction: column;

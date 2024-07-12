@@ -1,4 +1,4 @@
-import { Match } from "solid-js";
+import { Match, Owner } from "solid-js";
 
 export type PodSizes = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
@@ -39,7 +39,7 @@ export type PodUpdateParam =
   | { ref: HTMLDivElement }
   | { menuOpen: boolean }
   | { overlayOpen: boolean }
-  | { podOwner: any };
+  | { podOwner: Owner };
 
 export type MatchUpdateParam =
   | { winner: MatchData["winner"] }
@@ -113,7 +113,7 @@ export type Pod = {
   podHovered?: boolean;
   menuOpen?: boolean;
   overlayOpen?: boolean;
-  podOwner?: any;
+  podOwner?: Owner;
 };
 
 export type MatchData = {
@@ -151,5 +151,6 @@ export type Event = {
   evtStage: "seating" | "staging" | number;
   evtLoading: boolean;
   playerHopper?: HTMLDivElement;
-  evtControllerOwner?: any;
+  evtControllerOwner?: Owner;
+  nextPlayerId: number;
 };

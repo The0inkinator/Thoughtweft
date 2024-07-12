@@ -313,8 +313,6 @@ export function EventContextProvider(props: any) {
 
             if ("evtLoading" in updateParam) {
               newEvt.evtLoading = updateParam.evtLoading;
-            } else if ("owner" in updateParam) {
-              newEvt.evtControllerOwner = updateParam.owner;
             }
 
             return newEvt;

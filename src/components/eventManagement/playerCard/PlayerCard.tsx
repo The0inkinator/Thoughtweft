@@ -9,7 +9,6 @@ import {
   Show,
 } from "solid-js";
 import { FullSeat, Pod } from "~/typing/eventTypes";
-import { z } from "vinxi/dist/types/lib/router-modes";
 import { getAllSeats, openSeatFromPod } from "~/context/EventDataFunctions";
 import PlayerMenu from "./playerMenu/PlayerMenu";
 

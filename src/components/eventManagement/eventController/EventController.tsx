@@ -71,6 +71,7 @@ export default function EventController() {
 
   createEffect(() => {
     if (storing() && ticker()) {
+      console.log("test tick");
       const currentEventData = convertedEventData();
       const storedEventData = retrievedEventData();
       if (
@@ -104,6 +105,13 @@ export default function EventController() {
         }}
       >
         Store Event
+      </button>
+      <button
+        onclick={() => {
+          saveEvent(convertedEventData());
+        }}
+      >
+        Test
       </button>
       <button
         onClick={() => {

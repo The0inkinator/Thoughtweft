@@ -53,6 +53,7 @@ export default function EventController() {
   };
 
   const saveEvent = (input: SafeEvent) => {
+    console.log("saving event");
     const serializedEvtData = JSON.stringify(input);
 
     localStorage.setItem("savedEvent", serializedEvtData);
@@ -79,7 +80,7 @@ export default function EventController() {
         setTicker(false);
         setTimeout(() => {
           setTicker(true);
-        }, 100);
+        }, 300);
       }
     }
   });

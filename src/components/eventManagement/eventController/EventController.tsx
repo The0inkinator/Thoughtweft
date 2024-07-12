@@ -23,13 +23,6 @@ export default function EventController() {
   const [storedEvent, setStoredEvent] = createSignal<string>();
 
   const [color, setColor] = createSignal<boolean>(false);
-
-  const [ownersNeeded, setOwnersNeeded] = createSignal<number>(
-    eventState().evtPods.length
-  );
-  const [playersNeeded, setPlayersNeeded] = createSignal<number>(
-    eventState().evtPlayerList.length
-  );
   // Values
   const evtControllerOwner = getOwner();
 

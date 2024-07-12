@@ -33,7 +33,7 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
 
   const createPlayerFromSubmit = () => {
     if (thisPodState()?.podOwner) {
-      runWithOwner(thisPodState()?.podOwner, () => {
+      runWithOwner(thisPodState()!.podOwner as Owner, () => {
         if (playerNameValue() && openSeatFromPod(eventState(), podId)) {
           addPlayer(playerNameValue(), {
             podId: openSeatFromPod(eventState(), podId)!.podId,

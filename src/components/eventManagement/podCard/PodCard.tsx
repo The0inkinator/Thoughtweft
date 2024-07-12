@@ -10,6 +10,7 @@ import {
   Match,
   onCleanup,
   getOwner,
+  Owner,
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
 import DisplayFrame from "../displayFrame";
@@ -68,7 +69,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   onMount(() => {
     updatePodSize(podId, thisPodState()!.podSize);
-    updatePod(podId, { podOwner: podOwner });
+    updatePod(podId, { podOwner: podOwner as Owner });
   });
 
   const SeatingPodCard = () => {

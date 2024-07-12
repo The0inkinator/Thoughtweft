@@ -151,6 +151,11 @@ export type Event = {
   evtStage: "seating" | "staging" | number;
   evtLoading: boolean;
   playerHopper?: HTMLDivElement;
-  evtControllerOwner?: Owner;
   nextPlayerId: number;
+};
+
+export type SafePod = Omit<Pod, "podOwner">;
+
+export type SafeEvent = Omit<Event, "evtPodOwners"> & {
+  evtPods: SafePod[];
 };

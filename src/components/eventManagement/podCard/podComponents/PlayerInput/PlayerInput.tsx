@@ -32,33 +32,18 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
     eventState().evtPods.find((pod) => pod.podId === podId);
 
   const createPlayerFromSubmit = () => {
-    if (thisPodState()?.podOwner) {
-      runWithOwner(thisPodState()!.podOwner as Owner, () => {
-        if (playerNameValue() && openSeatFromPod(eventState(), podId)) {
-          addPlayer(playerNameValue(), {
-            podId: openSeatFromPod(eventState(), podId)!.podId,
-            seat: openSeatFromPod(eventState(), podId)!.seatNumber,
-          });
-          setPlayerNameValue("");
-          console.log(eventState().evtPlayerList);
-        } else {
-          console.log("pod full");
-        }
-      });
-    } else {
-      runWithOwner(inputOwner, () => {
-        if (playerNameValue() && openSeatFromPod(eventState(), podId)) {
-          addPlayer(playerNameValue(), {
-            podId: openSeatFromPod(eventState(), podId)!.podId,
-            seat: openSeatFromPod(eventState(), podId)!.seatNumber,
-          });
-          setPlayerNameValue("");
-          console.log(eventState().evtPlayerList);
-        } else {
-          console.log("pod full");
-        }
-      });
-    }
+    runWithOwner(thisPodState()!.podOwner as Owner, () => {
+      if (playerNameValue() && openSeatFromPod(eventState(), podId)) {
+        addPlayer(playerNameValue(), {
+          podId: openSeatFromPod(eventState(), podId)!.podId,
+          seat: openSeatFromPod(eventState(), podId)!.seatNumber,
+        });
+        setPlayerNameValue("");
+        console.log(eventState().evtPlayerList);
+      } else {
+        console.log("pod full");
+      }
+    });
   };
 
   return (

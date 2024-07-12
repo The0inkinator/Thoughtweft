@@ -1,7 +1,11 @@
 import { createEffect, onCleanup, onMount, Show } from "solid-js";
 import styles from "./playerMenu.module.css";
 import { useEventContext } from "~/context/EventContext";
-import { PlayerCloseButton, PlayerRenameButton } from "./playerMenuButtons";
+import {
+  PlayerCloseButton,
+  PlayerRenameButton,
+  RemovePlayerBtn,
+} from "./playerMenuButtons";
 
 interface PlayerMenuInputs {
   playerId: number;
@@ -18,6 +22,7 @@ export default function PlayerMenu({ playerId, podId }: PlayerMenuInputs) {
   return (
     <div style={{ "pointer-events": "auto" }}>
       <PlayerRenameButton playerId={playerId} podId={podId} />
+      <RemovePlayerBtn playerId={playerId} podId={podId} />
     </div>
   );
 }

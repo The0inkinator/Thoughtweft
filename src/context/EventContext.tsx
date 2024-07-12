@@ -132,6 +132,7 @@ const SampleEvent: Event = {
   evtStage: "seating",
   evtLoading: true,
   nextPodId: 2,
+  nextPlayerId: 8,
 };
 
 const EventContext = createContext<EventState | undefined>();
@@ -157,18 +158,19 @@ export function EventContextProvider(props: any) {
             }
 
             return {
-              id: event().evtPlayerList.length + 1,
+              id: event().nextPlayerId,
               name: name,
               podId: tempPodId,
               seat: tempSeat,
-              dragging: false,
               podRecords: [],
             };
           })();
 
           setEvent((prevEvt) => {
             const newEvt = { ...prevEvt };
+            const storedId = newEvt.nextPlayerId;
             newEvt.evtPlayerList = [...newEvt.evtPlayerList, newPlayer];
+            newEvt.nextPlayerId = storedId + 1;
             return newEvt;
           });
         },

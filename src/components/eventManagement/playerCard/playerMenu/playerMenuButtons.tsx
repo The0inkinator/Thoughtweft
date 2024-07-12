@@ -44,3 +44,21 @@ export function PlayerRenameButton({ playerId, podId }: PlayerButtonInputs) {
     ></input>
   );
 }
+
+export function RemovePlayerBtn({ playerId, podId }: PlayerButtonInputs) {
+  const [eventState, { removePlayer, updatePod, updatePlayer }] =
+    useEventContext();
+  const thisPlayerState = () =>
+    eventState().evtPlayerList.find((player) => player.id === playerId);
+  return (
+    <button
+      onclick={() => {
+        removePlayer(playerId);
+        updatePlayer(playerId, { menuOpen: false });
+        updatePod(podId, { overlayOpen: false });
+      }}
+    >
+      Remove {thisPlayerState()?.name}
+    </button>
+  );
+}

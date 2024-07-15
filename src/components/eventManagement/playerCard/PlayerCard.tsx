@@ -72,6 +72,7 @@ export default function PlayerCard({
       let playerLeft = thisPlayerCard.getBoundingClientRect().left;
 
       if (
+        playerID !== -1 &&
         hoveredPod() &&
         hoveredPod()?.podId !== podId() &&
         thisPlayerState().seat === 0

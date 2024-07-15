@@ -8,7 +8,6 @@ import {
   runWithOwner,
 } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
-import PlayerHopper from "../playerHopper";
 import PodCard from "../podCard";
 import PodPlusButton from "../podPlusButton";
 import { Player, SafeEvent, SeatAddress } from "~/typing/eventTypes";
@@ -27,6 +26,7 @@ export default function EventController() {
   const evtControllerOwner = getOwner();
 
   onMount(() => {
+    console.log(eventState());
     updateEvent({ evtLoading: false });
     if (localStorage.getItem("storing")) {
       if (localStorage.getItem("storing") === "true") {

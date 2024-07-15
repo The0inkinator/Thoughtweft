@@ -53,7 +53,7 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
 
   //Shuffle players between pods if both pods are full
 
-  const shufflePlayersAcrossPod = (seatPosition: number) => {
+  const shufflePlayersAcrossPod = () => {
     const podToShuffle = eventState().evtPods.find(
       (pod) => pod.podId === podId
     );
@@ -213,6 +213,21 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
     }
   };
 
+  //Function to run when hovered
+  const hoveredActions = () => {
+    updateSeat(podId, seatNumber, { hovered: true });
+
+    setTimeout(() => {
+      if (
+        draggedPlayer() &&
+        thisPodState()?.podSeats.filter((seat) => seat.filled).length ===
+          thisPodState()?.podSize
+      ) {
+        shufflePlayersAcrossPod();
+      } else if (draggedPlayer()) shufflePlayersFrom(seatNumber);
+    }, 300);
+  };
+
   //Handles mouse movement to trigger shuffle function
   const handleMouseMove = (event: MouseEvent | TouchEvent) => {
     const boundingBox = thisSeat.getBoundingClientRect();
@@ -224,17 +239,7 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
         event.clientY <= boundingBox.bottom &&
         !mouseOver()
       ) {
-        updateSeat(podId, seatNumber, { hovered: true });
-
-        setTimeout(() => {
-          if (
-            draggedPlayer() &&
-            thisPodState()?.podSeats.filter((seat) => seat.filled).length ===
-              thisPodState()?.podSize
-          ) {
-            shufflePlayersAcrossPod(seatNumber);
-          } else if (draggedPlayer()) shufflePlayersFrom(seatNumber);
-        }, 300);
+        hoveredActions();
       } else if (
         (mouseOver() && event.clientX <= boundingBox.left) ||
         event.clientX >= boundingBox.right ||
@@ -253,19 +258,7 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
         !mouseOver()
       ) {
         setMouseOver(true);
-        if (draggedPlayer() && draggedPlayer()?.seat === 0) {
-          updateSeat(podId, seatNumber, { hovered: true });
-
-          setTimeout(() => {
-            if (
-              draggedPlayer() &&
-              thisPodState()?.podSeats.filter((seat) => seat.filled).length ===
-                thisPodState()?.podSize
-            ) {
-              shufflePlayersAcrossPod(seatNumber);
-            } else if (draggedPlayer()) shufflePlayersFrom(seatNumber);
-          }, 300);
-        }
+        hoveredActions();
       } else if (
         (mouseOver() && event.touches[0].clientX <= boundingBox.left) ||
         event.touches[0].clientX >= boundingBox.right ||

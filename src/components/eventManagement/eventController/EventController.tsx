@@ -26,7 +26,6 @@ export default function EventController() {
   const evtControllerOwner = getOwner();
 
   onMount(() => {
-    console.log(eventState());
     updateEvent({ evtLoading: false });
     if (localStorage.getItem("storing")) {
       if (localStorage.getItem("storing") === "true") {

@@ -1,18 +1,9 @@
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  For,
-  onCleanup,
-  onMount,
-  Show,
-} from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
 import styles from "./seat.module.css";
 import { useEventContext } from "~/context/EventContext";
 import PlayerCard from "../playerCard";
 import { playerIdFromAddress } from "~/context/EventDataFunctions";
 import { FullSeat } from "~/typing/eventTypes";
-import seat from ".";
 
 interface SeatInputs {
   podId: number;
@@ -21,12 +12,7 @@ interface SeatInputs {
   justifyRight?: boolean;
 }
 
-export default function Seat({
-  podId,
-  seatNumber,
-  byeSeat,
-  justifyRight,
-}: SeatInputs) {
+export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
   //Context State
   const [eventState, { updateSeat, updatePlayer, removePlayer }] =
     useEventContext();
@@ -363,6 +349,15 @@ export default function Seat({
           playerID={seatedPlayer()!.id}
           seatNumber={seatNumber}
           playerName={seatedPlayer()!.name}
+          staticPodId={podId}
+        ></PlayerCard>
+      </Show>
+      <Show when={thisPodState()?.podStatus !== "seating" && !seatedPlayer()}>
+        <PlayerCard
+          playerID={-1}
+          seatNumber={seatNumber}
+          playerName={"Bye"}
+          staticPodId={podId}
         ></PlayerCard>
       </Show>
     </div>

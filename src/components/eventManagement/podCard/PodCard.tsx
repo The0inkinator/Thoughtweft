@@ -459,6 +459,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           <Show when={draggedPlayer()}>
             <PlayerCard
               playerID={draggedPlayer()!.id}
+              staticPodId={podId}
               seatNumber={draggedPlayer()!.seat}
               playerName={draggedPlayer()!.name}
               draggingCard={true}

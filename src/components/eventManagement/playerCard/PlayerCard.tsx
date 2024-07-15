@@ -16,6 +16,7 @@ interface PlayerCardInputs {
   playerID: number;
   playerName: string;
   seatNumber: number;
+  staticPodId: number;
   draggingCard?: boolean;
   initialEvent?: MouseEvent | TouchEvent;
 }
@@ -26,6 +27,7 @@ export default function PlayerCard({
   playerID,
   playerName,
   seatNumber,
+  staticPodId,
   draggingCard,
 }: PlayerCardInputs) {
   //Context State
@@ -47,7 +49,11 @@ export default function PlayerCard({
   };
 
   const podId = () => {
-    return thisPlayerState()?.podId;
+    if (playerID !== -1) {
+      return thisPlayerState()?.podId;
+    } else {
+      return staticPodId;
+    }
   };
 
   const thisPodState = () => {
@@ -84,9 +90,11 @@ export default function PlayerCard({
   });
 
   onMount(() => {
-    updatePlayer(playerID, { currentRef: thisPlayerCard });
-    if (draggingCard && thisPlayerState().lastEvent) {
-      dragInit(thisPlayerState().lastEvent!);
+    if (playerID !== -1) {
+      updatePlayer(playerID, { currentRef: thisPlayerCard });
+      if (draggingCard && thisPlayerState().lastEvent) {
+        dragInit(thisPlayerState().lastEvent!);
+      }
     }
   });
 
@@ -231,7 +239,17 @@ export default function PlayerCard({
   return (
     <div class={styles.playerCardCNT} ref={thisPlayerCard}>
       <Switch fallback={<></>}>
-        <Match when={playerCardMode() === "noSeat"}>
+        <Match when={playerID === -1}>
+          <div
+            class={`${
+              leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
+            }`}
+          >
+            <div class={styles.playerIcon}></div>
+            <div class={styles.playerName}>{playerName}</div>
+          </div>
+        </Match>
+        <Match when={playerCardMode() === "noSeat" && playerID !== -1}>
           <div
             class={`${
               leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT
@@ -241,7 +259,7 @@ export default function PlayerCard({
             <div class={styles.playerName}>{thisPlayerState().name}</div>
           </div>
         </Match>
-        <Match when={playerCardMode() === "dragging"}>
+        <Match when={playerCardMode() === "dragging" && playerID !== -1}>
           <div
             class={`${
               leftSeatPlayer() ? styles.playerLVisCNT : styles.playerRVisCNT

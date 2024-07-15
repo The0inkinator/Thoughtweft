@@ -1,5 +1,4 @@
 import { createSignal, createContext, useContext } from "solid-js";
-import playerHopper from "~/components/eventManagement/playerHopper";
 import {
   Pod,
   Player,

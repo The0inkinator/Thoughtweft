@@ -39,7 +39,6 @@ export default function PlayerInput({ podId }: PlayerInputInputs) {
           seat: openSeatFromPod(eventState(), podId)!.seatNumber,
         });
         setPlayerNameValue("");
-        console.log(eventState().evtPlayerList);
       } else {
         console.log("pod full");
       }

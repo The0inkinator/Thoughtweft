@@ -65,6 +65,23 @@ export default function Seat({
     return eventState().evtPlayerList.find((player) => player.seat === 0);
   };
 
+  //Shuffle players between pods if both pods are full
+
+  const shufflePlayersAcrossPod = (seatPosition: number) => {
+    const podToShuffle = eventState().evtPods.find(
+      (pod) => pod.podId === podId
+    );
+
+    if (podToShuffle && draggedPlayer() && seatedPlayer()) {
+      updatePlayer(seatedPlayer()!.id, {
+        address: {
+          podId: draggedPlayer()!.lastSeat!.podId,
+          seat: draggedPlayer()!.lastSeat!.seat,
+        },
+      });
+    }
+  };
+
   //Shuffles players to make space for a dragged player
   const shufflePlayersFrom = (seatPosition: number) => {
     const podToShuffle = eventState().evtPods.find(
@@ -221,15 +238,17 @@ export default function Seat({
         event.clientY <= boundingBox.bottom &&
         !mouseOver()
       ) {
-        setMouseOver(true);
-        if (draggedPlayer() && draggedPlayer()?.seat === 0) {
-          updateSeat(podId, seatNumber, { hovered: true });
-          setTimeout(() => {
-            if (draggedPlayer()) {
-              shufflePlayersFrom(seatNumber);
-            }
-          }, 400);
-        }
+        updateSeat(podId, seatNumber, { hovered: true });
+
+        setTimeout(() => {
+          if (
+            draggedPlayer() &&
+            thisPodState()?.podSeats.filter((seat) => seat.filled).length ===
+              thisPodState()?.podSize
+          ) {
+            shufflePlayersAcrossPod(seatNumber);
+          } else if (draggedPlayer()) shufflePlayersFrom(seatNumber);
+        }, 300);
       } else if (
         (mouseOver() && event.clientX <= boundingBox.left) ||
         event.clientX >= boundingBox.right ||
@@ -250,11 +269,16 @@ export default function Seat({
         setMouseOver(true);
         if (draggedPlayer() && draggedPlayer()?.seat === 0) {
           updateSeat(podId, seatNumber, { hovered: true });
+
           setTimeout(() => {
-            if (draggedPlayer()) {
-              shufflePlayersFrom(seatNumber);
-            }
-          }, 400);
+            if (
+              draggedPlayer() &&
+              thisPodState()?.podSeats.filter((seat) => seat.filled).length ===
+                thisPodState()?.podSize
+            ) {
+              shufflePlayersAcrossPod(seatNumber);
+            } else if (draggedPlayer()) shufflePlayersFrom(seatNumber);
+          }, 300);
         }
       } else if (
         (mouseOver() && event.touches[0].clientX <= boundingBox.left) ||
@@ -281,14 +305,6 @@ export default function Seat({
     document.removeEventListener("mousemove", handleMouseMove);
     document.removeEventListener("touchmove", handleMouseMove);
   });
-
-  const ByeSeatDisplay = () => {
-    if (isByeSeat()) {
-      return <div>Bye</div>;
-    } else {
-      return <></>;
-    }
-  };
 
   return (
     <div

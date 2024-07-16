@@ -37,6 +37,7 @@ export default function PlayerCard({
   const [playerCardMode, setPlayerCardMode] = createSignal<CardMode>("noSeat");
   // const [hoveredSeat, setHoveredSeat] = createSignal<FullSeat | undefined>();
   const [leftSeatPlayer, setLeftSeatPlayer] = createSignal<boolean>(false);
+  const [cancelDrag, setCancelDrag] = createSignal<boolean>(false);
   //refs
   let thisPlayerCard!: HTMLDivElement;
   let thisPlayerMenu!: HTMLDivElement;
@@ -100,7 +101,6 @@ export default function PlayerCard({
   });
 
   const dragInit = (event: MouseEvent | TouchEvent) => {
-    // setPlayerCardMode("dragging");
     thisPlayerCard.style.zIndex = "10";
 
     //Set offsets
@@ -138,39 +138,41 @@ export default function PlayerCard({
   };
 
   const dragging = (event: MouseEvent | TouchEvent) => {
-    if (
-      (event.type === "mousemove" || event.type === "touchmove") &&
-      playerCardMode() !== "dragging"
-    ) {
-      const storedMoveTally = moveTally;
-      moveTally = storedMoveTally + 1;
-      if (moveTally > 2) {
-        setPlayerCardMode("dragging");
+    if (thisPlayerState().seat === 0) {
+      if (
+        (event.type === "mousemove" || event.type === "touchmove") &&
+        playerCardMode() !== "dragging"
+      ) {
+        const storedMoveTally = moveTally;
+        moveTally = storedMoveTally + 1;
+        if (moveTally > 2) {
+          setPlayerCardMode("dragging");
+        }
       }
-    }
-    if (playerCardMode() === "dragging") {
-      const playerRef = thisPlayerState().currentRef
-        ? thisPlayerState().currentRef!
-        : thisPlayerCard;
-      if (event instanceof MouseEvent) {
-        const x = event.clientX - xOffset;
-        const y = event.clientY - yOffset;
-        playerRef.style.left = `${x + window.scrollX}px`;
-        playerRef.style.top = `${y + window.scrollY}px`;
-      } else if (event instanceof TouchEvent) {
-        const x = event.touches[0].clientX - xOffset;
-        const y = event.touches[0].clientY - yOffset;
-        playerRef.style.left = `${x + window.scrollX}px`;
-        playerRef.style.top = `${y + window.scrollY}px`;
+      if (playerCardMode() === "dragging") {
+        const playerRef = thisPlayerState().currentRef
+          ? thisPlayerState().currentRef!
+          : thisPlayerCard;
+        if (event instanceof MouseEvent) {
+          const x = event.clientX - xOffset;
+          const y = event.clientY - yOffset;
+          playerRef.style.left = `${x + window.scrollX}px`;
+          playerRef.style.top = `${y + window.scrollY}px`;
+        } else if (event instanceof TouchEvent) {
+          const x = event.touches[0].clientX - xOffset;
+          const y = event.touches[0].clientY - yOffset;
+          playerRef.style.left = `${x + window.scrollX}px`;
+          playerRef.style.top = `${y + window.scrollY}px`;
+        }
       }
-    }
-    if (hoveredSeat() && !hoveredSeat()?.filled) {
-      updatePlayer(playerID, {
-        lastSeat: {
-          podId: hoveredSeat()!.podId,
-          seat: hoveredSeat()!.seatNumber,
-        },
-      });
+      if (hoveredSeat() && !hoveredSeat()?.filled) {
+        updatePlayer(playerID, {
+          lastSeat: {
+            podId: hoveredSeat()!.podId,
+            seat: hoveredSeat()!.seatNumber,
+          },
+        });
+      }
     }
   };
 
@@ -183,7 +185,9 @@ export default function PlayerCard({
       updatePlayer(playerID, { menuOpen: true });
     }
 
-    if (hoveredSeat() && !hoveredSeat()?.filled) {
+    if (thisPodState()?.podStatus === "pairing") {
+      //do nothing
+    } else if (hoveredSeat() && !hoveredSeat()?.filled) {
       updatePlayer(playerID, {
         address: {
           podId: hoveredSeat()!.podId,

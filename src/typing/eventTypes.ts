@@ -43,7 +43,8 @@ export type PodUpdateParam =
 
 export type MatchUpdateParam =
   | { winner: MatchData["winner"] }
-  | { matchRecord: { p1: number; p2: number } };
+  | { matchRecord: { p1: number; p2: number } }
+  | { playersInMatch: { p1: number; p2: number } };
 
 export type EventUpdateParam = { evtLoading: boolean } | { owner: any };
 

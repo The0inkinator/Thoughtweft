@@ -124,22 +124,38 @@ export default function MatchCard({
 
   return (
     <>
+      {/* {matchInfo.matchId} */}
+      <button
+        onclick={() => {
+          console.log(thisMatchState());
+        }}
+      ></button>
       <Switch fallback={<></>}>
         <Match when={matchCardState === "pairing"}>
           <div class={styles.matchCNT}>
             <div class={styles.matchPlayerCNT}>
               <Seat seatNumber={matchInfo.p1Seat} podId={podId}></Seat>
-              <div class={styles.recordText}>
-                {getPodRecord(matchInfo.p1Id)}
+              <div
+                class={styles.recordText}
+                onclick={() => {
+                  getPodRecord(thisMatchState()!.p1Id);
+                }}
+              >
+                {getPodRecord(thisMatchState()!.p1Id)}
               </div>
             </div>
             <div class={styles.vs}>VS</div>
             <div class={styles.matchPlayerCNT}>
               <Seat seatNumber={matchInfo.p2Seat} podId={podId}></Seat>
-              <div class={styles.recordText}>
+              <div
+                class={styles.recordText}
+                onclick={() => {
+                  getPodRecord(thisMatchState()!.p2Id);
+                }}
+              >
                 {thisMatchState()?.p2Id === -1
                   ? ""
-                  : getPodRecord(matchInfo.p2Id)}
+                  : getPodRecord(thisMatchState()!.p2Id)}
               </div>
             </div>
           </div>
@@ -156,8 +172,13 @@ export default function MatchCard({
                   <ReportButton player="p1" wins={1} losses={0}></ReportButton>
                 </Match>
                 <Match when={!optionDisplayVisable()}>
-                  <div class={styles.recordText}>
-                    {getPodRecord(matchInfo.p1Id)}
+                  <div
+                    class={styles.recordText}
+                    onclick={() => {
+                      getPodRecord(thisMatchState()!.p1Id);
+                    }}
+                  >
+                    {getPodRecord(thisMatchState()!.p1Id)}
                   </div>
                 </Match>
               </Switch>
@@ -209,7 +230,7 @@ export default function MatchCard({
                   }
                 >
                   <div class={styles.recordText}>
-                    {getPodRecord(matchInfo.p1Id)}
+                    {getPodRecord(thisMatchState()!.p2Id)}
                   </div>
                 </Match>
               </Switch>

@@ -14,7 +14,7 @@ interface SeatInputs {
 
 export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
   //Context State
-  const [eventState, { updateSeat, updatePlayer, removePlayer }] =
+  const [eventState, { updateSeat, updatePlayer, updateMatch }] =
     useEventContext();
   //Local State
   const [mouseOver, setMouseOver] = createSignal<boolean>(false);
@@ -51,8 +51,73 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
     return eventState().evtPlayerList.find((player) => player.seat === 0);
   };
 
-  //Shuffle players between pods if both pods are full
+  //Swap Players during pairing
+  const swapPairedPlayers = () => {
+    const activeMatches = thisPodState()?.podMatches.filter(
+      (match) => match.matchRound === thisPodState()?.currentRound
+    );
 
+    if (draggedPlayer() && seatedPlayer()) {
+      const thisSeatMatch = activeMatches?.find(
+        (match) =>
+          match.p1Id === seatedPlayer()?.id || match.p2Id === seatedPlayer()?.id
+      );
+      const dragPlayerMatch = activeMatches?.find(
+        (match) =>
+          match.p1Id === draggedPlayer()?.id ||
+          match.p2Id === draggedPlayer()?.id
+      );
+      if (
+        dragPlayerMatch &&
+        thisSeatMatch &&
+        dragPlayerMatch !== thisSeatMatch
+      ) {
+        const draggedFromMatchP1 = () => {
+          if (dragPlayerMatch.p1Id === draggedPlayer()?.id) {
+            return seatedPlayer()!.id;
+          } else {
+            return dragPlayerMatch.p1Id;
+          }
+        };
+        const draggedFromMatchP2 = () => {
+          if (dragPlayerMatch.p2Id === draggedPlayer()?.id) {
+            return seatedPlayer()!.id;
+          } else {
+            return dragPlayerMatch.p2Id;
+          }
+        };
+        const draggedToMatchP1 = () => {
+          if (thisSeatMatch.p1Id === seatedPlayer()?.id) {
+            return draggedPlayer()!.id;
+          } else {
+            return thisSeatMatch.p1Id;
+          }
+        };
+        const draggedToMatchP2 = () => {
+          if (thisSeatMatch.p2Id === seatedPlayer()?.id) {
+            return draggedPlayer()!.id;
+          } else {
+            return thisSeatMatch.p2Id;
+          }
+        };
+
+        const fixedP1 = draggedToMatchP1();
+        const fixedP2 = draggedToMatchP2();
+
+        updateMatch(podId, dragPlayerMatch.matchId, {
+          playersInMatch: {
+            p1: draggedFromMatchP1(),
+            p2: draggedFromMatchP2(),
+          },
+        });
+        updateMatch(podId, thisSeatMatch.matchId, {
+          playersInMatch: { p1: fixedP1, p2: fixedP2 },
+        });
+      }
+    }
+  };
+
+  //Swap players between pods if both pods are full
   const shufflePlayersAcrossPod = () => {
     const podToShuffle = eventState().evtPods.find(
       (pod) => pod.podId === podId
@@ -218,13 +283,17 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
     updateSeat(podId, seatNumber, { hovered: true });
 
     setTimeout(() => {
-      if (
+      if (thisPodState()?.podStatus === "pairing") {
+        swapPairedPlayers();
+      } else if (
         draggedPlayer() &&
         thisPodState()?.podSeats.filter((seat) => seat.filled).length ===
           thisPodState()?.podSize
       ) {
         shufflePlayersAcrossPod();
-      } else if (draggedPlayer()) shufflePlayersFrom(seatNumber);
+      } else if (draggedPlayer()) {
+        shufflePlayersFrom(seatNumber);
+      }
     }, 300);
   };
 
@@ -295,7 +364,11 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
         }
       }}
       onMouseDown={(event) => {
-        if (seatedPlayer() && thisPodState()?.podStatus === "seating") {
+        if (
+          seatedPlayer() &&
+          (thisPodState()?.podStatus === "seating" ||
+            thisPodState()?.podStatus === "pairing")
+        ) {
           updatePlayer(seatedPlayer()!.id, {
             lastSeat: { podId: podId, seat: seatNumber },
           });
@@ -316,7 +389,11 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
         }
       }}
       ontouchstart={(event) => {
-        if (seatedPlayer() && thisPodState()?.podStatus === "seating") {
+        if (
+          seatedPlayer() &&
+          (thisPodState()?.podStatus === "seating" ||
+            thisPodState()?.podStatus === "pairing")
+        ) {
           updatePlayer(seatedPlayer()!.id, {
             lastSeat: { podId: podId, seat: seatNumber },
           });
@@ -336,7 +413,9 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
           });
         }
       }}
+      style={{ color: "white" }}
     >
+      {/* {seatNumber} */}
       <Show when={seatedPlayer()}>
         <PlayerCard
           playerID={seatedPlayer()!.id}
@@ -345,7 +424,13 @@ export default function Seat({ podId, seatNumber, byeSeat }: SeatInputs) {
           staticPodId={podId}
         ></PlayerCard>
       </Show>
-      <Show when={thisPodState()?.podStatus !== "seating" && !seatedPlayer()}>
+      <Show
+        when={
+          thisPodState()?.podStatus !== "seating" &&
+          !seatedPlayer() &&
+          !draggedPlayer()
+        }
+      >
         <PlayerCard
           playerID={-1}
           seatNumber={seatNumber}

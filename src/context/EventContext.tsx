@@ -483,6 +483,12 @@ export function EventContextProvider(props: any) {
                   p1Score: scopedParam.p1,
                   p2Score: scopedParam.p2,
                 };
+              } else if ("playersInMatch" in updateParam) {
+                newEvt.evtPods[podIndex].podMatches[matchIndex] = {
+                  ...newEvt.evtPods[podIndex].podMatches[matchIndex],
+                  p1Id: updateParam.playersInMatch.p1,
+                  p2Id: updateParam.playersInMatch.p2,
+                };
               }
             }
             return newEvt;

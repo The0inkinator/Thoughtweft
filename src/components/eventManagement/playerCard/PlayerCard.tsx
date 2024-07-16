@@ -186,12 +186,12 @@ export default function PlayerCard({
     }
 
     if (
-      thisPodState()?.podStatus === "pairing" &&
+      thisPodState()?.podStatus !== "seating" &&
       playerCardMode() === "dragging"
     ) {
       //do nothing
     } else if (
-      thisPodState()?.podStatus === "pairing" &&
+      thisPodState()?.podStatus !== "seating" &&
       playerCardMode() !== "dragging"
     ) {
       updatePlayer(playerID, {

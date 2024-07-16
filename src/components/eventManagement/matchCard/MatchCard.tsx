@@ -125,11 +125,6 @@ export default function MatchCard({
   return (
     <>
       {/* {matchInfo.matchId} */}
-      <button
-        onclick={() => {
-          console.log(thisMatchState());
-        }}
-      ></button>
       <Switch fallback={<></>}>
         <Match when={matchCardState === "pairing"}>
           <div class={styles.matchCNT}>

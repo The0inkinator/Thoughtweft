@@ -185,8 +185,21 @@ export default function PlayerCard({
       updatePlayer(playerID, { menuOpen: true });
     }
 
-    if (thisPodState()?.podStatus === "pairing") {
+    if (
+      thisPodState()?.podStatus === "pairing" &&
+      playerCardMode() === "dragging"
+    ) {
       //do nothing
+    } else if (
+      thisPodState()?.podStatus === "pairing" &&
+      playerCardMode() !== "dragging"
+    ) {
+      updatePlayer(playerID, {
+        address: {
+          podId: thisPlayerState()!.lastSeat!.podId,
+          seat: thisPlayerState()!.lastSeat!.podId,
+        },
+      });
     } else if (hoveredSeat() && !hoveredSeat()?.filled) {
       updatePlayer(playerID, {
         address: {

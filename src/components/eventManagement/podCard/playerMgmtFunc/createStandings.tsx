@@ -167,14 +167,17 @@ export default function CreateStandings(eventData: Event, podId: number) {
         });
       const opponentCount = opponentIds.length;
 
-      playerRecordArray
-        .filter((record) => opponentIds.some((id) => id === record.pId))
-        .map((foundRecord) => {
+      opponentIds.map((id) => {
+        const foundRecord = playerRecordArray.find(
+          (record) => id === record.pId
+        );
+        if (foundRecord) {
           const tempWinPer = totalWinPer;
           const result =
             foundRecord.pWins / (foundRecord.pLosses + foundRecord.pWins);
           totalWinPer = tempWinPer + result;
-        });
+        }
+      });
 
       return parseFloat(((totalWinPer / opponentCount) * 100).toFixed(0));
     };
@@ -202,15 +205,18 @@ export default function CreateStandings(eventData: Event, podId: number) {
         });
       const opponentCount = opponentIds.length;
 
-      playerRecordArray
-        .filter((record) => opponentIds.some((id) => id === record.pId))
-        .map((foundRecord) => {
+      opponentIds.map((id) => {
+        const foundRecord = playerRecordArray.find(
+          (record) => id === record.pId
+        );
+        if (foundRecord) {
           const tempWinPer = totalWinPer;
           const result =
             foundRecord.pGameWins! /
             (foundRecord.pGameLosses! + foundRecord.pGameWins!);
           totalWinPer = tempWinPer + result;
-        });
+        }
+      });
 
       return parseFloat(((totalWinPer / opponentCount) * 100).toFixed(0));
     };

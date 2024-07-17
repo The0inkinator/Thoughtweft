@@ -24,3 +24,7 @@
   background-color: grey;
   cursor: pointer;
 }
+
+.menuItem {
+  margin-block: 0.25rem;
+}

@@ -7,8 +7,9 @@
   opacity: 95%;
   border-radius: 2rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 
 .closeButton {

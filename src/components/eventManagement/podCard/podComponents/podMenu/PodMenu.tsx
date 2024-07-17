@@ -20,7 +20,13 @@ export default function PodMenu({ podId }: PodMenuInputs) {
     eventState().evtPlayerList.find((pod) => pod.podId === podId);
 
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        "flex-direction": "column",
+        "align-items": "center",
+      }}
+    >
       <RemovePodBtn podId={podId} />
       <ShrinkPodBtn podId={podId} />
       <ShufflePlayersBtn podId={podId} />

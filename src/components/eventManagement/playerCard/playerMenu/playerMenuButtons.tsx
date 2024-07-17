@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { useEventContext } from "~/context/EventContext";
+import styles from "./playerMenu.module.css";
 
 interface PlayerButtonInputs {
   playerId: number;
@@ -30,6 +31,7 @@ export function PlayerRenameButton({ playerId, podId }: PlayerButtonInputs) {
 
   return (
     <input
+      class={styles.menuItem}
       onInput={(event) => {
         setNameValue(event.target.value);
       }}
@@ -52,6 +54,7 @@ export function RemovePlayerBtn({ playerId, podId }: PlayerButtonInputs) {
     eventState().evtPlayerList.find((player) => player.id === playerId);
   return (
     <button
+      class={styles.menuItem}
       onclick={() => {
         removePlayer(playerId);
         updatePlayer(playerId, { menuOpen: false });

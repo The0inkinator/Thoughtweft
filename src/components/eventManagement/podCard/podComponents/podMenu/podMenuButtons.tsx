@@ -15,6 +15,7 @@ export function RemovePodBtn({ podId }: PodButtonInputs) {
 
   return (
     <button
+      class={styles.menuItem}
       type="submit"
       style={{ color: "red" }}
       onClick={() => {
@@ -37,6 +38,7 @@ export function ShrinkPodBtn({ podId }: PodButtonInputs) {
     eventState().evtPods.find((pod) => pod.podId === podId);
   return (
     <button
+      class={styles.menuItem}
       type="submit"
       style={{ color: "red" }}
       onClick={() => {
@@ -64,6 +66,7 @@ export function ShufflePlayersBtn({ podId }: PodButtonInputs) {
     <Switch fallback={<></>}>
       <Match when={shuffleMode() === "default"}>
         <button
+          class={styles.menuItem}
           type="submit"
           style={{ color: "red" }}
           onClick={() => {
@@ -118,7 +121,7 @@ export function ChangePodSizeBtn({ podId }: PodButtonInputs) {
   const [podSizeDrop, setPodSizeDrop] = createSignal<"open" | "close">("close");
   return (
     <button
-      class={styles.podSizeDrop}
+      class={`${styles.podSizeDrop} ${styles.menuItem}`}
       type="button"
       onMouseUp={() => {
         if (podSizeDrop() === "close") {

@@ -20,7 +20,13 @@ export default function PlayerMenu({ playerId, podId }: PlayerMenuInputs) {
     eventState().evtPlayerList.find((player) => player.id === playerId);
 
   return (
-    <div style={{ "pointer-events": "auto" }}>
+    <div
+      style={{
+        "pointer-events": "auto",
+        display: "flex",
+        "flex-direction": "column",
+      }}
+    >
       <PlayerRenameButton playerId={playerId} podId={podId} />
       <RemovePlayerBtn playerId={playerId} podId={podId} />
     </div>

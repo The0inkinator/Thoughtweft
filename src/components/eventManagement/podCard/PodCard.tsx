@@ -77,20 +77,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
       <>
         <PlayerInput podId={podId} />
         <div class={styles.podTitle}>
-          Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
-          {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}
-          <p></p>
-          {/* POD SIZE DROP DOWN */}
-          {/* MENU BUTTON */}
-          <button
-            onClick={() => {
-              updatePod(podId, { menuOpen: true });
-              updatePod(podId, { overlayOpen: true });
-            }}
-            style={{ color: "black" }}
-          >
-            Menu
-          </button>
           {/* ADVANCE TO DRAFTING */}
           <button
             type="submit"
@@ -133,10 +119,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const DraftingPodCard = () => {
     return (
       <>
-        <div class={styles.podTitle}>
-          Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
-          {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}{" "}
-        </div>
         <button
           type="submit"
           style={{ color: "red" }}
@@ -158,6 +140,27 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           Pair Round 1
         </button>
         <PodTimer eventData={eventState()} podId={podId}></PodTimer>
+        {/* Table Display */}
+        <div
+          class={styles.tableCNT}
+          style={{ height: `${rightSeats().length * 3}rem` }}
+        >
+          <div class={styles.leftSeats}>
+            <For each={leftSeats()}>
+              {(seat) => (
+                <Seat podId={podId} seatNumber={seat.seatNumber}></Seat>
+              )}
+            </For>
+          </div>
+          <div class={styles.tableVis}></div>
+          <div class={styles.rightSeats}>
+            <For each={rightSeats()}>
+              {(seat) => (
+                <Seat podId={podId} seatNumber={seat.seatNumber}></Seat>
+              )}
+            </For>
+          </div>
+        </div>
       </>
     );
   };
@@ -165,11 +168,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const PairingPodCard = () => {
     return (
       <>
-        <div class={styles.podTitle}>
-          Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
-          {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}{" "}
-        </div>
-        <div>Pairing Round {thisPodState()?.currentRound}</div>
         <button
           type="submit"
           style={{ color: "red" }}
@@ -204,11 +202,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const PlayingPodCard = () => {
     return (
       <>
-        <div class={styles.podTitle}>
-          Pod: {thisPodState()?.podNumber} Id: {thisPodState()?.podId} Status:{" "}
-          {thisPodState()?.podStatus} Rounds: {thisPodState()?.podRounds}{" "}
-        </div>
-        <div> Round {thisPodState()?.currentRound}</div>
         <div>timer</div>
         <button
           type="submit"
@@ -423,6 +416,20 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
       (player) => player.podId === podId && player.seat === 0
     );
 
+  const MenuButton = () => {
+    return (
+      <button
+        onClick={() => {
+          updatePod(podId, { menuOpen: true });
+          updatePod(podId, { overlayOpen: true });
+        }}
+        style={{ color: "black" }}
+      >
+        Menu
+      </button>
+    );
+  };
+
   return (
     <DisplayFrame>
       <ErrorBoundary fallback={<>oops!</>}>
@@ -435,20 +442,26 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
             updatePod(podId, { hovered: false });
           }}
         >
+          <div class={styles.podTitle}></div>
           <Switch fallback={<>oops!</>}>
             <Match when={thisPodState()?.podStatus === "seating"}>
+              <MenuButton />
               <SeatingPodCard />
             </Match>
             <Match when={thisPodState()?.podStatus === "drafting"}>
+              <MenuButton />
               <DraftingPodCard />
             </Match>
             <Match when={thisPodState()?.podStatus === "pairing"}>
+              <MenuButton />
               <PairingPodCard />
             </Match>
             <Match when={thisPodState()?.podStatus === "playing"}>
+              <MenuButton />
               <PlayingPodCard />
             </Match>
             <Match when={thisPodState()?.podStatus === "finished"}>
+              <MenuButton />
               <FinishedPodCard />
             </Match>
           </Switch>

@@ -2,8 +2,9 @@ import { createEffect, onCleanup, onMount, Show } from "solid-js";
 import styles from "./playerMenu.module.css";
 import { useEventContext } from "~/context/EventContext";
 import {
+  DropPlayerBtn,
   PlayerCloseButton,
-  PlayerRenameButton,
+  PlayerRenameBtn,
   RemovePlayerBtn,
 } from "./playerMenuButtons";
 
@@ -27,8 +28,9 @@ export default function PlayerMenu({ playerId, podId }: PlayerMenuInputs) {
         "flex-direction": "column",
       }}
     >
-      <PlayerRenameButton playerId={playerId} podId={podId} />
+      <PlayerRenameBtn playerId={playerId} podId={podId} />
       <RemovePlayerBtn playerId={playerId} podId={podId} />
+      <DropPlayerBtn playerId={playerId} podId={podId} />
     </div>
   );
 }

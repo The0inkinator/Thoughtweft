@@ -213,24 +213,34 @@ export default function PairPlayers(
     });
 
     //creates an array of relavent player info to be referenced
-    let playersToPair: PlayerPairing[] = playerRecordArray.map((entry) => {
-      const points = entry.pWins * 3 + entry.pDraws;
-      const byeBoolean = pod.byePlayerIds
-        ? pod.byePlayerIds!.includes(entry.pId)
-        : false;
-      const hasPlayedArray: number[] = pod.podMatches
-        .filter((match) => match.p1Id === entry.pId || match.p2Id === entry.pId)
-        .map((result) => {
-          return [result.p1Id, result.p2Id].filter((id) => id !== entry.pId)[0];
-        });
+    let playersToPair: PlayerPairing[] = playerRecordArray
+      .filter((record) =>
+        eventData.evtPlayerList.some(
+          (player) => player.id === record.pId && !player.dropped
+        )
+      )
+      .map((entry) => {
+        const points = entry.pWins * 3 + entry.pDraws;
+        const byeBoolean = pod.byePlayerIds
+          ? pod.byePlayerIds!.includes(entry.pId)
+          : false;
+        const hasPlayedArray: number[] = pod.podMatches
+          .filter(
+            (match) => match.p1Id === entry.pId || match.p2Id === entry.pId
+          )
+          .map((result) => {
+            return [result.p1Id, result.p2Id].filter(
+              (id) => id !== entry.pId
+            )[0];
+          });
 
-      return {
-        pId: entry.pId,
-        points: points,
-        hasBye: byeBoolean,
-        hasPlayed: hasPlayedArray,
-      };
-    });
+        return {
+          pId: entry.pId,
+          points: points,
+          hasBye: byeBoolean,
+          hasPlayed: hasPlayedArray,
+        };
+      });
 
     //Takes in a list of all player ids to pair then
     // generates a list of all potential rounds ignoring player seating

@@ -445,6 +445,26 @@ export function EventContextProvider(props: any) {
                 newEvt.evtPods[podIndex].overlayOpen = updateParam.overlayOpen;
               } else if ("podOwner" in updateParam) {
                 newEvt.evtPods[podIndex].podOwner = updateParam.podOwner;
+              } else if ("addPodSave") {
+                const { podSaves, podOwner, ...podData } =
+                  newEvt.evtPods[podIndex];
+                const listLength = newEvt.evtPods[podIndex].podSaves
+                  ? newEvt.evtPods[podIndex].podSaves!.length
+                  : 0;
+                const newPodSave = { saveId: listLength, saveData: podData };
+
+                if (newEvt.evtPods[podIndex].podSaves) {
+                  newEvt.evtPods[podIndex].podSaves.push(newPodSave);
+                } else {
+                  newEvt.evtPods[podIndex].podSaves = [newPodSave];
+                }
+              } else if ("setPodToSave" in updateParam) {
+                const currentPodData = newEvt.evtPods[podIndex];
+                newEvt.evtPods[podIndex] = {
+                  ...updateParam.setPodToSave,
+                  podOwner: currentPodData.podOwner,
+                  podSaves: currentPodData.podSaves,
+                };
               }
             }
             return newEvt;

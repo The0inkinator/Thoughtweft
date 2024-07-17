@@ -177,3 +177,25 @@ export function ChangePodSizeBtn({ podId }: PodButtonInputs) {
     </Show>
   );
 }
+
+export function BackBtn({ podId }: PodButtonInputs) {
+  const [eventState, { updatePod }] = useEventContext();
+  const thisPodState = () =>
+    eventState().evtPods.find((pod) => pod.podId === podId);
+  return (
+    <Show when={thisPodState()?.podStatus === "seating"}>
+      <button
+        class={styles.menuItem}
+        type="submit"
+        style={{ color: "red" }}
+        onClick={() => {
+          updatePod(podId, { addPodSave: "add" });
+          updatePod(podId, { menuOpen: false });
+          updatePod(podId, { overlayOpen: false });
+        }}
+      >
+        Back
+      </button>
+    </Show>
+  );
+}

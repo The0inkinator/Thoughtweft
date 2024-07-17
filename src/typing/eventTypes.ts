@@ -40,7 +40,9 @@ export type PodUpdateParam =
   | { ref: HTMLDivElement }
   | { menuOpen: boolean }
   | { overlayOpen: boolean }
-  | { podOwner: Owner };
+  | { podOwner: Owner }
+  | { addPodSave: "add" }
+  | { setPodToSave: Pod };
 
 export type MatchUpdateParam =
   | { winner: MatchData["winner"] }
@@ -117,6 +119,7 @@ export type Pod = {
   menuOpen?: boolean;
   overlayOpen?: boolean;
   podOwner?: Owner;
+  podSaves?: { saveId: number; saveData: Pod }[];
 };
 
 export type MatchData = {

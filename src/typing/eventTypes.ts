@@ -21,7 +21,8 @@ export type PlayerUpdateParam =
   | { lastLoc: { x: number; y: number } }
   | { currentRef: HTMLDivElement }
   | { menuOpen: boolean }
-  | { name: string };
+  | { name: string }
+  | { dropped: boolean };
 
 export type PodStatusModes =
   | "seating"
@@ -59,6 +60,7 @@ export type Player = {
   lastLoc?: { x: number; y: number };
   currentRef?: HTMLDivElement;
   menuOpen?: boolean;
+  dropped?: boolean;
 };
 
 export type PodRecord = {

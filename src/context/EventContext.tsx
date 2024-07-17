@@ -634,6 +634,11 @@ export function EventContextProvider(props: any) {
                   ...newEvt.evtPlayerList[playerIndex],
                   name: updateParam.name,
                 };
+              } else if ("dropped" in updateParam) {
+                newEvt.evtPlayerList[playerIndex] = {
+                  ...newEvt.evtPlayerList[playerIndex],
+                  dropped: updateParam.dropped,
+                };
               }
 
               return newEvt;

@@ -165,6 +165,13 @@ export default function MatchCard({
                   <ReportButton player="p1" wins={2} losses={0}></ReportButton>
                   <ReportButton player="p1" wins={2} losses={1}></ReportButton>
                   <ReportButton player="p1" wins={1} losses={0}></ReportButton>
+                  <button
+                    onclick={() => {
+                      updatePlayer(matchInfo.p1Id, { dropped: true });
+                    }}
+                  >
+                    Drop
+                  </button>
                 </Match>
                 <Match when={!optionDisplayVisable()}>
                   <div
@@ -218,6 +225,13 @@ export default function MatchCard({
                   <ReportButton player="p2" wins={2} losses={0}></ReportButton>
                   <ReportButton player="p2" wins={2} losses={1}></ReportButton>
                   <ReportButton player="p2" wins={1} losses={0}></ReportButton>
+                  <button
+                    onclick={() => {
+                      updatePlayer(matchInfo.p2Id, { dropped: true });
+                    }}
+                  >
+                    Drop
+                  </button>
                 </Match>
                 <Match
                   when={

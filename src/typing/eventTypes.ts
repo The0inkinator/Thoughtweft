@@ -120,6 +120,7 @@ export type Pod = {
   overlayOpen?: boolean;
   podOwner?: Owner;
   podSaves?: { saveId: number; saveData: Pod }[];
+  currentSave?: number;
 };
 
 export type MatchData = {

@@ -183,13 +183,20 @@ export function BackBtn({ podId }: PodButtonInputs) {
   const thisPodState = () =>
     eventState().evtPods.find((pod) => pod.podId === podId);
   return (
-    <Show when={thisPodState()?.podStatus === "seating"}>
+    <Show when={thisPodState()?.podStatus !== "seating"}>
       <button
         class={styles.menuItem}
         type="submit"
         style={{ color: "red" }}
         onClick={() => {
-          updatePod(podId, { addPodSave: "add" });
+          const foundSave = thisPodState()?.podSaves?.find(
+            (save) => save.saveId === thisPodState()!.currentSave
+          );
+
+          if (foundSave) {
+            updatePod(podId, { setPodToSave: foundSave.saveData });
+          }
+
           updatePod(podId, { menuOpen: false });
           updatePod(podId, { overlayOpen: false });
         }}

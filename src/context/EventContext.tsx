@@ -445,25 +445,34 @@ export function EventContextProvider(props: any) {
                 newEvt.evtPods[podIndex].overlayOpen = updateParam.overlayOpen;
               } else if ("podOwner" in updateParam) {
                 newEvt.evtPods[podIndex].podOwner = updateParam.podOwner;
-              } else if ("addPodSave") {
+              } else if ("addPodSave" in updateParam) {
                 const { podSaves, podOwner, ...podData } =
                   newEvt.evtPods[podIndex];
                 const listLength = newEvt.evtPods[podIndex].podSaves
                   ? newEvt.evtPods[podIndex].podSaves!.length
                   : 0;
-                const newPodSave = { saveId: listLength, saveData: podData };
+                const newPodSave = {
+                  saveId: listLength,
+                  saveData: { ...podData, currentSave: listLength },
+                };
 
                 if (newEvt.evtPods[podIndex].podSaves) {
                   newEvt.evtPods[podIndex].podSaves.push(newPodSave);
+                  newEvt.evtPods[podIndex].currentSave = newPodSave.saveId;
                 } else {
                   newEvt.evtPods[podIndex].podSaves = [newPodSave];
+                  newEvt.evtPods[podIndex].currentSave = newPodSave.saveId;
                 }
               } else if ("setPodToSave" in updateParam) {
                 const currentPodData = newEvt.evtPods[podIndex];
+                const newPodSaves = currentPodData.podSaves?.filter(
+                  (save) => save.saveId <= updateParam.setPodToSave.currentSave!
+                );
+
                 newEvt.evtPods[podIndex] = {
                   ...updateParam.setPodToSave,
                   podOwner: currentPodData.podOwner,
-                  podSaves: currentPodData.podSaves,
+                  podSaves: newPodSaves,
                 };
               }
             }

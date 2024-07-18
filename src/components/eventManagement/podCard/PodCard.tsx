@@ -70,6 +70,10 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   onMount(() => {
     updatePodSize(podId, thisPodState()!.podSize);
     updatePod(podId, { podOwner: podOwner as Owner });
+    if (!thisPodState()?.podSaves) {
+      //Save Pod State
+      updatePod(podId, { addPodSave: "add" });
+    }
   });
 
   const SeatingPodCard = () => {
@@ -86,6 +90,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 shrinkPod(podId);
               });
               updatePod(podId, { status: "drafting" });
+              //Save Pod State
+              updatePod(podId, { addPodSave: "add" });
             }}
           >
             Advance to Drafting
@@ -135,6 +141,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 });
               });
             updatePod(podId, { status: "pairing" });
+            //Save Pod State
+            updatePod(podId, { addPodSave: "add" });
           }}
         >
           Pair Round 1
@@ -173,6 +181,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
           style={{ color: "red" }}
           onClick={() => {
             updatePod(podId, { status: "playing" });
+            //Save Pod State
+            updatePod(podId, { addPodSave: "add" });
           }}
         >
           Begin Round {thisPodState()?.currentRound}
@@ -252,6 +262,9 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
                 //update pod status
                 updatePod(podId, { status: "pairing" });
+
+                //Save Pod State
+                updatePod(podId, { addPodSave: "add" });
               } else {
                 CreateStandings(eventState(), podId);
                 updatePod(podId, { status: "finished" });
@@ -418,15 +431,18 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
 
   const MenuButton = () => {
     return (
-      <button
-        onClick={() => {
-          updatePod(podId, { menuOpen: true });
-          updatePod(podId, { overlayOpen: true });
-        }}
-        style={{ color: "black" }}
-      >
-        Menu
-      </button>
+      <>
+        {thisPodState()?.currentSave}
+        <button
+          onClick={() => {
+            updatePod(podId, { menuOpen: true });
+            updatePod(podId, { overlayOpen: true });
+          }}
+          style={{ color: "black" }}
+        >
+          Menu
+        </button>
+      </>
     );
   };
 

@@ -28,6 +28,9 @@ export default function MatchCard({
       ?.podMatches.find((match) => match.matchId === matchInfo.matchId);
   };
 
+  const thisPodState = () =>
+    eventState().evtPods.find((pod) => pod.podId === podId);
+
   const report = (p1r: number, p2r: number, drawR?: boolean) => {
     updateMatch(podId, thisMatchState()!.matchId, {
       matchRecord: { p1: p1r, p2: p2r },
@@ -167,7 +170,9 @@ export default function MatchCard({
                   <ReportButton player="p1" wins={1} losses={0}></ReportButton>
                   <button
                     onclick={() => {
-                      updatePlayer(matchInfo.p1Id, { dropped: true });
+                      updatePlayer(matchInfo.p1Id, {
+                        dropped: thisPodState()!.currentRound!,
+                      });
                     }}
                   >
                     Drop
@@ -227,7 +232,9 @@ export default function MatchCard({
                   <ReportButton player="p2" wins={1} losses={0}></ReportButton>
                   <button
                     onclick={() => {
-                      updatePlayer(matchInfo.p2Id, { dropped: true });
+                      updatePlayer(matchInfo.p2Id, {
+                        dropped: thisPodState()!.currentRound!,
+                      });
                     }}
                   >
                     Drop

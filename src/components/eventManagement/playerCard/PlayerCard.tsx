@@ -254,6 +254,11 @@ export default function PlayerCard({
     document.removeEventListener("touchend", dragEnd);
   };
 
+  const dropped = () => {
+    return eventState().evtPlayerList.find((player) => player.id === playerID)
+      ?.dropped;
+  };
+
   return (
     <div class={styles.playerCardCNT} ref={thisPlayerCard}>
       <Switch fallback={<></>}>

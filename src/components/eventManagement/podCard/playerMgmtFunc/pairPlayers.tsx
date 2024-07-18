@@ -216,7 +216,13 @@ export default function PairPlayers(
     let playersToPair: PlayerPairing[] = playerRecordArray
       .filter((record) =>
         eventData.evtPlayerList.some(
-          (player) => player.id === record.pId && !player.dropped
+          (player) =>
+            player.id === record.pId &&
+            !(
+              player.dropped! <=
+              eventData.evtPods.find((pod) => pod.podId === podId)!
+                .currentRound!
+            )
         )
       )
       .map((entry) => {

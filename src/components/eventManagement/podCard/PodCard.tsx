@@ -432,7 +432,6 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const MenuButton = () => {
     return (
       <>
-        {thisPodState()?.currentSave}
         <button
           onClick={() => {
             updatePod(podId, { menuOpen: true });

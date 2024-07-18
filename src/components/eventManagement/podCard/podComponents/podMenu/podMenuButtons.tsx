@@ -190,10 +190,11 @@ export function BackBtn({ podId }: PodButtonInputs) {
         style={{ color: "red" }}
         onClick={() => {
           const foundSave = thisPodState()?.podSaves?.find(
-            (save) => save.saveId === thisPodState()!.currentSave
+            (save) => save.saveId === thisPodState()!.currentSave! - 1
           );
 
           if (foundSave) {
+            console.log(foundSave);
             updatePod(podId, { setPodToSave: foundSave.saveData });
           }
 

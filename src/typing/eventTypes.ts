@@ -22,7 +22,7 @@ export type PlayerUpdateParam =
   | { currentRef: HTMLDivElement }
   | { menuOpen: boolean }
   | { name: string }
-  | { dropped: boolean };
+  | { dropped: number };
 
 export type PodStatusModes =
   | "seating"
@@ -62,7 +62,7 @@ export type Player = {
   lastLoc?: { x: number; y: number };
   currentRef?: HTMLDivElement;
   menuOpen?: boolean;
-  dropped?: boolean;
+  dropped?: number;
 };
 
 export type PodRecord = {

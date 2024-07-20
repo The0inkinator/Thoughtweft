@@ -474,6 +474,9 @@ export function EventContextProvider(props: any) {
                   podOwner: currentPodData.podOwner,
                   podSaves: newPodSaves,
                 };
+              } else if ("draftStart" in updateParam) {
+                newEvt.evtPods[podIndex].draftStartTime =
+                  updateParam.draftStart;
               }
             }
             return newEvt;

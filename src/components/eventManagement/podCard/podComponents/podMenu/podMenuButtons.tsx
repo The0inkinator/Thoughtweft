@@ -194,7 +194,6 @@ export function BackBtn({ podId }: PodButtonInputs) {
           );
 
           if (foundSave) {
-            console.log(foundSave);
             updatePod(podId, { setPodToSave: foundSave.saveData });
           }
 

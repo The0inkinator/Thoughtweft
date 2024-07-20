@@ -42,7 +42,8 @@ export type PodUpdateParam =
   | { overlayOpen: boolean }
   | { podOwner: Owner }
   | { addPodSave: "add" }
-  | { setPodToSave: Pod };
+  | { setPodToSave: Pod }
+  | { draftStart: Date };
 
 export type MatchUpdateParam =
   | { winner: MatchData["winner"] }
@@ -121,6 +122,7 @@ export type Pod = {
   podOwner?: Owner;
   podSaves?: { saveId: number; saveData: Pod }[];
   currentSave?: number;
+  draftStartTime?: Date;
 };
 
 export type MatchData = {

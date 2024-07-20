@@ -1,60 +1,96 @@
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, onMount } from "solid-js";
 import styles from "./podTimer.module.css";
 import { Event } from "~/typing/eventTypes";
+import { useEventContext } from "~/context/EventContext";
 
 interface PodTimerInputs {
-  eventData: Event;
-  podId: number;
+  rawStartTime: Date;
+  totalMin: number;
 }
 
-export default function PodTimer({ eventData, podId }: PodTimerInputs) {
+export default function PodTimer({ rawStartTime, totalMin }: PodTimerInputs) {
+  //Context
+  const [eventState, { updatePod }] = useEventContext();
   //Local State
   const [draftTimerHou, setDraftTimerHou] = createSignal<number>(0);
   const [draftTimerMin, setDraftTimerMin] = createSignal<number>(0);
   const [draftTimerSec, setDraftTimerSec] = createSignal<number>(0);
   //Values
-  const thisPodState = eventData.evtPods.find((pod) => pod.podId === podId);
-  let draftTimerStarted = false;
 
-  createEffect(() => {
-    if (draftTimerStarted === false && thisPodState?.podStatus === "drafting") {
-      draftTimerStarted = true;
-      const totalTime = thisPodState!.podDraftTime;
-      const totalHours = Math.floor(totalTime / 60);
-      const totalMins = totalTime - totalHours * 60;
-      const totalSecs = 0;
-      let tempSec;
-      let tempMin;
-      let tempHour;
-      setDraftTimerHou(totalHours);
-      setDraftTimerMin(totalMins);
-      setDraftTimerSec(totalSecs);
+  const timeTicker = () => {
+    const startTime = new Date(rawStartTime);
+    const currentTime = new Date();
 
-      const loop = () => {
-        if (draftTimerSec() > 0) {
-          tempSec = draftTimerSec() - 1;
-          setDraftTimerSec(tempSec);
-          setTimeout(loop, 1000);
-        } else if (draftTimerMin() > 0) {
-          tempMin = draftTimerMin() - 1;
-          tempSec = 59;
-          setDraftTimerMin(tempMin);
-          setDraftTimerSec(tempSec);
-          setTimeout(loop, 1000);
-        } else if (draftTimerHou() > 0) {
-          tempHour = draftTimerHou() - 1;
-          tempMin = 59;
-          tempSec = 59;
-          setDraftTimerHou(tempHour);
-          setDraftTimerMin(tempMin);
-          setDraftTimerSec(tempSec);
-          setTimeout(loop, 1000);
+    // console.log(startTime);
+    // console.log(currentTime);
+
+    const adjustedSecs = currentTime.getSeconds() - startTime.getSeconds();
+    const adjustedMins = currentTime.getMinutes() - startTime.getMinutes();
+    const adjustedHours = currentTime.getHours() - startTime.getHours();
+    const timerHours = Math.floor(totalMin / 60);
+    const timerMins = Math.floor(totalMin - timerHours * 60);
+
+    const elapsedSecs = adjustedSecs + adjustedMins * 60 + adjustedHours * 3600;
+    const countedHours = Math.floor(elapsedSecs / 3600);
+    const countedMins = Math.floor((elapsedSecs - countedHours * 3600) / 60);
+    const countedSecs = Math.floor(
+      elapsedSecs - countedHours * 3600 - countedMins * 60
+    );
+
+    let hoursNegative: boolean = false;
+    let minsNegative: boolean = false;
+    let secsNegative: boolean = false;
+
+    const displayHours = () => {
+      const hoursLeft = timerHours - countedHours;
+
+      if (hoursLeft >= 0) {
+        return hoursLeft;
+      } else {
+        hoursNegative = true;
+        return 0;
+      }
+    };
+
+    const displayMins = () => {
+      const minsLeft = timerMins - countedMins;
+      const secsInMinute = Math.abs(60 - countedSecs);
+
+      if (minsLeft >= 0 && !hoursNegative) {
+        if (secsInMinute === 60) {
+          return minsLeft;
+        } else {
+          return minsLeft - 1;
         }
-      };
+      } else {
+        minsNegative = true;
+        return 0;
+      }
+    };
 
-      setTimeout(loop, 1000);
-    }
-  });
+    const displaySecs = () => {
+      const secsInMinute = Math.abs(60 - countedSecs);
+
+      if (!minsNegative) {
+        if (secsInMinute === 60) {
+          return 0;
+        } else {
+          return secsInMinute;
+        }
+      } else {
+        return 0;
+      }
+    };
+
+    setDraftTimerHou(displayHours());
+    setDraftTimerMin(displayMins());
+    setDraftTimerSec(displaySecs());
+
+    setTimeout(timeTicker, 1000);
+  };
+
+  timeTicker();
+
   return (
     <div>
       {draftTimerHou()} {draftTimerMin()} {draftTimerSec()}

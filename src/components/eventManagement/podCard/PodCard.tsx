@@ -49,7 +49,7 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
   const podOwner = getOwner();
 
   const thisPodState = () => {
-    return eventState().evtPods.find((pod) => pod.podId === podId);
+    return eventState().evtPods.find((pod) => pod.podId === podId)!;
   };
 
   const thisPodSeats = () => {
@@ -90,6 +90,8 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
                 shrinkPod(podId);
               });
               updatePod(podId, { status: "drafting" });
+              const draftStartTime = new Date();
+              updatePod(podId, { draftStart: draftStartTime });
               //Save Pod State
               updatePod(podId, { addPodSave: "add" });
             }}
@@ -147,7 +149,12 @@ export default function PodCard({ podSize, podNumber, podId }: PodCardInputs) {
         >
           Pair Round 1
         </button>
-        <PodTimer eventData={eventState()} podId={podId}></PodTimer>
+        <Show when={thisPodState().draftStartTime}>
+          <PodTimer
+            rawStartTime={thisPodState().draftStartTime!}
+            totalMin={thisPodState().podDraftTime}
+          ></PodTimer>
+        </Show>
         {/* Table Display */}
         <div
           class={styles.tableCNT}

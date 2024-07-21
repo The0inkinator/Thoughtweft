@@ -21,8 +21,10 @@ export default function PodTimer({ rawStartTime, totalMin }: PodTimerInputs) {
     const startTime = new Date(rawStartTime);
     const currentTime = new Date();
 
-    // console.log(startTime);
-    // console.log(currentTime);
+    let monthsPast: number = 0;
+    let daysPast: number = 0;
+    monthsPast = currentTime.getMonth() - startTime.getMonth();
+    daysPast = currentTime.getDate() - startTime.getDate();
 
     const adjustedSecs = currentTime.getSeconds() - startTime.getSeconds();
     const adjustedMins = currentTime.getMinutes() - startTime.getMinutes();
@@ -31,7 +33,7 @@ export default function PodTimer({ rawStartTime, totalMin }: PodTimerInputs) {
     const timerMins = Math.floor(totalMin - timerHours * 60);
 
     const elapsedSecs = adjustedSecs + adjustedMins * 60 + adjustedHours * 3600;
-    const countedHours = Math.floor(elapsedSecs / 3600);
+    const countedHours = Math.floor(elapsedSecs / 3600) + daysPast * 24;
     const countedMins = Math.floor((elapsedSecs - countedHours * 3600) / 60);
     const countedSecs = Math.floor(
       elapsedSecs - countedHours * 3600 - countedMins * 60
@@ -44,11 +46,15 @@ export default function PodTimer({ rawStartTime, totalMin }: PodTimerInputs) {
     const displayHours = () => {
       const hoursLeft = timerHours - countedHours;
 
-      if (hoursLeft >= 0) {
-        return hoursLeft;
-      } else {
-        hoursNegative = true;
+      if (monthsPast) {
         return 0;
+      } else {
+        if (hoursLeft >= 0) {
+          return hoursLeft;
+        } else {
+          hoursNegative = true;
+          return 0;
+        }
       }
     };
 

@@ -6,7 +6,6 @@ import { EventContextProvider } from "./context/EventContext";
 import "./app.css";
 import "./styling/globalFonts.css";
 import "./styling/elementStyles.css";
-import { HovRefContextProvider } from "./context/HovRefContext";
 
 export default function App() {
   return (
@@ -15,9 +14,7 @@ export default function App() {
         <MetaProvider>
           <Title>Thoughtweft</Title>
           <EventContextProvider>
-            <HovRefContextProvider>
-              <Suspense>{props.children}</Suspense>
-            </HovRefContextProvider>
+            <Suspense>{props.children}</Suspense>
           </EventContextProvider>
         </MetaProvider>
       )}

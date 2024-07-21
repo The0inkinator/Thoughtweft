@@ -67,6 +67,17 @@ const SampleEvent: Event = {
       podRoundTime: 50,
       podMatches: [],
     },
+    {
+      podId: 2,
+      podNumber: 2,
+      podSize: 8,
+      podSeats: [],
+      podStatus: "seating",
+      podRounds: 3,
+      podDraftTime: 50,
+      podRoundTime: 50,
+      podMatches: [],
+    },
   ],
   evtSeats: [],
   evtPlayerList: [
